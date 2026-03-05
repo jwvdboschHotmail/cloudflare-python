@@ -215,7 +215,7 @@ class VersionsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> VersionGetResponse:
         """
-        Get Version Detail
+        Retrieves detailed information about a specific version of a Workers script.
 
         Args:
           account_id: Identifier.
@@ -425,7 +425,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> VersionGetResponse:
         """
-        Get Version Detail
+        Retrieves detailed information about a specific version of a Workers script.
 
         Args:
           account_id: Identifier.
