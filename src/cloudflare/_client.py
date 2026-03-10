@@ -124,6 +124,7 @@ if TYPE_CHECKING:
         schema_validation,
         url_normalization,
         custom_nameservers,
+        google_tag_gateway,
         managed_transforms,
         client_certificates,
         custom_certificates,
@@ -236,6 +237,7 @@ if TYPE_CHECKING:
     from .resources.browser_rendering.browser_rendering import BrowserRenderingResource, AsyncBrowserRenderingResource
     from .resources.mtls_certificates.mtls_certificates import MTLSCertificatesResource, AsyncMTLSCertificatesResource
     from .resources.schema_validation.schema_validation import SchemaValidationResource, AsyncSchemaValidationResource
+    from .resources.google_tag_gateway.google_tag_gateway import GoogleTagGatewayResource, AsyncGoogleTagGatewayResource
     from .resources.custom_certificates.custom_certificates import (
         CustomCertificatesResource,
         AsyncCustomCertificatesResource,
@@ -808,6 +810,12 @@ class Cloudflare(SyncAPIClient):
         from .resources.origin_post_quantum_encryption import OriginPostQuantumEncryptionResource
 
         return OriginPostQuantumEncryptionResource(self)
+
+    @cached_property
+    def google_tag_gateway(self) -> GoogleTagGatewayResource:
+        from .resources.google_tag_gateway import GoogleTagGatewayResource
+
+        return GoogleTagGatewayResource(self)
 
     @cached_property
     def zaraz(self) -> ZarazResource:
@@ -1682,6 +1690,12 @@ class AsyncCloudflare(AsyncAPIClient):
         return AsyncOriginPostQuantumEncryptionResource(self)
 
     @cached_property
+    def google_tag_gateway(self) -> AsyncGoogleTagGatewayResource:
+        from .resources.google_tag_gateway import AsyncGoogleTagGatewayResource
+
+        return AsyncGoogleTagGatewayResource(self)
+
+    @cached_property
     def zaraz(self) -> AsyncZarazResource:
         from .resources.zaraz import AsyncZarazResource
 
@@ -2484,6 +2498,12 @@ class CloudflareWithRawResponse:
         return OriginPostQuantumEncryptionResourceWithRawResponse(self._client.origin_post_quantum_encryption)
 
     @cached_property
+    def google_tag_gateway(self) -> google_tag_gateway.GoogleTagGatewayResourceWithRawResponse:
+        from .resources.google_tag_gateway import GoogleTagGatewayResourceWithRawResponse
+
+        return GoogleTagGatewayResourceWithRawResponse(self._client.google_tag_gateway)
+
+    @cached_property
     def zaraz(self) -> zaraz.ZarazResourceWithRawResponse:
         from .resources.zaraz import ZarazResourceWithRawResponse
 
@@ -3111,6 +3131,12 @@ class AsyncCloudflareWithRawResponse:
         return AsyncOriginPostQuantumEncryptionResourceWithRawResponse(self._client.origin_post_quantum_encryption)
 
     @cached_property
+    def google_tag_gateway(self) -> google_tag_gateway.AsyncGoogleTagGatewayResourceWithRawResponse:
+        from .resources.google_tag_gateway import AsyncGoogleTagGatewayResourceWithRawResponse
+
+        return AsyncGoogleTagGatewayResourceWithRawResponse(self._client.google_tag_gateway)
+
+    @cached_property
     def zaraz(self) -> zaraz.AsyncZarazResourceWithRawResponse:
         from .resources.zaraz import AsyncZarazResourceWithRawResponse
 
@@ -3736,6 +3762,12 @@ class CloudflareWithStreamedResponse:
         from .resources.origin_post_quantum_encryption import OriginPostQuantumEncryptionResourceWithStreamingResponse
 
         return OriginPostQuantumEncryptionResourceWithStreamingResponse(self._client.origin_post_quantum_encryption)
+
+    @cached_property
+    def google_tag_gateway(self) -> google_tag_gateway.GoogleTagGatewayResourceWithStreamingResponse:
+        from .resources.google_tag_gateway import GoogleTagGatewayResourceWithStreamingResponse
+
+        return GoogleTagGatewayResourceWithStreamingResponse(self._client.google_tag_gateway)
 
     @cached_property
     def zaraz(self) -> zaraz.ZarazResourceWithStreamingResponse:
@@ -4371,6 +4403,12 @@ class AsyncCloudflareWithStreamedResponse:
         return AsyncOriginPostQuantumEncryptionResourceWithStreamingResponse(
             self._client.origin_post_quantum_encryption
         )
+
+    @cached_property
+    def google_tag_gateway(self) -> google_tag_gateway.AsyncGoogleTagGatewayResourceWithStreamingResponse:
+        from .resources.google_tag_gateway import AsyncGoogleTagGatewayResourceWithStreamingResponse
+
+        return AsyncGoogleTagGatewayResourceWithStreamingResponse(self._client.google_tag_gateway)
 
     @cached_property
     def zaraz(self) -> zaraz.AsyncZarazResourceWithStreamingResponse:
