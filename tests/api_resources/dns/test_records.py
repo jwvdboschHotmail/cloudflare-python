@@ -49,6 +49,7 @@ class TestRecords:
             type="A",
             comment="Domain verification record",
             content="198.51.100.4",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -122,6 +123,7 @@ class TestRecords:
             type="AAAA",
             comment="Domain verification record",
             content="2400:cb00:2049::1",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -1656,6 +1658,7 @@ class TestRecords:
             type="A",
             comment="Domain verification record",
             content="198.51.100.4",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -1743,6 +1746,7 @@ class TestRecords:
             type="AAAA",
             comment="Domain verification record",
             content="2400:cb00:2049::1",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -3688,6 +3692,7 @@ class TestRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
@@ -3704,6 +3709,7 @@ class TestRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
@@ -3719,6 +3725,7 @@ class TestRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
@@ -3788,6 +3795,7 @@ class TestRecords:
             type="A",
             comment="Domain verification record",
             content="198.51.100.4",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -3875,6 +3883,7 @@ class TestRecords:
             type="AAAA",
             comment="Domain verification record",
             content="2400:cb00:2049::1",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -5918,6 +5927,7 @@ class TestRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
@@ -6028,6 +6038,7 @@ class TestAsyncRecords:
             type="A",
             comment="Domain verification record",
             content="198.51.100.4",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -6101,6 +6112,7 @@ class TestAsyncRecords:
             type="AAAA",
             comment="Domain verification record",
             content="2400:cb00:2049::1",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -7635,6 +7647,7 @@ class TestAsyncRecords:
             type="A",
             comment="Domain verification record",
             content="198.51.100.4",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -7722,6 +7735,7 @@ class TestAsyncRecords:
             type="AAAA",
             comment="Domain verification record",
             content="2400:cb00:2049::1",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -9667,6 +9681,7 @@ class TestAsyncRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
@@ -9683,6 +9698,7 @@ class TestAsyncRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
@@ -9698,6 +9714,7 @@ class TestAsyncRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
@@ -9767,6 +9784,7 @@ class TestAsyncRecords:
             type="A",
             comment="Domain verification record",
             content="198.51.100.4",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -9854,6 +9872,7 @@ class TestAsyncRecords:
             type="AAAA",
             comment="Domain verification record",
             content="2400:cb00:2049::1",
+            private_routing=True,
             proxied=True,
             settings={
                 "ipv4_only": True,
@@ -11897,6 +11916,7 @@ class TestAsyncRecords:
                     "type": "A",
                     "comment": "Domain verification record",
                     "content": "198.51.100.4",
+                    "private_routing": True,
                     "proxied": True,
                     "settings": {
                         "ipv4_only": True,
