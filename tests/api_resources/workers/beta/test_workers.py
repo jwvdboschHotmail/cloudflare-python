@@ -40,9 +40,17 @@ class TestWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -111,9 +119,17 @@ class TestWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -293,9 +309,17 @@ class TestWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -444,9 +468,17 @@ class TestAsyncWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -515,9 +547,17 @@ class TestAsyncWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -697,9 +737,17 @@ class TestAsyncWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
