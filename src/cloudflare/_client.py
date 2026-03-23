@@ -99,6 +99,7 @@ if TYPE_CHECKING:
         security_txt,
         abuse_reports,
         email_routing,
+        email_sending,
         magic_transit,
         organizations,
         secrets_store,
@@ -212,6 +213,7 @@ if TYPE_CHECKING:
     from .resources.realtime_kit.realtime_kit import RealtimeKitResource, AsyncRealtimeKitResource
     from .resources.abuse_reports.abuse_reports import AbuseReportsResource, AsyncAbuseReportsResource
     from .resources.email_routing.email_routing import EmailRoutingResource, AsyncEmailRoutingResource
+    from .resources.email_sending.email_sending import EmailSendingResource, AsyncEmailSendingResource
     from .resources.magic_transit.magic_transit import MagicTransitResource, AsyncMagicTransitResource
     from .resources.organizations.organizations import OrganizationsResource, AsyncOrganizationsResource
     from .resources.secrets_store.secrets_store import SecretsStoreResource, AsyncSecretsStoreResource
@@ -486,6 +488,12 @@ class Cloudflare(SyncAPIClient):
         from .resources.email_routing import EmailRoutingResource
 
         return EmailRoutingResource(self)
+
+    @cached_property
+    def email_sending(self) -> EmailSendingResource:
+        from .resources.email_sending import EmailSendingResource
+
+        return EmailSendingResource(self)
 
     @cached_property
     def filters(self) -> FiltersResource:
@@ -1366,6 +1374,12 @@ class AsyncCloudflare(AsyncAPIClient):
         return AsyncEmailRoutingResource(self)
 
     @cached_property
+    def email_sending(self) -> AsyncEmailSendingResource:
+        from .resources.email_sending import AsyncEmailSendingResource
+
+        return AsyncEmailSendingResource(self)
+
+    @cached_property
     def filters(self) -> AsyncFiltersResource:
         from .resources.filters import AsyncFiltersResource
 
@@ -2172,6 +2186,12 @@ class CloudflareWithRawResponse:
         return EmailRoutingResourceWithRawResponse(self._client.email_routing)
 
     @cached_property
+    def email_sending(self) -> email_sending.EmailSendingResourceWithRawResponse:
+        from .resources.email_sending import EmailSendingResourceWithRawResponse
+
+        return EmailSendingResourceWithRawResponse(self._client.email_sending)
+
+    @cached_property
     def filters(self) -> filters.FiltersResourceWithRawResponse:
         from .resources.filters import FiltersResourceWithRawResponse
 
@@ -2803,6 +2823,12 @@ class AsyncCloudflareWithRawResponse:
         from .resources.email_routing import AsyncEmailRoutingResourceWithRawResponse
 
         return AsyncEmailRoutingResourceWithRawResponse(self._client.email_routing)
+
+    @cached_property
+    def email_sending(self) -> email_sending.AsyncEmailSendingResourceWithRawResponse:
+        from .resources.email_sending import AsyncEmailSendingResourceWithRawResponse
+
+        return AsyncEmailSendingResourceWithRawResponse(self._client.email_sending)
 
     @cached_property
     def filters(self) -> filters.AsyncFiltersResourceWithRawResponse:
@@ -3438,6 +3464,12 @@ class CloudflareWithStreamedResponse:
         return EmailRoutingResourceWithStreamingResponse(self._client.email_routing)
 
     @cached_property
+    def email_sending(self) -> email_sending.EmailSendingResourceWithStreamingResponse:
+        from .resources.email_sending import EmailSendingResourceWithStreamingResponse
+
+        return EmailSendingResourceWithStreamingResponse(self._client.email_sending)
+
+    @cached_property
     def filters(self) -> filters.FiltersResourceWithStreamingResponse:
         from .resources.filters import FiltersResourceWithStreamingResponse
 
@@ -4071,6 +4103,12 @@ class AsyncCloudflareWithStreamedResponse:
         from .resources.email_routing import AsyncEmailRoutingResourceWithStreamingResponse
 
         return AsyncEmailRoutingResourceWithStreamingResponse(self._client.email_routing)
+
+    @cached_property
+    def email_sending(self) -> email_sending.AsyncEmailSendingResourceWithStreamingResponse:
+        from .resources.email_sending import AsyncEmailSendingResourceWithStreamingResponse
+
+        return AsyncEmailSendingResourceWithStreamingResponse(self._client.email_sending)
 
     @cached_property
     def filters(self) -> filters.AsyncFiltersResourceWithStreamingResponse:
