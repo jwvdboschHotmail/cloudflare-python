@@ -69,7 +69,6 @@ if TYPE_CHECKING:
         aisearch,
         alerting,
         firewall,
-        rulesets,
         snippets,
         spectrum,
         hostnames,
@@ -113,7 +112,6 @@ if TYPE_CHECKING:
         durable_objects,
         r2_data_catalog,
         request_tracers,
-        security_center,
         brand_protection,
         content_scanning,
         custom_hostnames,
@@ -182,7 +180,6 @@ if TYPE_CHECKING:
     from .resources.aisearch.aisearch import AISearchResource, AsyncAISearchResource
     from .resources.alerting.alerting import AlertingResource, AsyncAlertingResource
     from .resources.firewall.firewall import FirewallResource, AsyncFirewallResource
-    from .resources.rulesets.rulesets import RulesetsResource, AsyncRulesetsResource
     from .resources.snippets.snippets import SnippetsResource, AsyncSnippetsResource
     from .resources.spectrum.spectrum import SpectrumResource, AsyncSpectrumResource
     from .resources.url_normalization import URLNormalizationResource, AsyncURLNormalizationResource
@@ -229,7 +226,6 @@ if TYPE_CHECKING:
     from .resources.durable_objects.durable_objects import DurableObjectsResource, AsyncDurableObjectsResource
     from .resources.r2_data_catalog.r2_data_catalog import R2DataCatalogResource, AsyncR2DataCatalogResource
     from .resources.request_tracers.request_tracers import RequestTracersResource, AsyncRequestTracersResource
-    from .resources.security_center.security_center import SecurityCenterResource, AsyncSecurityCenterResource
     from .resources.brand_protection.brand_protection import BrandProtectionResource, AsyncBrandProtectionResource
     from .resources.content_scanning.content_scanning import ContentScanningResource, AsyncContentScanningResource
     from .resources.custom_hostnames.custom_hostnames import CustomHostnamesResource, AsyncCustomHostnamesResource
@@ -604,12 +600,6 @@ class Cloudflare(SyncAPIClient):
         return PageShieldResource(self)
 
     @cached_property
-    def rulesets(self) -> RulesetsResource:
-        from .resources.rulesets import RulesetsResource
-
-        return RulesetsResource(self)
-
-    @cached_property
     def url_normalization(self) -> URLNormalizationResource:
         from .resources.url_normalization import URLNormalizationResource
 
@@ -950,12 +940,6 @@ class Cloudflare(SyncAPIClient):
         from .resources.aisearch import AISearchResource
 
         return AISearchResource(self)
-
-    @cached_property
-    def security_center(self) -> SecurityCenterResource:
-        from .resources.security_center import SecurityCenterResource
-
-        return SecurityCenterResource(self)
 
     @cached_property
     def browser_rendering(self) -> BrowserRenderingResource:
@@ -1488,12 +1472,6 @@ class AsyncCloudflare(AsyncAPIClient):
         return AsyncPageShieldResource(self)
 
     @cached_property
-    def rulesets(self) -> AsyncRulesetsResource:
-        from .resources.rulesets import AsyncRulesetsResource
-
-        return AsyncRulesetsResource(self)
-
-    @cached_property
     def url_normalization(self) -> AsyncURLNormalizationResource:
         from .resources.url_normalization import AsyncURLNormalizationResource
 
@@ -1834,12 +1812,6 @@ class AsyncCloudflare(AsyncAPIClient):
         from .resources.aisearch import AsyncAISearchResource
 
         return AsyncAISearchResource(self)
-
-    @cached_property
-    def security_center(self) -> AsyncSecurityCenterResource:
-        from .resources.security_center import AsyncSecurityCenterResource
-
-        return AsyncSecurityCenterResource(self)
 
     @cached_property
     def browser_rendering(self) -> AsyncBrowserRenderingResource:
@@ -2300,12 +2272,6 @@ class CloudflareWithRawResponse:
         return PageShieldResourceWithRawResponse(self._client.page_shield)
 
     @cached_property
-    def rulesets(self) -> rulesets.RulesetsResourceWithRawResponse:
-        from .resources.rulesets import RulesetsResourceWithRawResponse
-
-        return RulesetsResourceWithRawResponse(self._client.rulesets)
-
-    @cached_property
     def url_normalization(self) -> url_normalization.URLNormalizationResourceWithRawResponse:
         from .resources.url_normalization import URLNormalizationResourceWithRawResponse
 
@@ -2650,12 +2616,6 @@ class CloudflareWithRawResponse:
         return AISearchResourceWithRawResponse(self._client.aisearch)
 
     @cached_property
-    def security_center(self) -> security_center.SecurityCenterResourceWithRawResponse:
-        from .resources.security_center import SecurityCenterResourceWithRawResponse
-
-        return SecurityCenterResourceWithRawResponse(self._client.security_center)
-
-    @cached_property
     def browser_rendering(self) -> browser_rendering.BrowserRenderingResourceWithRawResponse:
         from .resources.browser_rendering import BrowserRenderingResourceWithRawResponse
 
@@ -2937,12 +2897,6 @@ class AsyncCloudflareWithRawResponse:
         from .resources.page_shield import AsyncPageShieldResourceWithRawResponse
 
         return AsyncPageShieldResourceWithRawResponse(self._client.page_shield)
-
-    @cached_property
-    def rulesets(self) -> rulesets.AsyncRulesetsResourceWithRawResponse:
-        from .resources.rulesets import AsyncRulesetsResourceWithRawResponse
-
-        return AsyncRulesetsResourceWithRawResponse(self._client.rulesets)
 
     @cached_property
     def url_normalization(self) -> url_normalization.AsyncURLNormalizationResourceWithRawResponse:
@@ -3289,12 +3243,6 @@ class AsyncCloudflareWithRawResponse:
         return AsyncAISearchResourceWithRawResponse(self._client.aisearch)
 
     @cached_property
-    def security_center(self) -> security_center.AsyncSecurityCenterResourceWithRawResponse:
-        from .resources.security_center import AsyncSecurityCenterResourceWithRawResponse
-
-        return AsyncSecurityCenterResourceWithRawResponse(self._client.security_center)
-
-    @cached_property
     def browser_rendering(self) -> browser_rendering.AsyncBrowserRenderingResourceWithRawResponse:
         from .resources.browser_rendering import AsyncBrowserRenderingResourceWithRawResponse
 
@@ -3576,12 +3524,6 @@ class CloudflareWithStreamedResponse:
         from .resources.page_shield import PageShieldResourceWithStreamingResponse
 
         return PageShieldResourceWithStreamingResponse(self._client.page_shield)
-
-    @cached_property
-    def rulesets(self) -> rulesets.RulesetsResourceWithStreamingResponse:
-        from .resources.rulesets import RulesetsResourceWithStreamingResponse
-
-        return RulesetsResourceWithStreamingResponse(self._client.rulesets)
 
     @cached_property
     def url_normalization(self) -> url_normalization.URLNormalizationResourceWithStreamingResponse:
@@ -3928,12 +3870,6 @@ class CloudflareWithStreamedResponse:
         return AISearchResourceWithStreamingResponse(self._client.aisearch)
 
     @cached_property
-    def security_center(self) -> security_center.SecurityCenterResourceWithStreamingResponse:
-        from .resources.security_center import SecurityCenterResourceWithStreamingResponse
-
-        return SecurityCenterResourceWithStreamingResponse(self._client.security_center)
-
-    @cached_property
     def browser_rendering(self) -> browser_rendering.BrowserRenderingResourceWithStreamingResponse:
         from .resources.browser_rendering import BrowserRenderingResourceWithStreamingResponse
 
@@ -4217,12 +4153,6 @@ class AsyncCloudflareWithStreamedResponse:
         from .resources.page_shield import AsyncPageShieldResourceWithStreamingResponse
 
         return AsyncPageShieldResourceWithStreamingResponse(self._client.page_shield)
-
-    @cached_property
-    def rulesets(self) -> rulesets.AsyncRulesetsResourceWithStreamingResponse:
-        from .resources.rulesets import AsyncRulesetsResourceWithStreamingResponse
-
-        return AsyncRulesetsResourceWithStreamingResponse(self._client.rulesets)
 
     @cached_property
     def url_normalization(self) -> url_normalization.AsyncURLNormalizationResourceWithStreamingResponse:
@@ -4575,12 +4505,6 @@ class AsyncCloudflareWithStreamedResponse:
         from .resources.aisearch import AsyncAISearchResourceWithStreamingResponse
 
         return AsyncAISearchResourceWithStreamingResponse(self._client.aisearch)
-
-    @cached_property
-    def security_center(self) -> security_center.AsyncSecurityCenterResourceWithStreamingResponse:
-        from .resources.security_center import AsyncSecurityCenterResourceWithStreamingResponse
-
-        return AsyncSecurityCenterResourceWithStreamingResponse(self._client.security_center)
 
     @cached_property
     def browser_rendering(self) -> browser_rendering.AsyncBrowserRenderingResourceWithStreamingResponse:
