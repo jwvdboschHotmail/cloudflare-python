@@ -129,6 +129,7 @@ if TYPE_CHECKING:
         custom_certificates,
         keyless_certificates,
         network_interconnects,
+        vulnerability_scanner,
         workers_for_platforms,
         magic_cloud_networking,
         origin_ca_certificates,
@@ -243,6 +244,10 @@ if TYPE_CHECKING:
     from .resources.network_interconnects.network_interconnects import (
         NetworkInterconnectsResource,
         AsyncNetworkInterconnectsResource,
+    )
+    from .resources.vulnerability_scanner.vulnerability_scanner import (
+        VulnerabilityScannerResource,
+        AsyncVulnerabilityScannerResource,
     )
     from .resources.workers_for_platforms.workers_for_platforms import (
         WorkersForPlatformsResource,
@@ -784,6 +789,12 @@ class Cloudflare(SyncAPIClient):
         from .resources.url_scanner import URLScannerResource
 
         return URLScannerResource(self)
+
+    @cached_property
+    def vulnerability_scanner(self) -> VulnerabilityScannerResource:
+        from .resources.vulnerability_scanner import VulnerabilityScannerResource
+
+        return VulnerabilityScannerResource(self)
 
     @cached_property
     def radar(self) -> RadarResource:
@@ -1658,6 +1669,12 @@ class AsyncCloudflare(AsyncAPIClient):
         return AsyncURLScannerResource(self)
 
     @cached_property
+    def vulnerability_scanner(self) -> AsyncVulnerabilityScannerResource:
+        from .resources.vulnerability_scanner import AsyncVulnerabilityScannerResource
+
+        return AsyncVulnerabilityScannerResource(self)
+
+    @cached_property
     def radar(self) -> AsyncRadarResource:
         from .resources.radar import AsyncRadarResource
 
@@ -2458,6 +2475,12 @@ class CloudflareWithRawResponse:
         return URLScannerResourceWithRawResponse(self._client.url_scanner)
 
     @cached_property
+    def vulnerability_scanner(self) -> vulnerability_scanner.VulnerabilityScannerResourceWithRawResponse:
+        from .resources.vulnerability_scanner import VulnerabilityScannerResourceWithRawResponse
+
+        return VulnerabilityScannerResourceWithRawResponse(self._client.vulnerability_scanner)
+
+    @cached_property
     def radar(self) -> radar.RadarResourceWithRawResponse:
         from .resources.radar import RadarResourceWithRawResponse
 
@@ -3085,6 +3108,12 @@ class AsyncCloudflareWithRawResponse:
         return AsyncURLScannerResourceWithRawResponse(self._client.url_scanner)
 
     @cached_property
+    def vulnerability_scanner(self) -> vulnerability_scanner.AsyncVulnerabilityScannerResourceWithRawResponse:
+        from .resources.vulnerability_scanner import AsyncVulnerabilityScannerResourceWithRawResponse
+
+        return AsyncVulnerabilityScannerResourceWithRawResponse(self._client.vulnerability_scanner)
+
+    @cached_property
     def radar(self) -> radar.AsyncRadarResourceWithRawResponse:
         from .resources.radar import AsyncRadarResourceWithRawResponse
 
@@ -3710,6 +3739,12 @@ class CloudflareWithStreamedResponse:
         from .resources.url_scanner import URLScannerResourceWithStreamingResponse
 
         return URLScannerResourceWithStreamingResponse(self._client.url_scanner)
+
+    @cached_property
+    def vulnerability_scanner(self) -> vulnerability_scanner.VulnerabilityScannerResourceWithStreamingResponse:
+        from .resources.vulnerability_scanner import VulnerabilityScannerResourceWithStreamingResponse
+
+        return VulnerabilityScannerResourceWithStreamingResponse(self._client.vulnerability_scanner)
 
     @cached_property
     def radar(self) -> radar.RadarResourceWithStreamingResponse:
@@ -4341,6 +4376,12 @@ class AsyncCloudflareWithStreamedResponse:
         from .resources.url_scanner import AsyncURLScannerResourceWithStreamingResponse
 
         return AsyncURLScannerResourceWithStreamingResponse(self._client.url_scanner)
+
+    @cached_property
+    def vulnerability_scanner(self) -> vulnerability_scanner.AsyncVulnerabilityScannerResourceWithStreamingResponse:
+        from .resources.vulnerability_scanner import AsyncVulnerabilityScannerResourceWithStreamingResponse
+
+        return AsyncVulnerabilityScannerResourceWithStreamingResponse(self._client.vulnerability_scanner)
 
     @cached_property
     def radar(self) -> radar.AsyncRadarResourceWithStreamingResponse:
