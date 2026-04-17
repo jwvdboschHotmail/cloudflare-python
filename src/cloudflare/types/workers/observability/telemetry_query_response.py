@@ -197,8 +197,8 @@ class RunQueryParametersHaving(BaseModel):
     value: float
 
 
-class RunQueryParametersNeedleValue:
-    pass
+class RunQueryParametersNeedleValue(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
 
 
 class RunQueryParametersNeedle(BaseModel):
