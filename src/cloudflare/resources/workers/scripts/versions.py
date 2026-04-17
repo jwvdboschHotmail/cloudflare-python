@@ -18,7 +18,7 @@ from ...._types import (
     omit,
     not_given,
 )
-from ...._utils import is_given, path_template, maybe_transform, deepcopy_minimal, async_maybe_transform
+from ...._utils import is_given, maybe_transform, deepcopy_minimal, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -62,7 +62,7 @@ class VersionsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         metadata: version_create_params.Metadata,
         bindings_inherit: Literal["strict"] | Omit = omit,
         files: SequenceNotStr[FileTypes] | Omit = omit,
@@ -106,8 +106,6 @@ class VersionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -124,11 +122,7 @@ class VersionsResource(SyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return self._post(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/versions",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/versions",
             body=maybe_transform(body, version_create_params.VersionCreateParams),
             files=extracted_files,
             options=make_request_options(
@@ -149,7 +143,7 @@ class VersionsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         deployable: bool | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
@@ -183,18 +177,12 @@ class VersionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return self._get_api_list(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/versions",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/versions",
             page=SyncV4PagePagination[VersionListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -217,7 +205,7 @@ class VersionsResource(SyncAPIResource):
         self,
         version_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         script_name: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -242,8 +230,6 @@ class VersionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -251,12 +237,7 @@ class VersionsResource(SyncAPIResource):
         if not version_id:
             raise ValueError(f"Expected a non-empty value for `version_id` but received {version_id!r}")
         return self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/versions/{version_id}",
-                account_id=account_id,
-                script_name=script_name,
-                version_id=version_id,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/versions/{version_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -292,7 +273,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         metadata: version_create_params.Metadata,
         bindings_inherit: Literal["strict"] | Omit = omit,
         files: SequenceNotStr[FileTypes] | Omit = omit,
@@ -336,8 +317,6 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -353,11 +332,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return await self._post(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/versions",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/versions",
             body=await async_maybe_transform(body, version_create_params.VersionCreateParams),
             files=extracted_files,
             options=make_request_options(
@@ -378,7 +353,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         deployable: bool | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
@@ -412,18 +387,12 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return self._get_api_list(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/versions",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/versions",
             page=AsyncV4PagePagination[VersionListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -446,7 +415,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         version_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         script_name: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -471,8 +440,6 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -480,12 +447,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         if not version_id:
             raise ValueError(f"Expected a non-empty value for `version_id` but received {version_id!r}")
         return await self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/versions/{version_id}",
-                account_id=account_id,
-                script_name=script_name,
-                version_id=version_id,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/versions/{version_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

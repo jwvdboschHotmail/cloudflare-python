@@ -7,7 +7,7 @@ from typing import Type, cast
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import path_template, maybe_transform, async_maybe_transform
+from ...._utils import maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -49,7 +49,7 @@ class ScriptAndVersionSettingsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         settings: script_and_version_setting_edit_params.Settings | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -74,8 +74,6 @@ class ScriptAndVersionSettingsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -85,11 +83,7 @@ class ScriptAndVersionSettingsResource(SyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return self._patch(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/settings",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/settings",
             body=maybe_transform(
                 {"settings": settings}, script_and_version_setting_edit_params.ScriptAndVersionSettingEditParams
             ),
@@ -108,7 +102,7 @@ class ScriptAndVersionSettingsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -132,18 +126,12 @@ class ScriptAndVersionSettingsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/settings",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/settings",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -179,7 +167,7 @@ class AsyncScriptAndVersionSettingsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         settings: script_and_version_setting_edit_params.Settings | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -204,8 +192,6 @@ class AsyncScriptAndVersionSettingsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -215,11 +201,7 @@ class AsyncScriptAndVersionSettingsResource(AsyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return await self._patch(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/settings",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/settings",
             body=await async_maybe_transform(
                 {"settings": settings}, script_and_version_setting_edit_params.ScriptAndVersionSettingEditParams
             ),
@@ -238,7 +220,7 @@ class AsyncScriptAndVersionSettingsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -262,18 +244,12 @@ class AsyncScriptAndVersionSettingsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return await self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/settings",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/settings",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

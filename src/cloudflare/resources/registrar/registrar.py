@@ -15,7 +15,7 @@ from .domains import (
     AsyncDomainsResourceWithStreamingResponse,
 )
 from ..._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform
+from ..._utils import maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -96,7 +96,7 @@ class RegistrarResource(SyncAPIResource):
     def check(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         domains: SequenceNotStr[str],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -175,12 +175,10 @@ class RegistrarResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            path_template("/accounts/{account_id}/registrar/domain-check", account_id=account_id),
+            f"/accounts/{account_id}/registrar/domain-check",
             body=maybe_transform({"domains": domains}, registrar_check_params.RegistrarCheckParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -195,7 +193,7 @@ class RegistrarResource(SyncAPIResource):
     def search(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         q: str,
         extensions: SequenceNotStr[str] | Omit = omit,
         limit: int | Omit = omit,
@@ -217,7 +215,8 @@ class RegistrarResource(SyncAPIResource):
 
         Suggestions are scoped to extensions supported for programmatic registration via
         this API (`POST /registrations`). Domains on unsupported extensions will not
-        appear in results, even if they are available at the registry level.
+        appear in results, even if they are available at the registry level. See the
+        supported extensions list in `info.description`.
 
         ### Use cases
 
@@ -263,12 +262,10 @@ class RegistrarResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get(
-            path_template("/accounts/{account_id}/registrar/domain-search", account_id=account_id),
+            f"/accounts/{account_id}/registrar/domain-search",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -327,7 +324,7 @@ class AsyncRegistrarResource(AsyncAPIResource):
     async def check(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         domains: SequenceNotStr[str],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -406,12 +403,10 @@ class AsyncRegistrarResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            path_template("/accounts/{account_id}/registrar/domain-check", account_id=account_id),
+            f"/accounts/{account_id}/registrar/domain-check",
             body=await async_maybe_transform({"domains": domains}, registrar_check_params.RegistrarCheckParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -426,7 +421,7 @@ class AsyncRegistrarResource(AsyncAPIResource):
     async def search(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         q: str,
         extensions: SequenceNotStr[str] | Omit = omit,
         limit: int | Omit = omit,
@@ -448,7 +443,8 @@ class AsyncRegistrarResource(AsyncAPIResource):
 
         Suggestions are scoped to extensions supported for programmatic registration via
         this API (`POST /registrations`). Domains on unsupported extensions will not
-        appear in results, even if they are available at the registry level.
+        appear in results, even if they are available at the registry level. See the
+        supported extensions list in `info.description`.
 
         ### Use cases
 
@@ -494,12 +490,10 @@ class AsyncRegistrarResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._get(
-            path_template("/accounts/{account_id}/registrar/domain-search", account_id=account_id),
+            f"/accounts/{account_id}/registrar/domain-search",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

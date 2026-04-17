@@ -7,7 +7,7 @@ from typing import Type, cast
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform
+from ..._utils import maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -52,7 +52,7 @@ class RoutesResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         pattern: str,
         script: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -81,12 +81,10 @@ class RoutesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            path_template("/zones/{zone_id}/workers/routes", zone_id=zone_id),
+            f"/zones/{zone_id}/workers/routes",
             body=maybe_transform(
                 {
                     "pattern": pattern,
@@ -108,7 +106,7 @@ class RoutesResource(SyncAPIResource):
         self,
         route_id: str,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         pattern: str,
         script: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -139,14 +137,12 @@ class RoutesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not route_id:
             raise ValueError(f"Expected a non-empty value for `route_id` but received {route_id!r}")
         return self._put(
-            path_template("/zones/{zone_id}/workers/routes/{route_id}", zone_id=zone_id, route_id=route_id),
+            f"/zones/{zone_id}/workers/routes/{route_id}",
             body=maybe_transform(
                 {
                     "pattern": pattern,
@@ -167,7 +163,7 @@ class RoutesResource(SyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -189,12 +185,10 @@ class RoutesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            path_template("/zones/{zone_id}/workers/routes", zone_id=zone_id),
+            f"/zones/{zone_id}/workers/routes",
             page=SyncSinglePage[RouteListResponse],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -206,7 +200,7 @@ class RoutesResource(SyncAPIResource):
         self,
         route_id: str,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -230,14 +224,12 @@ class RoutesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not route_id:
             raise ValueError(f"Expected a non-empty value for `route_id` but received {route_id!r}")
         return self._delete(
-            path_template("/zones/{zone_id}/workers/routes/{route_id}", zone_id=zone_id, route_id=route_id),
+            f"/zones/{zone_id}/workers/routes/{route_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -252,7 +244,7 @@ class RoutesResource(SyncAPIResource):
         self,
         route_id: str,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -276,14 +268,12 @@ class RoutesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not route_id:
             raise ValueError(f"Expected a non-empty value for `route_id` but received {route_id!r}")
         return self._get(
-            path_template("/zones/{zone_id}/workers/routes/{route_id}", zone_id=zone_id, route_id=route_id),
+            f"/zones/{zone_id}/workers/routes/{route_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -318,7 +308,7 @@ class AsyncRoutesResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         pattern: str,
         script: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -347,12 +337,10 @@ class AsyncRoutesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            path_template("/zones/{zone_id}/workers/routes", zone_id=zone_id),
+            f"/zones/{zone_id}/workers/routes",
             body=await async_maybe_transform(
                 {
                     "pattern": pattern,
@@ -374,7 +362,7 @@ class AsyncRoutesResource(AsyncAPIResource):
         self,
         route_id: str,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         pattern: str,
         script: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -405,14 +393,12 @@ class AsyncRoutesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not route_id:
             raise ValueError(f"Expected a non-empty value for `route_id` but received {route_id!r}")
         return await self._put(
-            path_template("/zones/{zone_id}/workers/routes/{route_id}", zone_id=zone_id, route_id=route_id),
+            f"/zones/{zone_id}/workers/routes/{route_id}",
             body=await async_maybe_transform(
                 {
                     "pattern": pattern,
@@ -433,7 +419,7 @@ class AsyncRoutesResource(AsyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -455,12 +441,10 @@ class AsyncRoutesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            path_template("/zones/{zone_id}/workers/routes", zone_id=zone_id),
+            f"/zones/{zone_id}/workers/routes",
             page=AsyncSinglePage[RouteListResponse],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -472,7 +456,7 @@ class AsyncRoutesResource(AsyncAPIResource):
         self,
         route_id: str,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -496,14 +480,12 @@ class AsyncRoutesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not route_id:
             raise ValueError(f"Expected a non-empty value for `route_id` but received {route_id!r}")
         return await self._delete(
-            path_template("/zones/{zone_id}/workers/routes/{route_id}", zone_id=zone_id, route_id=route_id),
+            f"/zones/{zone_id}/workers/routes/{route_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -518,7 +500,7 @@ class AsyncRoutesResource(AsyncAPIResource):
         self,
         route_id: str,
         *,
-        zone_id: str | None = None,
+        zone_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -542,14 +524,12 @@ class AsyncRoutesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not route_id:
             raise ValueError(f"Expected a non-empty value for `route_id` but received {route_id!r}")
         return await self._get(
-            path_template("/zones/{zone_id}/workers/routes/{route_id}", zone_id=zone_id, route_id=route_id),
+            f"/zones/{zone_id}/workers/routes/{route_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

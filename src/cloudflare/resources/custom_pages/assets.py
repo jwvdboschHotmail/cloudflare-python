@@ -7,7 +7,7 @@ from typing import Type, Optional, cast
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NoneType, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform
+from ..._utils import maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -54,8 +54,8 @@ class AssetsResource(SyncAPIResource):
         description: str,
         name: str,
         url: str,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -86,10 +86,6 @@ class AssetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -103,11 +99,7 @@ class AssetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._post(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
             body=maybe_transform(
                 {
                     "description": description,
@@ -132,8 +124,8 @@ class AssetsResource(SyncAPIResource):
         *,
         description: str,
         url: str,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -166,10 +158,6 @@ class AssetsResource(SyncAPIResource):
         """
         if not asset_name:
             raise ValueError(f"Expected a non-empty value for `asset_name` but received {asset_name!r}")
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -183,12 +171,7 @@ class AssetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._put(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
-                asset_name=asset_name,
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
             body=maybe_transform(
                 {
                     "description": description,
@@ -209,8 +192,8 @@ class AssetsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -236,10 +219,6 @@ class AssetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -253,11 +232,7 @@ class AssetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
             page=SyncV4PagePaginationArray[AssetListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -279,8 +254,8 @@ class AssetsResource(SyncAPIResource):
         self,
         asset_name: str,
         *,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -309,10 +284,6 @@ class AssetsResource(SyncAPIResource):
         """
         if not asset_name:
             raise ValueError(f"Expected a non-empty value for `asset_name` but received {asset_name!r}")
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -327,12 +298,7 @@ class AssetsResource(SyncAPIResource):
             account_or_zone_id = zone_id
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return self._delete(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
-                asset_name=asset_name,
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -343,8 +309,8 @@ class AssetsResource(SyncAPIResource):
         self,
         asset_name: str,
         *,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -373,10 +339,6 @@ class AssetsResource(SyncAPIResource):
         """
         if not asset_name:
             raise ValueError(f"Expected a non-empty value for `asset_name` but received {asset_name!r}")
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -390,12 +352,7 @@ class AssetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
-                asset_name=asset_name,
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -433,8 +390,8 @@ class AsyncAssetsResource(AsyncAPIResource):
         description: str,
         name: str,
         url: str,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -465,10 +422,6 @@ class AsyncAssetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -482,11 +435,7 @@ class AsyncAssetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._post(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
             body=await async_maybe_transform(
                 {
                     "description": description,
@@ -511,8 +460,8 @@ class AsyncAssetsResource(AsyncAPIResource):
         *,
         description: str,
         url: str,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -545,10 +494,6 @@ class AsyncAssetsResource(AsyncAPIResource):
         """
         if not asset_name:
             raise ValueError(f"Expected a non-empty value for `asset_name` but received {asset_name!r}")
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -562,12 +507,7 @@ class AsyncAssetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._put(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
-                asset_name=asset_name,
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
             body=await async_maybe_transform(
                 {
                     "description": description,
@@ -588,8 +528,8 @@ class AsyncAssetsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -615,10 +555,6 @@ class AsyncAssetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -632,11 +568,7 @@ class AsyncAssetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets",
             page=AsyncV4PagePaginationArray[AssetListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -658,8 +590,8 @@ class AsyncAssetsResource(AsyncAPIResource):
         self,
         asset_name: str,
         *,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -688,10 +620,6 @@ class AsyncAssetsResource(AsyncAPIResource):
         """
         if not asset_name:
             raise ValueError(f"Expected a non-empty value for `asset_name` but received {asset_name!r}")
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -706,12 +634,7 @@ class AsyncAssetsResource(AsyncAPIResource):
             account_or_zone_id = zone_id
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return await self._delete(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
-                asset_name=asset_name,
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -722,8 +645,8 @@ class AsyncAssetsResource(AsyncAPIResource):
         self,
         asset_name: str,
         *,
-        account_id: str | None = None,
-        zone_id: str | None = None,
+        account_id: str | Omit = omit,
+        zone_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -752,10 +675,6 @@ class AsyncAssetsResource(AsyncAPIResource):
         """
         if not asset_name:
             raise ValueError(f"Expected a non-empty value for `asset_name` but received {asset_name!r}")
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
-        if zone_id is None:
-            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -769,12 +688,7 @@ class AsyncAssetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._get(
-            path_template(
-                "/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
-                asset_name=asset_name,
-                account_or_zone=account_or_zone,
-                account_or_zone_id=account_or_zone_id,
-            ),
+            f"/{account_or_zone}/{account_or_zone_id}/custom_pages/assets/{asset_name}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

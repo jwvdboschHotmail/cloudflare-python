@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import path_template, maybe_transform, async_maybe_transform
+from ...._utils import maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -51,7 +51,7 @@ class DeploymentsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         strategy: Literal["percentage"],
         versions: Iterable[deployment_create_params.Version],
         force: bool | Omit = omit,
@@ -85,18 +85,12 @@ class DeploymentsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return self._post(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments",
             body=maybe_transform(
                 {
                     "strategy": strategy,
@@ -120,7 +114,7 @@ class DeploymentsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -146,18 +140,12 @@ class DeploymentsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -172,7 +160,7 @@ class DeploymentsResource(SyncAPIResource):
         self,
         deployment_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         script_name: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -199,8 +187,6 @@ class DeploymentsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -208,12 +194,7 @@ class DeploymentsResource(SyncAPIResource):
         if not deployment_id:
             raise ValueError(f"Expected a non-empty value for `deployment_id` but received {deployment_id!r}")
         return self._delete(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
-                account_id=account_id,
-                script_name=script_name,
-                deployment_id=deployment_id,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -224,7 +205,7 @@ class DeploymentsResource(SyncAPIResource):
         self,
         deployment_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         script_name: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -249,8 +230,6 @@ class DeploymentsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -258,12 +237,7 @@ class DeploymentsResource(SyncAPIResource):
         if not deployment_id:
             raise ValueError(f"Expected a non-empty value for `deployment_id` but received {deployment_id!r}")
         return self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
-                account_id=account_id,
-                script_name=script_name,
-                deployment_id=deployment_id,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -299,7 +273,7 @@ class AsyncDeploymentsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         strategy: Literal["percentage"],
         versions: Iterable[deployment_create_params.Version],
         force: bool | Omit = omit,
@@ -333,18 +307,12 @@ class AsyncDeploymentsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return await self._post(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments",
             body=await async_maybe_transform(
                 {
                     "strategy": strategy,
@@ -368,7 +336,7 @@ class AsyncDeploymentsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -394,18 +362,12 @@ class AsyncDeploymentsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return await self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments",
-                account_id=account_id,
-                script_name=script_name,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -420,7 +382,7 @@ class AsyncDeploymentsResource(AsyncAPIResource):
         self,
         deployment_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         script_name: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -447,8 +409,6 @@ class AsyncDeploymentsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -456,12 +416,7 @@ class AsyncDeploymentsResource(AsyncAPIResource):
         if not deployment_id:
             raise ValueError(f"Expected a non-empty value for `deployment_id` but received {deployment_id!r}")
         return await self._delete(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
-                account_id=account_id,
-                script_name=script_name,
-                deployment_id=deployment_id,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -472,7 +427,7 @@ class AsyncDeploymentsResource(AsyncAPIResource):
         self,
         deployment_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         script_name: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -497,8 +452,6 @@ class AsyncDeploymentsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -506,12 +459,7 @@ class AsyncDeploymentsResource(AsyncAPIResource):
         if not deployment_id:
             raise ValueError(f"Expected a non-empty value for `deployment_id` but received {deployment_id!r}")
         return await self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
-                account_id=account_id,
-                script_name=script_name,
-                deployment_id=deployment_id,
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}/deployments/{deployment_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

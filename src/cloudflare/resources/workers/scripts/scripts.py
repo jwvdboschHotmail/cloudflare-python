@@ -58,7 +58,7 @@ from ...._types import (
     omit,
     not_given,
 )
-from ...._utils import is_given, path_template, maybe_transform, deepcopy_minimal, async_maybe_transform
+from ...._utils import is_given, maybe_transform, deepcopy_minimal, async_maybe_transform
 from .schedules import (
     SchedulesResource,
     AsyncSchedulesResource,
@@ -182,7 +182,7 @@ class ScriptsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         metadata: script_update_params.Metadata,
         bindings_inherit: Literal["strict"] | Omit = omit,
         files: SequenceNotStr[FileTypes] | Omit = omit,
@@ -226,8 +226,6 @@ class ScriptsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -244,9 +242,7 @@ class ScriptsResource(SyncAPIResource):
             # multipart/form-data; boundary=---abc--
             extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return self._put(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}", account_id=account_id, script_name=script_name
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}",
             body=maybe_transform(body, script_update_params.ScriptUpdateParams),
             files=extracted_files,
             options=make_request_options(
@@ -264,7 +260,7 @@ class ScriptsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         tags: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -290,12 +286,10 @@ class ScriptsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            path_template("/accounts/{account_id}/workers/scripts", account_id=account_id),
+            f"/accounts/{account_id}/workers/scripts",
             page=SyncSinglePage[ScriptListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -311,7 +305,7 @@ class ScriptsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         force: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -341,16 +335,12 @@ class ScriptsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return self._delete(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}", account_id=account_id, script_name=script_name
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -366,7 +356,7 @@ class ScriptsResource(SyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -392,17 +382,13 @@ class ScriptsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         extra_headers = {"Accept": "application/javascript", **(extra_headers or {})}
         return self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}", account_id=account_id, script_name=script_name
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -412,7 +398,7 @@ class ScriptsResource(SyncAPIResource):
     def search(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         id: str | Omit = omit,
         name: str | Omit = omit,
         order_by: Literal["created_on", "modified_on", "name"] | Omit = omit,
@@ -449,12 +435,10 @@ class ScriptsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get(
-            path_template("/accounts/{account_id}/workers/scripts-search", account_id=account_id),
+            f"/accounts/{account_id}/workers/scripts-search",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -540,7 +524,7 @@ class AsyncScriptsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         metadata: script_update_params.Metadata,
         bindings_inherit: Literal["strict"] | Omit = omit,
         files: SequenceNotStr[FileTypes] | Omit = omit,
@@ -584,8 +568,6 @@ class AsyncScriptsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
@@ -602,9 +584,7 @@ class AsyncScriptsResource(AsyncAPIResource):
             # multipart/form-data; boundary=---abc--
             extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return await self._put(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}", account_id=account_id, script_name=script_name
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}",
             body=await async_maybe_transform(body, script_update_params.ScriptUpdateParams),
             files=extracted_files,
             options=make_request_options(
@@ -624,7 +604,7 @@ class AsyncScriptsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         tags: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -650,12 +630,10 @@ class AsyncScriptsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            path_template("/accounts/{account_id}/workers/scripts", account_id=account_id),
+            f"/accounts/{account_id}/workers/scripts",
             page=AsyncSinglePage[ScriptListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -671,7 +649,7 @@ class AsyncScriptsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         force: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -701,16 +679,12 @@ class AsyncScriptsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         return await self._delete(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}", account_id=account_id, script_name=script_name
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -726,7 +700,7 @@ class AsyncScriptsResource(AsyncAPIResource):
         self,
         script_name: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -752,17 +726,13 @@ class AsyncScriptsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not script_name:
             raise ValueError(f"Expected a non-empty value for `script_name` but received {script_name!r}")
         extra_headers = {"Accept": "application/javascript", **(extra_headers or {})}
         return await self._get(
-            path_template(
-                "/accounts/{account_id}/workers/scripts/{script_name}", account_id=account_id, script_name=script_name
-            ),
+            f"/accounts/{account_id}/workers/scripts/{script_name}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -772,7 +742,7 @@ class AsyncScriptsResource(AsyncAPIResource):
     async def search(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         id: str | Omit = omit,
         name: str | Omit = omit,
         order_by: Literal["created_on", "modified_on", "name"] | Omit = omit,
@@ -809,12 +779,10 @@ class AsyncScriptsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._get(
-            path_template("/accounts/{account_id}/workers/scripts-search", account_id=account_id),
+            f"/accounts/{account_id}/workers/scripts-search",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

@@ -7,7 +7,7 @@ from typing import Type, cast
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import path_template, maybe_transform, async_maybe_transform
+from ..._utils import maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -51,7 +51,7 @@ class DomainsResource(SyncAPIResource):
     def update(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         hostname: str,
         service: str,
         environment: str | Omit = omit,
@@ -90,12 +90,10 @@ class DomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._put(
-            path_template("/accounts/{account_id}/workers/domains", account_id=account_id),
+            f"/accounts/{account_id}/workers/domains",
             body=maybe_transform(
                 {
                     "hostname": hostname,
@@ -119,7 +117,7 @@ class DomainsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         environment: str | Omit = omit,
         hostname: str | Omit = omit,
         service: str | Omit = omit,
@@ -156,12 +154,10 @@ class DomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            path_template("/accounts/{account_id}/workers/domains", account_id=account_id),
+            f"/accounts/{account_id}/workers/domains",
             page=SyncSinglePage[DomainListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -186,7 +182,7 @@ class DomainsResource(SyncAPIResource):
         self,
         domain_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -212,16 +208,12 @@ class DomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_id:
             raise ValueError(f"Expected a non-empty value for `domain_id` but received {domain_id!r}")
         return self._delete(
-            path_template(
-                "/accounts/{account_id}/workers/domains/{domain_id}", account_id=account_id, domain_id=domain_id
-            ),
+            f"/accounts/{account_id}/workers/domains/{domain_id}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -232,7 +224,7 @@ class DomainsResource(SyncAPIResource):
         self,
         domain_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -256,16 +248,12 @@ class DomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_id:
             raise ValueError(f"Expected a non-empty value for `domain_id` but received {domain_id!r}")
         return self._get(
-            path_template(
-                "/accounts/{account_id}/workers/domains/{domain_id}", account_id=account_id, domain_id=domain_id
-            ),
+            f"/accounts/{account_id}/workers/domains/{domain_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -300,7 +288,7 @@ class AsyncDomainsResource(AsyncAPIResource):
     async def update(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         hostname: str,
         service: str,
         environment: str | Omit = omit,
@@ -339,12 +327,10 @@ class AsyncDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._put(
-            path_template("/accounts/{account_id}/workers/domains", account_id=account_id),
+            f"/accounts/{account_id}/workers/domains",
             body=await async_maybe_transform(
                 {
                     "hostname": hostname,
@@ -368,7 +354,7 @@ class AsyncDomainsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | None = None,
+        account_id: str,
         environment: str | Omit = omit,
         hostname: str | Omit = omit,
         service: str | Omit = omit,
@@ -405,12 +391,10 @@ class AsyncDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            path_template("/accounts/{account_id}/workers/domains", account_id=account_id),
+            f"/accounts/{account_id}/workers/domains",
             page=AsyncSinglePage[DomainListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -435,7 +419,7 @@ class AsyncDomainsResource(AsyncAPIResource):
         self,
         domain_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -461,16 +445,12 @@ class AsyncDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_id:
             raise ValueError(f"Expected a non-empty value for `domain_id` but received {domain_id!r}")
         return await self._delete(
-            path_template(
-                "/accounts/{account_id}/workers/domains/{domain_id}", account_id=account_id, domain_id=domain_id
-            ),
+            f"/accounts/{account_id}/workers/domains/{domain_id}",
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -481,7 +461,7 @@ class AsyncDomainsResource(AsyncAPIResource):
         self,
         domain_id: str,
         *,
-        account_id: str | None = None,
+        account_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -505,16 +485,12 @@ class AsyncDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        if account_id is None:
-            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_id:
             raise ValueError(f"Expected a non-empty value for `domain_id` but received {domain_id!r}")
         return await self._get(
-            path_template(
-                "/accounts/{account_id}/workers/domains/{domain_id}", account_id=account_id, domain_id=domain_id
-            ),
+            f"/accounts/{account_id}/workers/domains/{domain_id}",
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
