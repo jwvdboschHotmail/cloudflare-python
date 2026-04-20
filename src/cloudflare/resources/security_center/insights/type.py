@@ -7,7 +7,7 @@ from typing import List, Type, Optional, cast
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -49,8 +49,8 @@ class TypeResource(SyncAPIResource):
     def get(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismissed: bool | Omit = omit,
         issue_class: SequenceNotStr[str] | Omit = omit,
         issue_class_neq: SequenceNotStr[str] | Omit = omit,
@@ -70,7 +70,7 @@ class TypeResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[TypeGetResponse]:
         """
-        Retrieves Security Center Insight Counts by Type
+        Retrieves Security Center insight counts aggregated by insight type.
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -85,6 +85,10 @@ class TypeResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -98,7 +102,11 @@ class TypeResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights/type",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights/type",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -149,8 +157,8 @@ class AsyncTypeResource(AsyncAPIResource):
     async def get(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismissed: bool | Omit = omit,
         issue_class: SequenceNotStr[str] | Omit = omit,
         issue_class_neq: SequenceNotStr[str] | Omit = omit,
@@ -170,7 +178,7 @@ class AsyncTypeResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[TypeGetResponse]:
         """
-        Retrieves Security Center Insight Counts by Type
+        Retrieves Security Center insight counts aggregated by insight type.
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -185,6 +193,10 @@ class AsyncTypeResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -198,7 +210,11 @@ class AsyncTypeResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights/type",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights/type",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

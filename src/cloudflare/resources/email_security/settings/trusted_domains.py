@@ -8,7 +8,7 @@ from typing_extensions import Literal, overload
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import required_args, maybe_transform, async_maybe_transform
+from ...._utils import path_template, required_args, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -58,7 +58,7 @@ class TrustedDomainsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         is_recent: bool,
         is_regex: bool,
         is_similarity: bool,
@@ -72,7 +72,8 @@ class TrustedDomainsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainCreateResponse:
         """
-        Create a trusted email domain
+        Adds a domain to the trusted domains list for email security, reducing false
+        positive detections.
 
         Args:
           account_id: Account Identifier
@@ -97,7 +98,7 @@ class TrustedDomainsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: Iterable[trusted_domain_create_params.Variant1Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -107,7 +108,8 @@ class TrustedDomainsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainCreateResponse:
         """
-        Create a trusted email domain
+        Adds a domain to the trusted domains list for email security, reducing false
+        positive detections.
 
         Args:
           account_id: Account Identifier
@@ -122,11 +124,11 @@ class TrustedDomainsResource(SyncAPIResource):
         """
         ...
 
-    @required_args(["account_id", "is_recent", "is_regex", "is_similarity", "pattern"], ["account_id", "body"])
+    @required_args(["is_recent", "is_regex", "is_similarity", "pattern"], ["body"])
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         is_recent: bool | Omit = omit,
         is_regex: bool | Omit = omit,
         is_similarity: bool | Omit = omit,
@@ -140,12 +142,14 @@ class TrustedDomainsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainCreateResponse:
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return cast(
             TrustedDomainCreateResponse,
             self._post(
-                f"/accounts/{account_id}/email-security/settings/trusted_domains",
+                path_template("/accounts/{account_id}/email-security/settings/trusted_domains", account_id=account_id),
                 body=maybe_transform(
                     {
                         "is_recent": is_recent,
@@ -173,7 +177,7 @@ class TrustedDomainsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         direction: Literal["asc", "desc"] | Omit = omit,
         is_recent: bool | Omit = omit,
         is_similarity: bool | Omit = omit,
@@ -215,10 +219,12 @@ class TrustedDomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains",
+            path_template("/accounts/{account_id}/email-security/settings/trusted_domains", account_id=account_id),
             page=SyncV4PagePaginationArray[TrustedDomainListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -246,7 +252,7 @@ class TrustedDomainsResource(SyncAPIResource):
         self,
         trusted_domain_id: int,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -255,7 +261,8 @@ class TrustedDomainsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainDeleteResponse:
         """
-        Delete a trusted email domain
+        Removes a domain from the trusted domains list, subjecting it to normal security
+        scanning.
 
         Args:
           account_id: Account Identifier
@@ -270,10 +277,16 @@ class TrustedDomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+                account_id=account_id,
+                trusted_domain_id=trusted_domain_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -288,7 +301,7 @@ class TrustedDomainsResource(SyncAPIResource):
         self,
         trusted_domain_id: int,
         *,
-        account_id: str,
+        account_id: str | None = None,
         comments: str | Omit = omit,
         is_recent: bool | Omit = omit,
         is_regex: bool | Omit = omit,
@@ -302,7 +315,7 @@ class TrustedDomainsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainEditResponse:
         """
-        Update a trusted email domain
+        Modifies a trusted domain entry's configuration.
 
         Args:
           account_id: Account Identifier
@@ -323,10 +336,16 @@ class TrustedDomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._patch(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+                account_id=account_id,
+                trusted_domain_id=trusted_domain_id,
+            ),
             body=maybe_transform(
                 {
                     "comments": comments,
@@ -351,7 +370,7 @@ class TrustedDomainsResource(SyncAPIResource):
         self,
         trusted_domain_id: int,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -360,7 +379,7 @@ class TrustedDomainsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainGetResponse:
         """
-        Get a trusted email domain
+        Gets information about a specific trusted domain entry.
 
         Args:
           account_id: Account Identifier
@@ -375,10 +394,16 @@ class TrustedDomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+                account_id=account_id,
+                trusted_domain_id=trusted_domain_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -414,7 +439,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         is_recent: bool,
         is_regex: bool,
         is_similarity: bool,
@@ -428,7 +453,8 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainCreateResponse:
         """
-        Create a trusted email domain
+        Adds a domain to the trusted domains list for email security, reducing false
+        positive detections.
 
         Args:
           account_id: Account Identifier
@@ -453,7 +479,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: Iterable[trusted_domain_create_params.Variant1Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -463,7 +489,8 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainCreateResponse:
         """
-        Create a trusted email domain
+        Adds a domain to the trusted domains list for email security, reducing false
+        positive detections.
 
         Args:
           account_id: Account Identifier
@@ -478,11 +505,11 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         """
         ...
 
-    @required_args(["account_id", "is_recent", "is_regex", "is_similarity", "pattern"], ["account_id", "body"])
+    @required_args(["is_recent", "is_regex", "is_similarity", "pattern"], ["body"])
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         is_recent: bool | Omit = omit,
         is_regex: bool | Omit = omit,
         is_similarity: bool | Omit = omit,
@@ -496,12 +523,14 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainCreateResponse:
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return cast(
             TrustedDomainCreateResponse,
             await self._post(
-                f"/accounts/{account_id}/email-security/settings/trusted_domains",
+                path_template("/accounts/{account_id}/email-security/settings/trusted_domains", account_id=account_id),
                 body=await async_maybe_transform(
                     {
                         "is_recent": is_recent,
@@ -529,7 +558,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         direction: Literal["asc", "desc"] | Omit = omit,
         is_recent: bool | Omit = omit,
         is_similarity: bool | Omit = omit,
@@ -571,10 +600,12 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains",
+            path_template("/accounts/{account_id}/email-security/settings/trusted_domains", account_id=account_id),
             page=AsyncV4PagePaginationArray[TrustedDomainListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -602,7 +633,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         self,
         trusted_domain_id: int,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -611,7 +642,8 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainDeleteResponse:
         """
-        Delete a trusted email domain
+        Removes a domain from the trusted domains list, subjecting it to normal security
+        scanning.
 
         Args:
           account_id: Account Identifier
@@ -626,10 +658,16 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+                account_id=account_id,
+                trusted_domain_id=trusted_domain_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -644,7 +682,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         self,
         trusted_domain_id: int,
         *,
-        account_id: str,
+        account_id: str | None = None,
         comments: str | Omit = omit,
         is_recent: bool | Omit = omit,
         is_regex: bool | Omit = omit,
@@ -658,7 +696,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainEditResponse:
         """
-        Update a trusted email domain
+        Modifies a trusted domain entry's configuration.
 
         Args:
           account_id: Account Identifier
@@ -679,10 +717,16 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._patch(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+                account_id=account_id,
+                trusted_domain_id=trusted_domain_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "comments": comments,
@@ -707,7 +751,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         self,
         trusted_domain_id: int,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -716,7 +760,7 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TrustedDomainGetResponse:
         """
-        Get a trusted email domain
+        Gets information about a specific trusted domain entry.
 
         Args:
           account_id: Account Identifier
@@ -731,10 +775,16 @@ class AsyncTrustedDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/settings/trusted_domains/{trusted_domain_id}",
+                account_id=account_id,
+                trusted_domain_id=trusted_domain_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

@@ -9,7 +9,7 @@ __all__ = ["PortalCreateParams", "Server", "ServerUpdatedPrompt", "ServerUpdated
 
 
 class PortalCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     id: Required[str]
     """portal id"""
@@ -17,6 +17,9 @@ class PortalCreateParams(TypedDict, total=False):
     hostname: Required[str]
 
     name: Required[str]
+
+    allow_code_mode: bool
+    """Allow remote code execution in Dynamic Workers (beta)"""
 
     description: str
 
@@ -29,6 +32,8 @@ class PortalCreateParams(TypedDict, total=False):
 class ServerUpdatedPrompt(TypedDict, total=False):
     name: Required[str]
 
+    alias: str
+
     description: str
 
     enabled: bool
@@ -36,6 +41,8 @@ class ServerUpdatedPrompt(TypedDict, total=False):
 
 class ServerUpdatedTool(TypedDict, total=False):
     name: Required[str]
+
+    alias: str
 
     description: str
 

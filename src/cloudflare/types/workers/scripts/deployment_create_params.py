@@ -11,7 +11,7 @@ __all__ = ["DeploymentCreateParams", "Version", "Annotations"]
 
 
 class DeploymentCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Identifier."""
 
     strategy: Required[Literal["percentage"]]
@@ -35,4 +35,4 @@ class Version(TypedDict, total=False):
 
 class Annotations(TypedDict, total=False):
     workers_message: Annotated[str, PropertyInfo(alias="workers/message")]
-    """Human-readable message about the deployment. Truncated to 100 bytes."""
+    """Human-readable message about the deployment. Truncated to 1000 bytes if longer."""

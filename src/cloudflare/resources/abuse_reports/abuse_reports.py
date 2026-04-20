@@ -8,7 +8,7 @@ from typing_extensions import Literal, overload
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import required_args, maybe_transform, async_maybe_transform
+from ..._utils import path_template, required_args, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -65,7 +65,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_dmca"],
         address1: str,
         agent_name: str,
@@ -175,7 +175,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_trademark"],
         email: str,
         email2: str,
@@ -266,14 +266,14 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_general"],
         email: str,
         email2: str,
         host_notification: Literal["send", "send-anon"],
         justification: str,
         name: str,
-        owner_notification: Literal["send", "send-anon", "none"],
+        owner_notification: Literal["send", "send-anon"],
         urls: str,
         comments: str | Omit = omit,
         company: str | Omit = omit,
@@ -364,7 +364,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_phishing"],
         email: str,
         email2: str,
@@ -450,7 +450,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_children"],
         email: str,
         email2: str,
@@ -540,7 +540,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_threat"],
         email: str,
         email2: str,
@@ -622,7 +622,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_registrar_whois"],
         email: str,
         email2: str,
@@ -631,6 +631,7 @@ class AbuseReportsResource(SyncAPIResource):
         urls: str,
         comments: str | Omit = omit,
         company: str | Omit = omit,
+        reg_who_request: abuse_report_create_params.AbuseReportsRegistrarWhoisReportRegWhoRequest | Omit = omit,
         reported_country: str | Omit = omit,
         reported_user_agent: str | Omit = omit,
         tele: str | Omit = omit,
@@ -671,6 +672,8 @@ class AbuseReportsResource(SyncAPIResource):
           company: Text not exceeding 100 characters. This field may be released by Cloudflare to
               third parties such as the Lumen Database (https://lumendatabase.org/).
 
+          reg_who_request: RDP-mandated fields for registrar WHOIS data disclosure requests.
+
           reported_country: Text containing 2 characters
 
           reported_user_agent: Text not exceeding 255 characters
@@ -695,7 +698,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_ncsei"],
         email: str,
         email2: str,
@@ -776,7 +779,6 @@ class AbuseReportsResource(SyncAPIResource):
 
     @required_args(
         [
-            "account_id",
             "act",
             "address1",
             "agent_name",
@@ -794,7 +796,6 @@ class AbuseReportsResource(SyncAPIResource):
             "urls",
         ],
         [
-            "account_id",
             "act",
             "email",
             "email2",
@@ -807,19 +808,8 @@ class AbuseReportsResource(SyncAPIResource):
             "trademark_symbol",
             "urls",
         ],
+        ["act", "email", "email2", "host_notification", "justification", "name", "owner_notification", "urls"],
         [
-            "account_id",
-            "act",
-            "email",
-            "email2",
-            "host_notification",
-            "justification",
-            "name",
-            "owner_notification",
-            "urls",
-        ],
-        [
-            "account_id",
             "act",
             "email",
             "email2",
@@ -830,9 +820,8 @@ class AbuseReportsResource(SyncAPIResource):
             "owner_notification",
             "urls",
         ],
-        ["account_id", "act", "email", "email2", "name", "owner_notification", "urls"],
+        ["act", "email", "email2", "name", "owner_notification", "urls"],
         [
-            "account_id",
             "act",
             "email",
             "email2",
@@ -847,7 +836,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_dmca"]
         | Literal["abuse_trademark"]
         | Literal["abuse_general"]
@@ -866,7 +855,7 @@ class AbuseReportsResource(SyncAPIResource):
         host_notification: Literal["send"] | Literal["send", "send-anon"] | Omit = omit,
         name: str,
         original_work: str | Omit = omit,
-        owner_notification: Literal["send"] | Literal["send", "send-anon", "none"] | Literal["send", "send-anon"],
+        owner_notification: Literal["send"] | Literal["send", "send-anon"] | Literal["send", "send-anon", "none"],
         signature: str | Omit = omit,
         state: str | Omit = omit,
         urls: str,
@@ -884,6 +873,7 @@ class AbuseReportsResource(SyncAPIResource):
         ports_protocols: str | Omit = omit,
         source_ips: str | Omit = omit,
         ncmec_notification: Literal["send", "send-anon"] | Omit = omit,
+        reg_who_request: abuse_report_create_params.AbuseReportsRegistrarWhoisReportRegWhoRequest | Omit = omit,
         ncsei_subject_representation: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -892,12 +882,16 @@ class AbuseReportsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> str:
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not report_param:
             raise ValueError(f"Expected a non-empty value for `report_param` but received {report_param!r}")
         return self._post(
-            f"/accounts/{account_id}/abuse-reports/{report_param}",
+            path_template(
+                "/accounts/{account_id}/abuse-reports/{report_param}", account_id=account_id, report_param=report_param
+            ),
             body=maybe_transform(
                 {
                     "act": act,
@@ -929,6 +923,7 @@ class AbuseReportsResource(SyncAPIResource):
                     "ports_protocols": ports_protocols,
                     "source_ips": source_ips,
                     "ncmec_notification": ncmec_notification,
+                    "reg_who_request": reg_who_request,
                     "ncsei_subject_representation": ncsei_subject_representation,
                 },
                 abuse_report_create_params.AbuseReportCreateParams,
@@ -946,7 +941,7 @@ class AbuseReportsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         created_after: str | Omit = omit,
         created_before: str | Omit = omit,
         domain: str | Omit = omit,
@@ -993,10 +988,12 @@ class AbuseReportsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/abuse-reports",
+            path_template("/accounts/{account_id}/abuse-reports", account_id=account_id),
             page=SyncV4PagePagination[Optional[AbuseReportListResponse]],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -1025,7 +1022,7 @@ class AbuseReportsResource(SyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1045,12 +1042,16 @@ class AbuseReportsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not report_param:
             raise ValueError(f"Expected a non-empty value for `report_param` but received {report_param!r}")
         return self._get(
-            f"/accounts/{account_id}/abuse-reports/{report_param}",
+            path_template(
+                "/accounts/{account_id}/abuse-reports/{report_param}", account_id=account_id, report_param=report_param
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -1091,7 +1092,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_dmca"],
         address1: str,
         agent_name: str,
@@ -1201,7 +1202,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_trademark"],
         email: str,
         email2: str,
@@ -1292,14 +1293,14 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_general"],
         email: str,
         email2: str,
         host_notification: Literal["send", "send-anon"],
         justification: str,
         name: str,
-        owner_notification: Literal["send", "send-anon", "none"],
+        owner_notification: Literal["send", "send-anon"],
         urls: str,
         comments: str | Omit = omit,
         company: str | Omit = omit,
@@ -1390,7 +1391,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_phishing"],
         email: str,
         email2: str,
@@ -1476,7 +1477,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_children"],
         email: str,
         email2: str,
@@ -1566,7 +1567,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_threat"],
         email: str,
         email2: str,
@@ -1648,7 +1649,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_registrar_whois"],
         email: str,
         email2: str,
@@ -1657,6 +1658,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         urls: str,
         comments: str | Omit = omit,
         company: str | Omit = omit,
+        reg_who_request: abuse_report_create_params.AbuseReportsRegistrarWhoisReportRegWhoRequest | Omit = omit,
         reported_country: str | Omit = omit,
         reported_user_agent: str | Omit = omit,
         tele: str | Omit = omit,
@@ -1697,6 +1699,8 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
           company: Text not exceeding 100 characters. This field may be released by Cloudflare to
               third parties such as the Lumen Database (https://lumendatabase.org/).
 
+          reg_who_request: RDP-mandated fields for registrar WHOIS data disclosure requests.
+
           reported_country: Text containing 2 characters
 
           reported_user_agent: Text not exceeding 255 characters
@@ -1721,7 +1725,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_ncsei"],
         email: str,
         email2: str,
@@ -1802,7 +1806,6 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
 
     @required_args(
         [
-            "account_id",
             "act",
             "address1",
             "agent_name",
@@ -1820,7 +1823,6 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
             "urls",
         ],
         [
-            "account_id",
             "act",
             "email",
             "email2",
@@ -1833,19 +1835,8 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
             "trademark_symbol",
             "urls",
         ],
+        ["act", "email", "email2", "host_notification", "justification", "name", "owner_notification", "urls"],
         [
-            "account_id",
-            "act",
-            "email",
-            "email2",
-            "host_notification",
-            "justification",
-            "name",
-            "owner_notification",
-            "urls",
-        ],
-        [
-            "account_id",
             "act",
             "email",
             "email2",
@@ -1856,9 +1847,8 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
             "owner_notification",
             "urls",
         ],
-        ["account_id", "act", "email", "email2", "name", "owner_notification", "urls"],
+        ["act", "email", "email2", "name", "owner_notification", "urls"],
         [
-            "account_id",
             "act",
             "email",
             "email2",
@@ -1873,7 +1863,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         act: Literal["abuse_dmca"]
         | Literal["abuse_trademark"]
         | Literal["abuse_general"]
@@ -1892,7 +1882,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         host_notification: Literal["send"] | Literal["send", "send-anon"] | Omit = omit,
         name: str,
         original_work: str | Omit = omit,
-        owner_notification: Literal["send"] | Literal["send", "send-anon", "none"] | Literal["send", "send-anon"],
+        owner_notification: Literal["send"] | Literal["send", "send-anon"] | Literal["send", "send-anon", "none"],
         signature: str | Omit = omit,
         state: str | Omit = omit,
         urls: str,
@@ -1910,6 +1900,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         ports_protocols: str | Omit = omit,
         source_ips: str | Omit = omit,
         ncmec_notification: Literal["send", "send-anon"] | Omit = omit,
+        reg_who_request: abuse_report_create_params.AbuseReportsRegistrarWhoisReportRegWhoRequest | Omit = omit,
         ncsei_subject_representation: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -1918,12 +1909,16 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> str:
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not report_param:
             raise ValueError(f"Expected a non-empty value for `report_param` but received {report_param!r}")
         return await self._post(
-            f"/accounts/{account_id}/abuse-reports/{report_param}",
+            path_template(
+                "/accounts/{account_id}/abuse-reports/{report_param}", account_id=account_id, report_param=report_param
+            ),
             body=await async_maybe_transform(
                 {
                     "act": act,
@@ -1955,6 +1950,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
                     "ports_protocols": ports_protocols,
                     "source_ips": source_ips,
                     "ncmec_notification": ncmec_notification,
+                    "reg_who_request": reg_who_request,
                     "ncsei_subject_representation": ncsei_subject_representation,
                 },
                 abuse_report_create_params.AbuseReportCreateParams,
@@ -1972,7 +1968,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         created_after: str | Omit = omit,
         created_before: str | Omit = omit,
         domain: str | Omit = omit,
@@ -2019,10 +2015,12 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/abuse-reports",
+            path_template("/accounts/{account_id}/abuse-reports", account_id=account_id),
             page=AsyncV4PagePagination[Optional[AbuseReportListResponse]],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -2051,7 +2049,7 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
         self,
         report_param: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -2071,12 +2069,16 @@ class AsyncAbuseReportsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not report_param:
             raise ValueError(f"Expected a non-empty value for `report_param` but received {report_param!r}")
         return await self._get(
-            f"/accounts/{account_id}/abuse-reports/{report_param}",
+            path_template(
+                "/accounts/{account_id}/abuse-reports/{report_param}", account_id=account_id, report_param=report_param
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

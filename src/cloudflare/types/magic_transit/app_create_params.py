@@ -10,7 +10,7 @@ __all__ = ["AppCreateParams"]
 
 
 class AppCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Identifier"""
 
     name: Required[str]
@@ -23,6 +23,12 @@ class AppCreateParams(TypedDict, total=False):
     """FQDNs to associate with traffic decisions."""
 
     ip_subnets: SequenceNotStr[str]
+    """IPv4 CIDRs to associate with traffic decisions.
+
+    (IPv6 CIDRs are currently unsupported)
+    """
+
+    source_subnets: SequenceNotStr[str]
     """IPv4 CIDRs to associate with traffic decisions.
 
     (IPv6 CIDRs are currently unsupported)

@@ -7,7 +7,7 @@ from typing import Type, Iterable, cast
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -47,7 +47,7 @@ class ConfigurationsResource(SyncAPIResource):
     def update(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         auth_id_characteristics: Iterable[configuration_update_params.AuthIDCharacteristic],
         normalize: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -57,8 +57,10 @@ class ConfigurationsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Configuration:
-        """
-        Update configuration properties
+        """Updates API Shield configuration settings for a zone.
+
+        Can modify validation
+        strictness, enforcement mode, and other global settings.
 
         Args:
           zone_id: Identifier.
@@ -73,10 +75,12 @@ class ConfigurationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._put(
-            f"/zones/{zone_id}/api_gateway/configuration",
+            path_template("/zones/{zone_id}/api_gateway/configuration", zone_id=zone_id),
             body=maybe_transform(
                 {"auth_id_characteristics": auth_id_characteristics},
                 configuration_update_params.ConfigurationUpdateParams,
@@ -95,7 +99,7 @@ class ConfigurationsResource(SyncAPIResource):
     def get(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         normalize: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -105,7 +109,8 @@ class ConfigurationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Configuration:
         """
-        Retrieve information about specific configuration properties
+        Gets the current API Shield configuration settings for a zone, including
+        validation behavior and enforcement mode.
 
         Args:
           zone_id: Identifier.
@@ -120,10 +125,12 @@ class ConfigurationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get(
-            f"/zones/{zone_id}/api_gateway/configuration",
+            path_template("/zones/{zone_id}/api_gateway/configuration", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -159,7 +166,7 @@ class AsyncConfigurationsResource(AsyncAPIResource):
     async def update(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         auth_id_characteristics: Iterable[configuration_update_params.AuthIDCharacteristic],
         normalize: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -169,8 +176,10 @@ class AsyncConfigurationsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Configuration:
-        """
-        Update configuration properties
+        """Updates API Shield configuration settings for a zone.
+
+        Can modify validation
+        strictness, enforcement mode, and other global settings.
 
         Args:
           zone_id: Identifier.
@@ -185,10 +194,12 @@ class AsyncConfigurationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._put(
-            f"/zones/{zone_id}/api_gateway/configuration",
+            path_template("/zones/{zone_id}/api_gateway/configuration", zone_id=zone_id),
             body=await async_maybe_transform(
                 {"auth_id_characteristics": auth_id_characteristics},
                 configuration_update_params.ConfigurationUpdateParams,
@@ -209,7 +220,7 @@ class AsyncConfigurationsResource(AsyncAPIResource):
     async def get(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         normalize: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -219,7 +230,8 @@ class AsyncConfigurationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Configuration:
         """
-        Retrieve information about specific configuration properties
+        Gets the current API Shield configuration settings for a zone, including
+        validation behavior and enforcement mode.
 
         Args:
           zone_id: Identifier.
@@ -234,10 +246,12 @@ class AsyncConfigurationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._get(
-            f"/zones/{zone_id}/api_gateway/configuration",
+            path_template("/zones/{zone_id}/api_gateway/configuration", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

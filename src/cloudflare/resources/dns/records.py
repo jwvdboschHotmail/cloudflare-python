@@ -9,7 +9,7 @@ from typing_extensions import Literal, overload
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ..._utils import required_args, maybe_transform, async_maybe_transform
+from ..._utils import path_template, required_args, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -71,12 +71,13 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_create_params.ARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -113,6 +114,8 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid IPv4 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -134,12 +137,13 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["AAAA"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_create_params.AAAARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -176,6 +180,8 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid IPv6 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -197,7 +203,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CNAME"],
@@ -260,7 +266,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["MX"],
@@ -303,8 +309,9 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid mail server hostname.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -327,7 +334,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NS"],
@@ -390,7 +397,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["OPENPGPKEY"],
@@ -453,7 +460,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["PTR"],
@@ -516,7 +523,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TXT"],
@@ -584,7 +591,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CAA"],
@@ -647,7 +654,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CERT"],
@@ -710,7 +717,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DNSKEY"],
@@ -773,7 +780,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DS"],
@@ -836,7 +843,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["HTTPS"],
@@ -899,7 +906,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["LOC"],
@@ -962,7 +969,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NAPTR"],
@@ -1025,7 +1032,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SMIMEA"],
@@ -1088,7 +1095,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SRV"],
@@ -1151,7 +1158,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SSHFP"],
@@ -1214,7 +1221,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SVCB"],
@@ -1277,7 +1284,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TLSA"],
@@ -1340,7 +1347,7 @@ class RecordsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["URI"],
@@ -1383,8 +1390,9 @@ class RecordsResource(SyncAPIResource):
 
           data: Components of a URI record.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -1403,11 +1411,11 @@ class RecordsResource(SyncAPIResource):
         """
         ...
 
-    @required_args(["zone_id", "name", "ttl", "type"])
+    @required_args(["name", "ttl", "type"])
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"]
@@ -1433,6 +1441,7 @@ class RecordsResource(SyncAPIResource):
         | Literal["URI"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_create_params.ARecordSettings
         | record_create_params.AAAARecordSettings
@@ -1479,12 +1488,14 @@ class RecordsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RecordResponse]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return cast(
             Optional[RecordResponse],
             self._post(
-                f"/zones/{zone_id}/dns_records",
+                path_template("/zones/{zone_id}/dns_records", zone_id=zone_id),
                 body=maybe_transform(
                     {
                         "name": name,
@@ -1492,6 +1503,7 @@ class RecordsResource(SyncAPIResource):
                         "type": type,
                         "comment": comment,
                         "content": content,
+                        "private_routing": private_routing,
                         "proxied": proxied,
                         "settings": settings,
                         "tags": tags,
@@ -1518,12 +1530,13 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_update_params.ARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -1562,6 +1575,8 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid IPv4 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -1584,12 +1599,13 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["AAAA"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_update_params.AAAARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -1628,6 +1644,8 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid IPv6 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -1650,7 +1668,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CNAME"],
@@ -1716,7 +1734,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["MX"],
@@ -1761,8 +1779,9 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid mail server hostname.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -1786,7 +1805,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NS"],
@@ -1852,7 +1871,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["OPENPGPKEY"],
@@ -1918,7 +1937,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["PTR"],
@@ -1984,7 +2003,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TXT"],
@@ -2055,7 +2074,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CAA"],
@@ -2121,7 +2140,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CERT"],
@@ -2187,7 +2206,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DNSKEY"],
@@ -2253,7 +2272,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DS"],
@@ -2319,7 +2338,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["HTTPS"],
@@ -2385,7 +2404,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["LOC"],
@@ -2451,7 +2470,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NAPTR"],
@@ -2517,7 +2536,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SMIMEA"],
@@ -2583,7 +2602,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SRV"],
@@ -2649,7 +2668,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SSHFP"],
@@ -2715,7 +2734,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SVCB"],
@@ -2781,7 +2800,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TLSA"],
@@ -2847,7 +2866,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["URI"],
@@ -2892,8 +2911,9 @@ class RecordsResource(SyncAPIResource):
 
           data: Components of a URI record.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -2912,12 +2932,12 @@ class RecordsResource(SyncAPIResource):
         """
         ...
 
-    @required_args(["zone_id", "name", "ttl", "type"])
+    @required_args(["name", "ttl", "type"])
     def update(
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"]
@@ -2943,6 +2963,7 @@ class RecordsResource(SyncAPIResource):
         | Literal["URI"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_update_params.ARecordSettings
         | record_update_params.AAAARecordSettings
@@ -2989,6 +3010,8 @@ class RecordsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RecordResponse]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
@@ -2996,7 +3019,9 @@ class RecordsResource(SyncAPIResource):
         return cast(
             Optional[RecordResponse],
             self._put(
-                f"/zones/{zone_id}/dns_records/{dns_record_id}",
+                path_template(
+                    "/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id
+                ),
                 body=maybe_transform(
                     {
                         "name": name,
@@ -3004,6 +3029,7 @@ class RecordsResource(SyncAPIResource):
                         "type": type,
                         "comment": comment,
                         "content": content,
+                        "private_routing": private_routing,
                         "proxied": proxied,
                         "settings": settings,
                         "tags": tags,
@@ -3028,7 +3054,7 @@ class RecordsResource(SyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         comment: record_list_params.Comment | Omit = omit,
         content: record_list_params.Content | Omit = omit,
         direction: SortDirection | Omit = omit,
@@ -3115,10 +3141,12 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/dns_records",
+            path_template("/zones/{zone_id}/dns_records", zone_id=zone_id),
             page=SyncV4PagePaginationArray[RecordResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -3151,7 +3179,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -3175,12 +3203,14 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
             raise ValueError(f"Expected a non-empty value for `dns_record_id` but received {dns_record_id!r}")
         return self._delete(
-            f"/zones/{zone_id}/dns_records/{dns_record_id}",
+            path_template("/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -3194,7 +3224,7 @@ class RecordsResource(SyncAPIResource):
     def batch(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         deletes: Iterable[record_batch_params.Delete] | Omit = omit,
         patches: Iterable[BatchPatchParam] | Omit = omit,
         posts: Iterable[record_batch_params.Post] | Omit = omit,
@@ -3236,10 +3266,12 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            f"/zones/{zone_id}/dns_records/batch",
+            path_template("/zones/{zone_id}/dns_records/batch", zone_id=zone_id),
             body=maybe_transform(
                 {
                     "deletes": deletes,
@@ -3264,12 +3296,13 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_edit_params.ARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -3308,6 +3341,8 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid IPv4 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -3330,12 +3365,13 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["AAAA"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_edit_params.AAAARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -3374,6 +3410,8 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid IPv6 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -3396,7 +3434,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CNAME"],
@@ -3462,7 +3500,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["MX"],
@@ -3507,8 +3545,9 @@ class RecordsResource(SyncAPIResource):
 
           content: A valid mail server hostname.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -3532,7 +3571,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NS"],
@@ -3598,7 +3637,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["OPENPGPKEY"],
@@ -3664,7 +3703,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["PTR"],
@@ -3730,7 +3769,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TXT"],
@@ -3801,7 +3840,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CAA"],
@@ -3867,7 +3906,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CERT"],
@@ -3933,7 +3972,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DNSKEY"],
@@ -3999,7 +4038,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DS"],
@@ -4065,7 +4104,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["HTTPS"],
@@ -4131,7 +4170,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["LOC"],
@@ -4197,7 +4236,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NAPTR"],
@@ -4263,7 +4302,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SMIMEA"],
@@ -4329,7 +4368,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SRV"],
@@ -4395,7 +4434,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SSHFP"],
@@ -4461,7 +4500,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SVCB"],
@@ -4527,7 +4566,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TLSA"],
@@ -4593,7 +4632,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["URI"],
@@ -4638,8 +4677,9 @@ class RecordsResource(SyncAPIResource):
 
           data: Components of a URI record.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -4658,12 +4698,12 @@ class RecordsResource(SyncAPIResource):
         """
         ...
 
-    @required_args(["zone_id", "name", "ttl", "type"])
+    @required_args(["name", "ttl", "type"])
     def edit(
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"]
@@ -4689,6 +4729,7 @@ class RecordsResource(SyncAPIResource):
         | Literal["URI"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_edit_params.ARecordSettings
         | record_edit_params.AAAARecordSettings
@@ -4735,6 +4776,8 @@ class RecordsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RecordResponse]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
@@ -4742,7 +4785,9 @@ class RecordsResource(SyncAPIResource):
         return cast(
             Optional[RecordResponse],
             self._patch(
-                f"/zones/{zone_id}/dns_records/{dns_record_id}",
+                path_template(
+                    "/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id
+                ),
                 body=maybe_transform(
                     {
                         "name": name,
@@ -4750,6 +4795,7 @@ class RecordsResource(SyncAPIResource):
                         "type": type,
                         "comment": comment,
                         "content": content,
+                        "private_routing": private_routing,
                         "proxied": proxied,
                         "settings": settings,
                         "tags": tags,
@@ -4774,7 +4820,7 @@ class RecordsResource(SyncAPIResource):
     def export(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -4802,11 +4848,13 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         extra_headers = {"Accept": "text/plain", **(extra_headers or {})}
         return self._get(
-            f"/zones/{zone_id}/dns_records/export",
+            path_template("/zones/{zone_id}/dns_records/export", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -4817,7 +4865,7 @@ class RecordsResource(SyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -4841,6 +4889,8 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
@@ -4848,7 +4898,9 @@ class RecordsResource(SyncAPIResource):
         return cast(
             Optional[RecordResponse],
             self._get(
-                f"/zones/{zone_id}/dns_records/{dns_record_id}",
+                path_template(
+                    "/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id
+                ),
                 options=make_request_options(
                     extra_headers=extra_headers,
                     extra_query=extra_query,
@@ -4865,7 +4917,7 @@ class RecordsResource(SyncAPIResource):
     def import_(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         file: str,
         proxied: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -4906,6 +4958,8 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         # It should be noted that the actual Content-Type header that will be
@@ -4913,7 +4967,7 @@ class RecordsResource(SyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return self._post(
-            f"/zones/{zone_id}/dns_records/import",
+            path_template("/zones/{zone_id}/dns_records/import", zone_id=zone_id),
             body=maybe_transform(
                 {
                     "file": file,
@@ -4937,7 +4991,7 @@ class RecordsResource(SyncAPIResource):
     def scan(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         body: object,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -4961,10 +5015,12 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            f"/zones/{zone_id}/dns_records/scan",
+            path_template("/zones/{zone_id}/dns_records/scan", zone_id=zone_id),
             body=maybe_transform(body, record_scan_params.RecordScanParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -4979,7 +5035,7 @@ class RecordsResource(SyncAPIResource):
     def scan_list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -5004,10 +5060,12 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/dns_records/scan/review",
+            path_template("/zones/{zone_id}/dns_records/scan/review", zone_id=zone_id),
             page=SyncSinglePage[RecordResponse],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -5018,7 +5076,7 @@ class RecordsResource(SyncAPIResource):
     def scan_review(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         accepts: Iterable[record_scan_review_params.Accept] | Omit = omit,
         rejects: Iterable[record_scan_review_params.Reject] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -5045,10 +5103,12 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            f"/zones/{zone_id}/dns_records/scan/review",
+            path_template("/zones/{zone_id}/dns_records/scan/review", zone_id=zone_id),
             body=maybe_transform(
                 {
                     "accepts": accepts,
@@ -5069,7 +5129,7 @@ class RecordsResource(SyncAPIResource):
     def scan_trigger(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -5095,10 +5155,12 @@ class RecordsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            f"/zones/{zone_id}/dns_records/scan/trigger",
+            path_template("/zones/{zone_id}/dns_records/scan/trigger", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -5130,12 +5192,13 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_create_params.ARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -5172,6 +5235,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid IPv4 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -5193,12 +5258,13 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["AAAA"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_create_params.AAAARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -5235,6 +5301,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid IPv6 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -5256,7 +5324,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CNAME"],
@@ -5319,7 +5387,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["MX"],
@@ -5362,8 +5430,9 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid mail server hostname.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -5386,7 +5455,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NS"],
@@ -5449,7 +5518,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["OPENPGPKEY"],
@@ -5512,7 +5581,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["PTR"],
@@ -5575,7 +5644,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TXT"],
@@ -5643,7 +5712,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CAA"],
@@ -5706,7 +5775,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CERT"],
@@ -5769,7 +5838,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DNSKEY"],
@@ -5832,7 +5901,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DS"],
@@ -5895,7 +5964,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["HTTPS"],
@@ -5958,7 +6027,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["LOC"],
@@ -6021,7 +6090,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NAPTR"],
@@ -6084,7 +6153,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SMIMEA"],
@@ -6147,7 +6216,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SRV"],
@@ -6210,7 +6279,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SSHFP"],
@@ -6273,7 +6342,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SVCB"],
@@ -6336,7 +6405,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TLSA"],
@@ -6399,7 +6468,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["URI"],
@@ -6442,8 +6511,9 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           data: Components of a URI record.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -6462,11 +6532,11 @@ class AsyncRecordsResource(AsyncAPIResource):
         """
         ...
 
-    @required_args(["zone_id", "name", "ttl", "type"])
+    @required_args(["name", "ttl", "type"])
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"]
@@ -6492,6 +6562,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         | Literal["URI"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_create_params.ARecordSettings
         | record_create_params.AAAARecordSettings
@@ -6538,12 +6609,14 @@ class AsyncRecordsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RecordResponse]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return cast(
             Optional[RecordResponse],
             await self._post(
-                f"/zones/{zone_id}/dns_records",
+                path_template("/zones/{zone_id}/dns_records", zone_id=zone_id),
                 body=await async_maybe_transform(
                     {
                         "name": name,
@@ -6551,6 +6624,7 @@ class AsyncRecordsResource(AsyncAPIResource):
                         "type": type,
                         "comment": comment,
                         "content": content,
+                        "private_routing": private_routing,
                         "proxied": proxied,
                         "settings": settings,
                         "tags": tags,
@@ -6577,12 +6651,13 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_update_params.ARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -6621,6 +6696,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid IPv4 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -6643,12 +6720,13 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["AAAA"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_update_params.AAAARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -6687,6 +6765,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid IPv6 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -6709,7 +6789,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CNAME"],
@@ -6775,7 +6855,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["MX"],
@@ -6820,8 +6900,9 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid mail server hostname.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -6845,7 +6926,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NS"],
@@ -6911,7 +6992,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["OPENPGPKEY"],
@@ -6977,7 +7058,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["PTR"],
@@ -7043,7 +7124,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TXT"],
@@ -7114,7 +7195,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CAA"],
@@ -7180,7 +7261,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CERT"],
@@ -7246,7 +7327,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DNSKEY"],
@@ -7312,7 +7393,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DS"],
@@ -7378,7 +7459,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["HTTPS"],
@@ -7444,7 +7525,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["LOC"],
@@ -7510,7 +7591,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NAPTR"],
@@ -7576,7 +7657,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SMIMEA"],
@@ -7642,7 +7723,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SRV"],
@@ -7708,7 +7789,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SSHFP"],
@@ -7774,7 +7855,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SVCB"],
@@ -7840,7 +7921,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TLSA"],
@@ -7906,7 +7987,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["URI"],
@@ -7951,8 +8032,9 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           data: Components of a URI record.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -7971,12 +8053,12 @@ class AsyncRecordsResource(AsyncAPIResource):
         """
         ...
 
-    @required_args(["zone_id", "name", "ttl", "type"])
+    @required_args(["name", "ttl", "type"])
     async def update(
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"]
@@ -8002,6 +8084,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         | Literal["URI"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_update_params.ARecordSettings
         | record_update_params.AAAARecordSettings
@@ -8048,6 +8131,8 @@ class AsyncRecordsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RecordResponse]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
@@ -8055,7 +8140,9 @@ class AsyncRecordsResource(AsyncAPIResource):
         return cast(
             Optional[RecordResponse],
             await self._put(
-                f"/zones/{zone_id}/dns_records/{dns_record_id}",
+                path_template(
+                    "/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id
+                ),
                 body=await async_maybe_transform(
                     {
                         "name": name,
@@ -8063,6 +8150,7 @@ class AsyncRecordsResource(AsyncAPIResource):
                         "type": type,
                         "comment": comment,
                         "content": content,
+                        "private_routing": private_routing,
                         "proxied": proxied,
                         "settings": settings,
                         "tags": tags,
@@ -8087,7 +8175,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         comment: record_list_params.Comment | Omit = omit,
         content: record_list_params.Content | Omit = omit,
         direction: SortDirection | Omit = omit,
@@ -8174,10 +8262,12 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/dns_records",
+            path_template("/zones/{zone_id}/dns_records", zone_id=zone_id),
             page=AsyncV4PagePaginationArray[RecordResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -8210,7 +8300,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -8234,12 +8324,14 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
             raise ValueError(f"Expected a non-empty value for `dns_record_id` but received {dns_record_id!r}")
         return await self._delete(
-            f"/zones/{zone_id}/dns_records/{dns_record_id}",
+            path_template("/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -8253,7 +8345,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def batch(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         deletes: Iterable[record_batch_params.Delete] | Omit = omit,
         patches: Iterable[BatchPatchParam] | Omit = omit,
         posts: Iterable[record_batch_params.Post] | Omit = omit,
@@ -8295,10 +8387,12 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            f"/zones/{zone_id}/dns_records/batch",
+            path_template("/zones/{zone_id}/dns_records/batch", zone_id=zone_id),
             body=await async_maybe_transform(
                 {
                     "deletes": deletes,
@@ -8323,12 +8417,13 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_edit_params.ARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -8367,6 +8462,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid IPv4 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -8389,12 +8486,13 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["AAAA"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_edit_params.AAAARecordSettings | Omit = omit,
         tags: SequenceNotStr[RecordTags] | Omit = omit,
@@ -8433,6 +8531,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid IPv6 address.
 
+          private_routing: Enables private network routing to the origin.
+
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
 
@@ -8455,7 +8555,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CNAME"],
@@ -8521,7 +8621,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["MX"],
@@ -8566,8 +8666,9 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           content: A valid mail server hostname.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -8591,7 +8692,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NS"],
@@ -8657,7 +8758,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["OPENPGPKEY"],
@@ -8723,7 +8824,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["PTR"],
@@ -8789,7 +8890,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TXT"],
@@ -8860,7 +8961,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CAA"],
@@ -8926,7 +9027,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["CERT"],
@@ -8992,7 +9093,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DNSKEY"],
@@ -9058,7 +9159,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["DS"],
@@ -9124,7 +9225,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["HTTPS"],
@@ -9190,7 +9291,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["LOC"],
@@ -9256,7 +9357,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["NAPTR"],
@@ -9322,7 +9423,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SMIMEA"],
@@ -9388,7 +9489,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SRV"],
@@ -9454,7 +9555,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SSHFP"],
@@ -9520,7 +9621,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["SVCB"],
@@ -9586,7 +9687,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["TLSA"],
@@ -9652,7 +9753,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["URI"],
@@ -9697,8 +9798,9 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           data: Components of a URI record.
 
-          priority: Required for MX, SRV and URI records; unused by other record types. Records with
-              lower priorities are preferred.
+          priority: Required for MX and URI records; ignored for other record types (but may still
+              be returned by the API). Records with lower priorities are preferred. This field
+              is to be deprecated in favor of the priority field within the data map.
 
           proxied: Whether the record is receiving the performance and security benefits of
               Cloudflare.
@@ -9717,12 +9819,12 @@ class AsyncRecordsResource(AsyncAPIResource):
         """
         ...
 
-    @required_args(["zone_id", "name", "ttl", "type"])
+    @required_args(["name", "ttl", "type"])
     async def edit(
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         name: str,
         ttl: TTLParam,
         type: Literal["A"]
@@ -9748,6 +9850,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         | Literal["URI"],
         comment: str | Omit = omit,
         content: str | Omit = omit,
+        private_routing: bool | Omit = omit,
         proxied: bool | Omit = omit,
         settings: record_edit_params.ARecordSettings
         | record_edit_params.AAAARecordSettings
@@ -9794,6 +9897,8 @@ class AsyncRecordsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RecordResponse]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
@@ -9801,7 +9906,9 @@ class AsyncRecordsResource(AsyncAPIResource):
         return cast(
             Optional[RecordResponse],
             await self._patch(
-                f"/zones/{zone_id}/dns_records/{dns_record_id}",
+                path_template(
+                    "/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id
+                ),
                 body=await async_maybe_transform(
                     {
                         "name": name,
@@ -9809,6 +9916,7 @@ class AsyncRecordsResource(AsyncAPIResource):
                         "type": type,
                         "comment": comment,
                         "content": content,
+                        "private_routing": private_routing,
                         "proxied": proxied,
                         "settings": settings,
                         "tags": tags,
@@ -9833,7 +9941,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def export(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -9861,11 +9969,13 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         extra_headers = {"Accept": "text/plain", **(extra_headers or {})}
         return await self._get(
-            f"/zones/{zone_id}/dns_records/export",
+            path_template("/zones/{zone_id}/dns_records/export", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -9876,7 +9986,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         self,
         dns_record_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -9900,6 +10010,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not dns_record_id:
@@ -9907,7 +10019,9 @@ class AsyncRecordsResource(AsyncAPIResource):
         return cast(
             Optional[RecordResponse],
             await self._get(
-                f"/zones/{zone_id}/dns_records/{dns_record_id}",
+                path_template(
+                    "/zones/{zone_id}/dns_records/{dns_record_id}", zone_id=zone_id, dns_record_id=dns_record_id
+                ),
                 options=make_request_options(
                     extra_headers=extra_headers,
                     extra_query=extra_query,
@@ -9924,7 +10038,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def import_(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         file: str,
         proxied: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -9965,6 +10079,8 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         # It should be noted that the actual Content-Type header that will be
@@ -9972,7 +10088,7 @@ class AsyncRecordsResource(AsyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return await self._post(
-            f"/zones/{zone_id}/dns_records/import",
+            path_template("/zones/{zone_id}/dns_records/import", zone_id=zone_id),
             body=await async_maybe_transform(
                 {
                     "file": file,
@@ -9996,7 +10112,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def scan(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         body: object,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -10020,10 +10136,12 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            f"/zones/{zone_id}/dns_records/scan",
+            path_template("/zones/{zone_id}/dns_records/scan", zone_id=zone_id),
             body=await async_maybe_transform(body, record_scan_params.RecordScanParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -10038,7 +10156,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     def scan_list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -10063,10 +10181,12 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/dns_records/scan/review",
+            path_template("/zones/{zone_id}/dns_records/scan/review", zone_id=zone_id),
             page=AsyncSinglePage[RecordResponse],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -10077,7 +10197,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def scan_review(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         accepts: Iterable[record_scan_review_params.Accept] | Omit = omit,
         rejects: Iterable[record_scan_review_params.Reject] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -10104,10 +10224,12 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            f"/zones/{zone_id}/dns_records/scan/review",
+            path_template("/zones/{zone_id}/dns_records/scan/review", zone_id=zone_id),
             body=await async_maybe_transform(
                 {
                     "accepts": accepts,
@@ -10128,7 +10250,7 @@ class AsyncRecordsResource(AsyncAPIResource):
     async def scan_trigger(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -10154,10 +10276,12 @@ class AsyncRecordsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            f"/zones/{zone_id}/dns_records/scan/trigger",
+            path_template("/zones/{zone_id}/dns_records/scan/trigger", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),

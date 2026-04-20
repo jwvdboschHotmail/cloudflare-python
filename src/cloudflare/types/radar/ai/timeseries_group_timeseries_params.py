@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Union
+from typing import List, Union
 from datetime import datetime
 from typing_extensions import Literal, Annotated, TypedDict
 
@@ -27,6 +27,31 @@ class TimeseriesGroupTimeseriesParams(TypedDict, total=False):
     Prefix with `-` to exclude ASNs from results. For example, `-174, 3356` excludes
     results from AS174, but includes results from AS3356.
     """
+
+    content_type: Annotated[
+        List[
+            Literal[
+                "HTML",
+                "IMAGES",
+                "JSON",
+                "JAVASCRIPT",
+                "CSS",
+                "PLAIN_TEXT",
+                "FONTS",
+                "XML",
+                "YAML",
+                "VIDEO",
+                "AUDIO",
+                "MARKDOWN",
+                "DOCUMENTS",
+                "BINARY",
+                "SERIALIZATION",
+                "OTHER",
+            ]
+        ],
+        PropertyInfo(alias="contentType"),
+    ]
+    """Filters results by content type category."""
 
     continent: SequenceNotStr[str]
     """Filters results by continent.
@@ -76,6 +101,20 @@ class TimeseriesGroupTimeseriesParams(TypedDict, total=False):
 
     name: SequenceNotStr[str]
     """Array of names used to label the series in the response."""
+
+    response_status: Annotated[SequenceNotStr[str], PropertyInfo(alias="responseStatus")]
+    """Filters results by HTTP response status code (e.g.
+
+    200, 403, 404). Only
+    [IANA-registered codes](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+    are accepted.
+    """
+
+    response_status_category: Annotated[
+        List[Literal["INFORMATIONAL", "SUCCESS", "REDIRECTION", "CLIENT_ERROR", "SERVER_ERROR"]],
+        PropertyInfo(alias="responseStatusCategory"),
+    ]
+    """Filters results by HTTP response status code category."""
 
     user_agent: Annotated[SequenceNotStr[str], PropertyInfo(alias="userAgent")]
     """Filters results by user agent."""

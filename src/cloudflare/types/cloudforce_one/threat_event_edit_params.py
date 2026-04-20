@@ -12,8 +12,11 @@ __all__ = ["ThreatEventEditParams", "Raw"]
 
 
 class ThreatEventEditParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account ID."""
+
+    dataset_id: Required[Annotated[str, PropertyInfo(alias="datasetId")]]
+    """Dataset ID containing the event to update."""
 
     attacker: Optional[str]
 
@@ -22,8 +25,6 @@ class ThreatEventEditParams(TypedDict, total=False):
     category: str
 
     created_at: Annotated[Union[str, datetime], PropertyInfo(alias="createdAt", format="iso8601")]
-
-    dataset_id: Annotated[str, PropertyInfo(alias="datasetId")]
 
     date: Annotated[Union[str, datetime], PropertyInfo(format="iso8601")]
 

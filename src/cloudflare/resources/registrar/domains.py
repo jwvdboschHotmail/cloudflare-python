@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import typing_extensions
 from typing import Type, Optional, cast
 
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -45,11 +46,14 @@ class DomainsResource(SyncAPIResource):
         """
         return DomainsResourceWithStreamingResponse(self)
 
+    @typing_extensions.deprecated(
+        "This operation is deprecated and will be removed in a future release. A replacement Registrar API will be announced separately."
+    )
     def update(
         self,
         domain_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         auto_renew: bool | Omit = omit,
         locked: bool | Omit = omit,
         privacy: bool | Omit = omit,
@@ -66,7 +70,10 @@ class DomainsResource(SyncAPIResource):
         Args:
           account_id: Identifier
 
-          domain_name: Domain name.
+          domain_name: Fully qualified domain name (FQDN) including the extension (e.g., `example.com`,
+              `mybrand.app`). The domain name uniquely identifies a registration — the same
+              domain cannot be registered twice, making it a natural idempotency key for
+              registration requests.
 
           auto_renew: Auto-renew controls whether subscription is automatically renewed upon domain
               expiration.
@@ -83,12 +90,16 @@ class DomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_name:
             raise ValueError(f"Expected a non-empty value for `domain_name` but received {domain_name!r}")
         return self._put(
-            f"/accounts/{account_id}/registrar/domains/{domain_name}",
+            path_template(
+                "/accounts/{account_id}/registrar/domains/{domain_name}", account_id=account_id, domain_name=domain_name
+            ),
             body=maybe_transform(
                 {
                     "auto_renew": auto_renew,
@@ -107,10 +118,13 @@ class DomainsResource(SyncAPIResource):
             cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
+    @typing_extensions.deprecated(
+        "This operation is deprecated and will be removed in a future release. A replacement Registrar API will be announced separately."
+    )
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -132,10 +146,12 @@ class DomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/registrar/domains",
+            path_template("/accounts/{account_id}/registrar/domains", account_id=account_id),
             page=SyncSinglePage[Domain],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -143,11 +159,14 @@ class DomainsResource(SyncAPIResource):
             model=Domain,
         )
 
+    @typing_extensions.deprecated(
+        "This operation is deprecated and will be removed in a future release. A replacement Registrar API will be announced separately."
+    )
     def get(
         self,
         domain_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -161,7 +180,10 @@ class DomainsResource(SyncAPIResource):
         Args:
           account_id: Identifier
 
-          domain_name: Domain name.
+          domain_name: Fully qualified domain name (FQDN) including the extension (e.g., `example.com`,
+              `mybrand.app`). The domain name uniquely identifies a registration — the same
+              domain cannot be registered twice, making it a natural idempotency key for
+              registration requests.
 
           extra_headers: Send extra headers
 
@@ -171,12 +193,16 @@ class DomainsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_name:
             raise ValueError(f"Expected a non-empty value for `domain_name` but received {domain_name!r}")
         return self._get(
-            f"/accounts/{account_id}/registrar/domains/{domain_name}",
+            path_template(
+                "/accounts/{account_id}/registrar/domains/{domain_name}", account_id=account_id, domain_name=domain_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -208,11 +234,14 @@ class AsyncDomainsResource(AsyncAPIResource):
         """
         return AsyncDomainsResourceWithStreamingResponse(self)
 
+    @typing_extensions.deprecated(
+        "This operation is deprecated and will be removed in a future release. A replacement Registrar API will be announced separately."
+    )
     async def update(
         self,
         domain_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         auto_renew: bool | Omit = omit,
         locked: bool | Omit = omit,
         privacy: bool | Omit = omit,
@@ -229,7 +258,10 @@ class AsyncDomainsResource(AsyncAPIResource):
         Args:
           account_id: Identifier
 
-          domain_name: Domain name.
+          domain_name: Fully qualified domain name (FQDN) including the extension (e.g., `example.com`,
+              `mybrand.app`). The domain name uniquely identifies a registration — the same
+              domain cannot be registered twice, making it a natural idempotency key for
+              registration requests.
 
           auto_renew: Auto-renew controls whether subscription is automatically renewed upon domain
               expiration.
@@ -246,12 +278,16 @@ class AsyncDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_name:
             raise ValueError(f"Expected a non-empty value for `domain_name` but received {domain_name!r}")
         return await self._put(
-            f"/accounts/{account_id}/registrar/domains/{domain_name}",
+            path_template(
+                "/accounts/{account_id}/registrar/domains/{domain_name}", account_id=account_id, domain_name=domain_name
+            ),
             body=await async_maybe_transform(
                 {
                     "auto_renew": auto_renew,
@@ -270,10 +306,13 @@ class AsyncDomainsResource(AsyncAPIResource):
             cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
+    @typing_extensions.deprecated(
+        "This operation is deprecated and will be removed in a future release. A replacement Registrar API will be announced separately."
+    )
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -295,10 +334,12 @@ class AsyncDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/registrar/domains",
+            path_template("/accounts/{account_id}/registrar/domains", account_id=account_id),
             page=AsyncSinglePage[Domain],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -306,11 +347,14 @@ class AsyncDomainsResource(AsyncAPIResource):
             model=Domain,
         )
 
+    @typing_extensions.deprecated(
+        "This operation is deprecated and will be removed in a future release. A replacement Registrar API will be announced separately."
+    )
     async def get(
         self,
         domain_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -324,7 +368,10 @@ class AsyncDomainsResource(AsyncAPIResource):
         Args:
           account_id: Identifier
 
-          domain_name: Domain name.
+          domain_name: Fully qualified domain name (FQDN) including the extension (e.g., `example.com`,
+              `mybrand.app`). The domain name uniquely identifies a registration — the same
+              domain cannot be registered twice, making it a natural idempotency key for
+              registration requests.
 
           extra_headers: Send extra headers
 
@@ -334,12 +381,16 @@ class AsyncDomainsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not domain_name:
             raise ValueError(f"Expected a non-empty value for `domain_name` but received {domain_name!r}")
         return await self._get(
-            f"/accounts/{account_id}/registrar/domains/{domain_name}",
+            path_template(
+                "/accounts/{account_id}/registrar/domains/{domain_name}", account_id=account_id, domain_name=domain_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -355,14 +406,20 @@ class DomainsResourceWithRawResponse:
     def __init__(self, domains: DomainsResource) -> None:
         self._domains = domains
 
-        self.update = to_raw_response_wrapper(
-            domains.update,
+        self.update = (  # pyright: ignore[reportDeprecated]
+            to_raw_response_wrapper(
+                domains.update,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.list = to_raw_response_wrapper(
-            domains.list,
+        self.list = (  # pyright: ignore[reportDeprecated]
+            to_raw_response_wrapper(
+                domains.list,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.get = to_raw_response_wrapper(
-            domains.get,
+        self.get = (  # pyright: ignore[reportDeprecated]
+            to_raw_response_wrapper(
+                domains.get,  # pyright: ignore[reportDeprecated],
+            )
         )
 
 
@@ -370,14 +427,20 @@ class AsyncDomainsResourceWithRawResponse:
     def __init__(self, domains: AsyncDomainsResource) -> None:
         self._domains = domains
 
-        self.update = async_to_raw_response_wrapper(
-            domains.update,
+        self.update = (  # pyright: ignore[reportDeprecated]
+            async_to_raw_response_wrapper(
+                domains.update,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.list = async_to_raw_response_wrapper(
-            domains.list,
+        self.list = (  # pyright: ignore[reportDeprecated]
+            async_to_raw_response_wrapper(
+                domains.list,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.get = async_to_raw_response_wrapper(
-            domains.get,
+        self.get = (  # pyright: ignore[reportDeprecated]
+            async_to_raw_response_wrapper(
+                domains.get,  # pyright: ignore[reportDeprecated],
+            )
         )
 
 
@@ -385,14 +448,20 @@ class DomainsResourceWithStreamingResponse:
     def __init__(self, domains: DomainsResource) -> None:
         self._domains = domains
 
-        self.update = to_streamed_response_wrapper(
-            domains.update,
+        self.update = (  # pyright: ignore[reportDeprecated]
+            to_streamed_response_wrapper(
+                domains.update,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.list = to_streamed_response_wrapper(
-            domains.list,
+        self.list = (  # pyright: ignore[reportDeprecated]
+            to_streamed_response_wrapper(
+                domains.list,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.get = to_streamed_response_wrapper(
-            domains.get,
+        self.get = (  # pyright: ignore[reportDeprecated]
+            to_streamed_response_wrapper(
+                domains.get,  # pyright: ignore[reportDeprecated],
+            )
         )
 
 
@@ -400,12 +469,18 @@ class AsyncDomainsResourceWithStreamingResponse:
     def __init__(self, domains: AsyncDomainsResource) -> None:
         self._domains = domains
 
-        self.update = async_to_streamed_response_wrapper(
-            domains.update,
+        self.update = (  # pyright: ignore[reportDeprecated]
+            async_to_streamed_response_wrapper(
+                domains.update,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.list = async_to_streamed_response_wrapper(
-            domains.list,
+        self.list = (  # pyright: ignore[reportDeprecated]
+            async_to_streamed_response_wrapper(
+                domains.list,  # pyright: ignore[reportDeprecated],
+            )
         )
-        self.get = async_to_streamed_response_wrapper(
-            domains.get,
+        self.get = (  # pyright: ignore[reportDeprecated]
+            async_to_streamed_response_wrapper(
+                domains.get,  # pyright: ignore[reportDeprecated],
+            )
         )

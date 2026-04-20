@@ -11,7 +11,7 @@ __all__ = ["CustomCertificateCreateParams"]
 
 
 class CustomCertificateCreateParams(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     certificate: Required[str]
@@ -27,6 +27,12 @@ class CustomCertificateCreateParams(TypedDict, total=False):
     the shortest chain and newest intermediates. And the force bundle verifies the
     chain, but does not otherwise modify it.
     """
+
+    custom_csr_id: str
+    """The identifier for the Custom CSR that was used."""
+
+    deploy: Literal["staging", "production"]
+    """The environment to deploy the certificate to, defaults to production"""
 
     geo_restrictions: GeoRestrictionsParam
     """
@@ -49,7 +55,9 @@ class CustomCertificateCreateParams(TypedDict, total=False):
     (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements)
     can be chosen, such as 'country: IN', as well as 'region: EU' which refers to
     the EU region. If there are too few data centers satisfying the policy, it will
-    be rejected.
+    be rejected. Note: The API accepts this field as either "policy" or
+    "policy_restrictions" in requests. Responses return this field as
+    "policy_restrictions".
     """
 
     type: Literal["legacy_custom", "sni_custom"]

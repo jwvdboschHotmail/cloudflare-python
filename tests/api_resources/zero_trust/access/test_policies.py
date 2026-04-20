@@ -29,7 +29,7 @@ class TestPolicies:
         policy = client.zero_trust.access.policies.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
         assert_matches_type(Optional[PolicyCreateResponse], policy, path=["response"])
@@ -39,7 +39,7 @@ class TestPolicies:
         policy = client.zero_trust.access.policies.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
             approval_groups=[
                 {
@@ -54,11 +54,22 @@ class TestPolicies:
                 },
             ],
             approval_required=True,
-            exclude=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
+            exclude=[{"certificate": {}}],
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,
-            require=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            require=[{"certificate": {}}],
             session_duration="24h",
         )
         assert_matches_type(Optional[PolicyCreateResponse], policy, path=["response"])
@@ -68,7 +79,7 @@ class TestPolicies:
         response = client.zero_trust.access.policies.with_raw_response.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
 
@@ -82,7 +93,7 @@ class TestPolicies:
         with client.zero_trust.access.policies.with_streaming_response.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         ) as response:
             assert not response.is_closed
@@ -99,7 +110,7 @@ class TestPolicies:
             client.zero_trust.access.policies.with_raw_response.create(
                 account_id="",
                 decision="allow",
-                include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+                include=[{"certificate": {}}],
                 name="Allow devs",
             )
 
@@ -109,7 +120,7 @@ class TestPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
         assert_matches_type(Optional[PolicyUpdateResponse], policy, path=["response"])
@@ -120,7 +131,7 @@ class TestPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
             approval_groups=[
                 {
@@ -135,11 +146,22 @@ class TestPolicies:
                 },
             ],
             approval_required=True,
-            exclude=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
+            exclude=[{"certificate": {}}],
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,
-            require=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            require=[{"certificate": {}}],
             session_duration="24h",
         )
         assert_matches_type(Optional[PolicyUpdateResponse], policy, path=["response"])
@@ -150,7 +172,7 @@ class TestPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
 
@@ -165,7 +187,7 @@ class TestPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         ) as response:
             assert not response.is_closed
@@ -183,7 +205,7 @@ class TestPolicies:
                 policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
                 account_id="",
                 decision="allow",
-                include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+                include=[{"certificate": {}}],
                 name="Allow devs",
             )
 
@@ -192,7 +214,7 @@ class TestPolicies:
                 policy_id="",
                 account_id="023e105f4ecef8ad9ca31a8372d0c353",
                 decision="allow",
-                include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+                include=[{"certificate": {}}],
                 name="Allow devs",
             )
 
@@ -350,7 +372,7 @@ class TestAsyncPolicies:
         policy = await async_client.zero_trust.access.policies.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
         assert_matches_type(Optional[PolicyCreateResponse], policy, path=["response"])
@@ -360,7 +382,7 @@ class TestAsyncPolicies:
         policy = await async_client.zero_trust.access.policies.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
             approval_groups=[
                 {
@@ -375,11 +397,22 @@ class TestAsyncPolicies:
                 },
             ],
             approval_required=True,
-            exclude=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
+            exclude=[{"certificate": {}}],
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,
-            require=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            require=[{"certificate": {}}],
             session_duration="24h",
         )
         assert_matches_type(Optional[PolicyCreateResponse], policy, path=["response"])
@@ -389,7 +422,7 @@ class TestAsyncPolicies:
         response = await async_client.zero_trust.access.policies.with_raw_response.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
 
@@ -403,7 +436,7 @@ class TestAsyncPolicies:
         async with async_client.zero_trust.access.policies.with_streaming_response.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         ) as response:
             assert not response.is_closed
@@ -420,7 +453,7 @@ class TestAsyncPolicies:
             await async_client.zero_trust.access.policies.with_raw_response.create(
                 account_id="",
                 decision="allow",
-                include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+                include=[{"certificate": {}}],
                 name="Allow devs",
             )
 
@@ -430,7 +463,7 @@ class TestAsyncPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
         assert_matches_type(Optional[PolicyUpdateResponse], policy, path=["response"])
@@ -441,7 +474,7 @@ class TestAsyncPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
             approval_groups=[
                 {
@@ -456,11 +489,22 @@ class TestAsyncPolicies:
                 },
             ],
             approval_required=True,
-            exclude=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
+            exclude=[{"certificate": {}}],
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,
-            require=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            require=[{"certificate": {}}],
             session_duration="24h",
         )
         assert_matches_type(Optional[PolicyUpdateResponse], policy, path=["response"])
@@ -471,7 +515,7 @@ class TestAsyncPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         )
 
@@ -486,7 +530,7 @@ class TestAsyncPolicies:
             policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             decision="allow",
-            include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+            include=[{"certificate": {}}],
             name="Allow devs",
         ) as response:
             assert not response.is_closed
@@ -504,7 +548,7 @@ class TestAsyncPolicies:
                 policy_id="f174e90a-fafe-4643-bbbc-4a0ed4fc8415",
                 account_id="",
                 decision="allow",
-                include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+                include=[{"certificate": {}}],
                 name="Allow devs",
             )
 
@@ -513,7 +557,7 @@ class TestAsyncPolicies:
                 policy_id="",
                 account_id="023e105f4ecef8ad9ca31a8372d0c353",
                 decision="allow",
-                include=[{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
+                include=[{"certificate": {}}],
                 name="Allow devs",
             )
 

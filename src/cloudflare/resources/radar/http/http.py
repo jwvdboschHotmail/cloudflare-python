@@ -25,7 +25,7 @@ from .summary import (
     AsyncSummaryResourceWithStreamingResponse,
 )
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from .ases.ases import (
     AsesResource,
     AsyncAsesResource,
@@ -112,6 +112,7 @@ class HTTPResource(SyncAPIResource):
         self,
         dimension: Literal[
             "ADM1",
+            "AS",
             "BOT_CLASS",
             "BROWSER",
             "BROWSER_FAMILY",
@@ -119,6 +120,7 @@ class HTTPResource(SyncAPIResource):
             "HTTP_PROTOCOL",
             "HTTP_VERSION",
             "IP_VERSION",
+            "LOCATION",
             "OS",
             "POST_QUANTUM",
             "TLS_VERSION",
@@ -214,7 +216,7 @@ class HTTPResource(SyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return self._get(
-            f"/radar/http/summary/{dimension}",
+            path_template("/radar/http/summary/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -382,6 +384,7 @@ class HTTPResource(SyncAPIResource):
         self,
         dimension: Literal[
             "ADM1",
+            "AS",
             "BOT_CLASS",
             "BROWSER",
             "BROWSER_FAMILY",
@@ -389,6 +392,7 @@ class HTTPResource(SyncAPIResource):
             "HTTP_PROTOCOL",
             "HTTP_VERSION",
             "IP_VERSION",
+            "LOCATION",
             "OS",
             "POST_QUANTUM",
             "TLS_VERSION",
@@ -493,7 +497,7 @@ class HTTPResource(SyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return self._get(
-            f"/radar/http/timeseries_groups/{dimension}",
+            path_template("/radar/http/timeseries_groups/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -573,6 +577,7 @@ class AsyncHTTPResource(AsyncAPIResource):
         self,
         dimension: Literal[
             "ADM1",
+            "AS",
             "BOT_CLASS",
             "BROWSER",
             "BROWSER_FAMILY",
@@ -580,6 +585,7 @@ class AsyncHTTPResource(AsyncAPIResource):
             "HTTP_PROTOCOL",
             "HTTP_VERSION",
             "IP_VERSION",
+            "LOCATION",
             "OS",
             "POST_QUANTUM",
             "TLS_VERSION",
@@ -675,7 +681,7 @@ class AsyncHTTPResource(AsyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return await self._get(
-            f"/radar/http/summary/{dimension}",
+            path_template("/radar/http/summary/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -843,6 +849,7 @@ class AsyncHTTPResource(AsyncAPIResource):
         self,
         dimension: Literal[
             "ADM1",
+            "AS",
             "BOT_CLASS",
             "BROWSER",
             "BROWSER_FAMILY",
@@ -850,6 +857,7 @@ class AsyncHTTPResource(AsyncAPIResource):
             "HTTP_PROTOCOL",
             "HTTP_VERSION",
             "IP_VERSION",
+            "LOCATION",
             "OS",
             "POST_QUANTUM",
             "TLS_VERSION",
@@ -954,7 +962,7 @@ class AsyncHTTPResource(AsyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return await self._get(
-            f"/radar/http/timeseries_groups/{dimension}",
+            path_template("/radar/http/timeseries_groups/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

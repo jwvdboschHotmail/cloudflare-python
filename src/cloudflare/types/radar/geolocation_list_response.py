@@ -1,6 +1,6 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from typing import List
+from typing import List, Optional
 from typing_extensions import Literal
 
 from pydantic import Field as FieldInfo
@@ -24,6 +24,11 @@ class GeolocationParentParent(BaseModel):
     type: Literal["CONTINENT", "COUNTRY", "ADM1"]
     """The type of the geolocation."""
 
+    code: Optional[str] = None
+
+    locale: Optional[str] = None
+    """BCP 47 locale code used for the geolocation name translation"""
+
 
 class GeolocationParent(BaseModel):
     geo_id: str = FieldInfo(alias="geoId")
@@ -41,6 +46,11 @@ class GeolocationParent(BaseModel):
     type: Literal["CONTINENT", "COUNTRY", "ADM1"]
     """The type of the geolocation."""
 
+    code: Optional[str] = None
+
+    locale: Optional[str] = None
+    """BCP 47 locale code used for the geolocation name translation"""
+
 
 class Geolocation(BaseModel):
     geo_id: str = FieldInfo(alias="geoId")
@@ -57,6 +67,11 @@ class Geolocation(BaseModel):
 
     type: Literal["CONTINENT", "COUNTRY", "ADM1"]
     """The type of the geolocation."""
+
+    code: Optional[str] = None
+
+    locale: Optional[str] = None
+    """BCP 47 locale code used for the geolocation name translation"""
 
 
 class GeolocationListResponse(BaseModel):

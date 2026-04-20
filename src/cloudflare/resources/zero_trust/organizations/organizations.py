@@ -15,7 +15,7 @@ from .doh import (
     AsyncDOHResourceWithStreamingResponse,
 )
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -67,14 +67,17 @@ class OrganizationsResource(SyncAPIResource):
         *,
         auth_domain: str,
         name: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         deny_unmatched_requests: bool | Omit = omit,
         deny_unmatched_requests_exempted_zone_names: SequenceNotStr[str] | Omit = omit,
         is_ui_read_only: bool | Omit = omit,
         login_design: LoginDesignParam | Omit = omit,
+        mfa_config: organization_create_params.MfaConfig | Omit = omit,
+        mfa_required_for_all_apps: bool | Omit = omit,
+        mfa_ssh_piv_key_requirements: organization_create_params.MfaSSHPivKeyRequirements | Omit = omit,
         session_duration: str | Omit = omit,
         ui_read_only_toggle_reason: str | Omit = omit,
         user_seat_expiration_inactive_time: str | Omit = omit,
@@ -118,6 +121,14 @@ class OrganizationsResource(SyncAPIResource):
           is_ui_read_only: Lock all settings as Read-Only in the Dashboard, regardless of user permission.
               Updates may only be made via the API or Terraform for this account when enabled.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings for an organization.
+
+          mfa_required_for_all_apps: Determines whether global MFA settings apply to applications by default. The
+              organization must have MFA enabled with at least one authentication method and a
+              session duration configured.
+
+          mfa_ssh_piv_key_requirements: Configures SSH PIV key requirements for MFA using hardware security keys.
+
           session_duration: The amount of time that tokens issued for applications will be valid. Must be in
               the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms, s, m,
               h.
@@ -141,6 +152,10 @@ class OrganizationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -154,7 +169,11 @@ class OrganizationsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform(
                 {
                     "auth_domain": auth_domain,
@@ -165,6 +184,9 @@ class OrganizationsResource(SyncAPIResource):
                     "deny_unmatched_requests_exempted_zone_names": deny_unmatched_requests_exempted_zone_names,
                     "is_ui_read_only": is_ui_read_only,
                     "login_design": login_design,
+                    "mfa_config": mfa_config,
+                    "mfa_required_for_all_apps": mfa_required_for_all_apps,
+                    "mfa_ssh_piv_key_requirements": mfa_ssh_piv_key_requirements,
                     "session_duration": session_duration,
                     "ui_read_only_toggle_reason": ui_read_only_toggle_reason,
                     "user_seat_expiration_inactive_time": user_seat_expiration_inactive_time,
@@ -185,8 +207,8 @@ class OrganizationsResource(SyncAPIResource):
     def update(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         auth_domain: str | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -195,6 +217,9 @@ class OrganizationsResource(SyncAPIResource):
         deny_unmatched_requests_exempted_zone_names: SequenceNotStr[str] | Omit = omit,
         is_ui_read_only: bool | Omit = omit,
         login_design: LoginDesignParam | Omit = omit,
+        mfa_config: organization_update_params.MfaConfig | Omit = omit,
+        mfa_required_for_all_apps: bool | Omit = omit,
+        mfa_ssh_piv_key_requirements: organization_update_params.MfaSSHPivKeyRequirements | Omit = omit,
         name: str | Omit = omit,
         session_duration: str | Omit = omit,
         ui_read_only_toggle_reason: str | Omit = omit,
@@ -237,6 +262,14 @@ class OrganizationsResource(SyncAPIResource):
           is_ui_read_only: Lock all settings as Read-Only in the Dashboard, regardless of user permission.
               Updates may only be made via the API or Terraform for this account when enabled.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings for an organization.
+
+          mfa_required_for_all_apps: Determines whether global MFA settings apply to applications by default. The
+              organization must have MFA enabled with at least one authentication method and a
+              session duration configured.
+
+          mfa_ssh_piv_key_requirements: Configures SSH PIV key requirements for MFA using hardware security keys.
+
           name: The name of your Zero Trust organization.
 
           session_duration: The amount of time that tokens issued for applications will be valid. Must be in
@@ -262,6 +295,10 @@ class OrganizationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -275,7 +312,11 @@ class OrganizationsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._put(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform(
                 {
                     "allow_authenticate_via_warp": allow_authenticate_via_warp,
@@ -286,6 +327,9 @@ class OrganizationsResource(SyncAPIResource):
                     "deny_unmatched_requests_exempted_zone_names": deny_unmatched_requests_exempted_zone_names,
                     "is_ui_read_only": is_ui_read_only,
                     "login_design": login_design,
+                    "mfa_config": mfa_config,
+                    "mfa_required_for_all_apps": mfa_required_for_all_apps,
+                    "mfa_ssh_piv_key_requirements": mfa_ssh_piv_key_requirements,
                     "name": name,
                     "session_duration": session_duration,
                     "ui_read_only_toggle_reason": ui_read_only_toggle_reason,
@@ -307,8 +351,8 @@ class OrganizationsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -332,6 +376,10 @@ class OrganizationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -345,7 +393,11 @@ class OrganizationsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -360,8 +412,8 @@ class OrganizationsResource(SyncAPIResource):
         self,
         *,
         email: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         query_devices: bool | Omit = omit,
         body_devices: bool | Omit = omit,
         user_uid: str | Omit = omit,
@@ -401,6 +453,10 @@ class OrganizationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -414,7 +470,11 @@ class OrganizationsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations/revoke_user",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations/revoke_user",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform(
                 {
                     "email": email,
@@ -469,14 +529,17 @@ class AsyncOrganizationsResource(AsyncAPIResource):
         *,
         auth_domain: str,
         name: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         deny_unmatched_requests: bool | Omit = omit,
         deny_unmatched_requests_exempted_zone_names: SequenceNotStr[str] | Omit = omit,
         is_ui_read_only: bool | Omit = omit,
         login_design: LoginDesignParam | Omit = omit,
+        mfa_config: organization_create_params.MfaConfig | Omit = omit,
+        mfa_required_for_all_apps: bool | Omit = omit,
+        mfa_ssh_piv_key_requirements: organization_create_params.MfaSSHPivKeyRequirements | Omit = omit,
         session_duration: str | Omit = omit,
         ui_read_only_toggle_reason: str | Omit = omit,
         user_seat_expiration_inactive_time: str | Omit = omit,
@@ -520,6 +583,14 @@ class AsyncOrganizationsResource(AsyncAPIResource):
           is_ui_read_only: Lock all settings as Read-Only in the Dashboard, regardless of user permission.
               Updates may only be made via the API or Terraform for this account when enabled.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings for an organization.
+
+          mfa_required_for_all_apps: Determines whether global MFA settings apply to applications by default. The
+              organization must have MFA enabled with at least one authentication method and a
+              session duration configured.
+
+          mfa_ssh_piv_key_requirements: Configures SSH PIV key requirements for MFA using hardware security keys.
+
           session_duration: The amount of time that tokens issued for applications will be valid. Must be in
               the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms, s, m,
               h.
@@ -543,6 +614,10 @@ class AsyncOrganizationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -556,7 +631,11 @@ class AsyncOrganizationsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "auth_domain": auth_domain,
@@ -567,6 +646,9 @@ class AsyncOrganizationsResource(AsyncAPIResource):
                     "deny_unmatched_requests_exempted_zone_names": deny_unmatched_requests_exempted_zone_names,
                     "is_ui_read_only": is_ui_read_only,
                     "login_design": login_design,
+                    "mfa_config": mfa_config,
+                    "mfa_required_for_all_apps": mfa_required_for_all_apps,
+                    "mfa_ssh_piv_key_requirements": mfa_ssh_piv_key_requirements,
                     "session_duration": session_duration,
                     "ui_read_only_toggle_reason": ui_read_only_toggle_reason,
                     "user_seat_expiration_inactive_time": user_seat_expiration_inactive_time,
@@ -587,8 +669,8 @@ class AsyncOrganizationsResource(AsyncAPIResource):
     async def update(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         auth_domain: str | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -597,6 +679,9 @@ class AsyncOrganizationsResource(AsyncAPIResource):
         deny_unmatched_requests_exempted_zone_names: SequenceNotStr[str] | Omit = omit,
         is_ui_read_only: bool | Omit = omit,
         login_design: LoginDesignParam | Omit = omit,
+        mfa_config: organization_update_params.MfaConfig | Omit = omit,
+        mfa_required_for_all_apps: bool | Omit = omit,
+        mfa_ssh_piv_key_requirements: organization_update_params.MfaSSHPivKeyRequirements | Omit = omit,
         name: str | Omit = omit,
         session_duration: str | Omit = omit,
         ui_read_only_toggle_reason: str | Omit = omit,
@@ -639,6 +724,14 @@ class AsyncOrganizationsResource(AsyncAPIResource):
           is_ui_read_only: Lock all settings as Read-Only in the Dashboard, regardless of user permission.
               Updates may only be made via the API or Terraform for this account when enabled.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings for an organization.
+
+          mfa_required_for_all_apps: Determines whether global MFA settings apply to applications by default. The
+              organization must have MFA enabled with at least one authentication method and a
+              session duration configured.
+
+          mfa_ssh_piv_key_requirements: Configures SSH PIV key requirements for MFA using hardware security keys.
+
           name: The name of your Zero Trust organization.
 
           session_duration: The amount of time that tokens issued for applications will be valid. Must be in
@@ -664,6 +757,10 @@ class AsyncOrganizationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -677,7 +774,11 @@ class AsyncOrganizationsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._put(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "allow_authenticate_via_warp": allow_authenticate_via_warp,
@@ -688,6 +789,9 @@ class AsyncOrganizationsResource(AsyncAPIResource):
                     "deny_unmatched_requests_exempted_zone_names": deny_unmatched_requests_exempted_zone_names,
                     "is_ui_read_only": is_ui_read_only,
                     "login_design": login_design,
+                    "mfa_config": mfa_config,
+                    "mfa_required_for_all_apps": mfa_required_for_all_apps,
+                    "mfa_ssh_piv_key_requirements": mfa_ssh_piv_key_requirements,
                     "name": name,
                     "session_duration": session_duration,
                     "ui_read_only_toggle_reason": ui_read_only_toggle_reason,
@@ -709,8 +813,8 @@ class AsyncOrganizationsResource(AsyncAPIResource):
     async def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -734,6 +838,10 @@ class AsyncOrganizationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -747,7 +855,11 @@ class AsyncOrganizationsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -762,8 +874,8 @@ class AsyncOrganizationsResource(AsyncAPIResource):
         self,
         *,
         email: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         query_devices: bool | Omit = omit,
         body_devices: bool | Omit = omit,
         user_uid: str | Omit = omit,
@@ -803,6 +915,10 @@ class AsyncOrganizationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -816,7 +932,11 @@ class AsyncOrganizationsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/access/organizations/revoke_user",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/organizations/revoke_user",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "email": email,

@@ -11,7 +11,7 @@ __all__ = ["CategoryCreateParams"]
 
 
 class CategoryCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account ID."""
 
     kill_chain: Required[Annotated[float, PropertyInfo(alias="killChain")]]
@@ -19,5 +19,7 @@ class CategoryCreateParams(TypedDict, total=False):
     name: Required[str]
 
     mitre_attack: Annotated[SequenceNotStr[str], PropertyInfo(alias="mitreAttack")]
+
+    mitre_capec: Annotated[SequenceNotStr[str], PropertyInfo(alias="mitreCapec")]
 
     shortname: str

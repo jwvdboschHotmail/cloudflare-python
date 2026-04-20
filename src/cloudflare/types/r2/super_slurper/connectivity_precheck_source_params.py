@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import Union, Optional
 from typing_extensions import Literal, Required, Annotated, TypeAlias, TypedDict
 
+from ...._types import SequenceNotStr
 from ...._utils import PropertyInfo
 from ..buckets.provider import Provider
 
@@ -20,7 +21,7 @@ __all__ = [
 
 
 class R2SlurperS3SourceSchema(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     bucket: Required[str]
 
@@ -29,6 +30,8 @@ class R2SlurperS3SourceSchema(TypedDict, total=False):
     vendor: Required[Literal["s3"]]
 
     endpoint: Optional[str]
+
+    keys: Optional[SequenceNotStr[str]]
 
     path_prefix: Annotated[Optional[str], PropertyInfo(alias="pathPrefix")]
 
@@ -42,13 +45,15 @@ class R2SlurperS3SourceSchemaSecret(TypedDict, total=False):
 
 
 class R2SlurperGcsSourceSchema(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     bucket: Required[str]
 
     secret: Required[R2SlurperGcsSourceSchemaSecret]
 
     vendor: Required[Literal["gcs"]]
+
+    keys: Optional[SequenceNotStr[str]]
 
     path_prefix: Annotated[Optional[str], PropertyInfo(alias="pathPrefix")]
 
@@ -60,7 +65,7 @@ class R2SlurperGcsSourceSchemaSecret(TypedDict, total=False):
 
 
 class R2SlurperR2SourceSchema(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     bucket: Required[str]
 
@@ -69,6 +74,8 @@ class R2SlurperR2SourceSchema(TypedDict, total=False):
     vendor: Required[Provider]
 
     jurisdiction: Literal["default", "eu", "fedramp"]
+
+    keys: Optional[SequenceNotStr[str]]
 
     path_prefix: Annotated[Optional[str], PropertyInfo(alias="pathPrefix")]
 

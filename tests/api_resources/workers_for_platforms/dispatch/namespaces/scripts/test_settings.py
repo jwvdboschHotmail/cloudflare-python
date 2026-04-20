@@ -47,7 +47,10 @@ class TestSettings:
                 ],
                 "compatibility_date": "2021-01-01",
                 "compatibility_flags": ["nodejs_compat"],
-                "limits": {"cpu_ms": 50},
+                "limits": {
+                    "cpu_ms": 50,
+                    "subrequests": 1000,
+                },
                 "logpush": False,
                 "migrations": {
                     "deleted_classes": ["string"],
@@ -76,6 +79,12 @@ class TestSettings:
                         "enabled": True,
                         "invocation_logs": True,
                         "destinations": ["cloudflare"],
+                        "head_sampling_rate": 0.1,
+                        "persist": True,
+                    },
+                    "traces": {
+                        "destinations": ["cloudflare"],
+                        "enabled": True,
                         "head_sampling_rate": 0.1,
                         "persist": True,
                     },
@@ -241,7 +250,10 @@ class TestAsyncSettings:
                 ],
                 "compatibility_date": "2021-01-01",
                 "compatibility_flags": ["nodejs_compat"],
-                "limits": {"cpu_ms": 50},
+                "limits": {
+                    "cpu_ms": 50,
+                    "subrequests": 1000,
+                },
                 "logpush": False,
                 "migrations": {
                     "deleted_classes": ["string"],
@@ -270,6 +282,12 @@ class TestAsyncSettings:
                         "enabled": True,
                         "invocation_logs": True,
                         "destinations": ["cloudflare"],
+                        "head_sampling_rate": 0.1,
+                        "persist": True,
+                    },
+                    "traces": {
+                        "destinations": ["cloudflare"],
+                        "enabled": True,
                         "head_sampling_rate": 0.1,
                         "persist": True,
                     },

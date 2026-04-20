@@ -13,7 +13,7 @@ __all__ = ["LogListParams", "Filter"]
 
 
 class LogListParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     cached: bool
 
@@ -94,8 +94,6 @@ class Filter(TypedDict, total=False):
             "event_id",
             "metadata.key",
             "metadata.value",
-            "prompts.prompt_id",
-            "prompts.version_id",
             "authentication",
             "wholesale",
             "compatibilityMode",

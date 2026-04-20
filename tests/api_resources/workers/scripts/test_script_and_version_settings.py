@@ -36,6 +36,10 @@ class TestScriptAndVersionSettings:
             script_name="this-is_my_script-01",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             settings={
+                "annotations": {
+                    "workers_message": "Fixed bug.",
+                    "workers_tag": "v1.0.1",
+                },
                 "bindings": [
                     {
                         "name": "MY_ENV_VAR",
@@ -45,7 +49,10 @@ class TestScriptAndVersionSettings:
                 ],
                 "compatibility_date": "2021-01-01",
                 "compatibility_flags": ["nodejs_compat"],
-                "limits": {"cpu_ms": 50},
+                "limits": {
+                    "cpu_ms": 50,
+                    "subrequests": 1000,
+                },
                 "logpush": False,
                 "migrations": {
                     "deleted_classes": ["string"],
@@ -74,6 +81,12 @@ class TestScriptAndVersionSettings:
                         "enabled": True,
                         "invocation_logs": True,
                         "destinations": ["cloudflare"],
+                        "head_sampling_rate": 0.1,
+                        "persist": True,
+                    },
+                    "traces": {
+                        "destinations": ["cloudflare"],
+                        "enabled": True,
                         "head_sampling_rate": 0.1,
                         "persist": True,
                     },
@@ -205,6 +218,10 @@ class TestAsyncScriptAndVersionSettings:
             script_name="this-is_my_script-01",
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
             settings={
+                "annotations": {
+                    "workers_message": "Fixed bug.",
+                    "workers_tag": "v1.0.1",
+                },
                 "bindings": [
                     {
                         "name": "MY_ENV_VAR",
@@ -214,7 +231,10 @@ class TestAsyncScriptAndVersionSettings:
                 ],
                 "compatibility_date": "2021-01-01",
                 "compatibility_flags": ["nodejs_compat"],
-                "limits": {"cpu_ms": 50},
+                "limits": {
+                    "cpu_ms": 50,
+                    "subrequests": 1000,
+                },
                 "logpush": False,
                 "migrations": {
                     "deleted_classes": ["string"],
@@ -243,6 +263,12 @@ class TestAsyncScriptAndVersionSettings:
                         "enabled": True,
                         "invocation_logs": True,
                         "destinations": ["cloudflare"],
+                        "head_sampling_rate": 0.1,
+                        "persist": True,
+                    },
+                    "traces": {
+                        "destinations": ["cloudflare"],
+                        "enabled": True,
                         "head_sampling_rate": 0.1,
                         "persist": True,
                     },

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Union
+from typing import Union, Optional
 from typing_extensions import Literal, Required, TypeAlias, TypedDict
 
 from .profiles.pattern_param import PatternParam
@@ -11,7 +11,7 @@ __all__ = ["EntryUpdateParams", "Variant0", "Variant1", "Variant2"]
 
 
 class Variant0(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     name: Required[str]
 
@@ -19,11 +19,13 @@ class Variant0(TypedDict, total=False):
 
     type: Required[Literal["custom"]]
 
+    description: Optional[str]
+
     enabled: bool
 
 
 class Variant1(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     type: Required[Literal["predefined"]]
 
@@ -31,7 +33,7 @@ class Variant1(TypedDict, total=False):
 
 
 class Variant2(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     type: Required[Literal["integration"]]
 

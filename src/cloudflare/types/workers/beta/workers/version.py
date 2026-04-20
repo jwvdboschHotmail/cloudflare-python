@@ -17,6 +17,8 @@ __all__ = [
     "AssetsConfig",
     "Binding",
     "BindingWorkersBindingKindAI",
+    "BindingWorkersBindingKindAISearch",
+    "BindingWorkersBindingKindAISearchNamespace",
     "BindingWorkersBindingKindAnalyticsEngine",
     "BindingWorkersBindingKindAssets",
     "BindingWorkersBindingKindBrowser",
@@ -24,6 +26,7 @@ __all__ = [
     "BindingWorkersBindingKindDataBlob",
     "BindingWorkersBindingKindDispatchNamespace",
     "BindingWorkersBindingKindDispatchNamespaceOutbound",
+    "BindingWorkersBindingKindDispatchNamespaceOutboundParam",
     "BindingWorkersBindingKindDispatchNamespaceOutboundWorker",
     "BindingWorkersBindingKindDurableObjectNamespace",
     "BindingWorkersBindingKindHyperdrive",
@@ -31,6 +34,7 @@ __all__ = [
     "BindingWorkersBindingKindImages",
     "BindingWorkersBindingKindJson",
     "BindingWorkersBindingKindKVNamespace",
+    "BindingWorkersBindingKindMedia",
     "BindingWorkersBindingKindMTLSCertificate",
     "BindingWorkersBindingKindPlainText",
     "BindingWorkersBindingKindPipelines",
@@ -45,9 +49,13 @@ __all__ = [
     "BindingWorkersBindingKindVectorize",
     "BindingWorkersBindingKindVersionMetadata",
     "BindingWorkersBindingKindSecretsStoreSecret",
+    "BindingWorkersBindingKindFlagship",
     "BindingWorkersBindingKindSecretKey",
     "BindingWorkersBindingKindWorkflow",
     "BindingWorkersBindingKindWasmModule",
+    "BindingWorkersBindingKindVPCService",
+    "BindingWorkersBindingKindVPCNetwork",
+    "Container",
     "Limits",
     "Migrations",
     "MigrationsWorkersMultipleStepMigrations",
@@ -72,10 +80,10 @@ class Annotations(BaseModel):
     """Metadata about the version."""
 
     workers_message: Optional[str] = FieldInfo(alias="workers/message", default=None)
-    """Human-readable message about the version."""
+    """Human-readable message about the version. Truncated to 1000 bytes if longer."""
 
     workers_tag: Optional[str] = FieldInfo(alias="workers/tag", default=None)
-    """User-provided identifier for the version."""
+    """User-provided identifier for the version. Maximum 100 bytes."""
 
     workers_triggered_by: Optional[str] = FieldInfo(alias="workers/triggered_by", default=None)
     """Operation that triggered the creation of the version."""
@@ -127,6 +135,45 @@ class BindingWorkersBindingKindAI(BaseModel):
     """The kind of resource that the binding provides."""
 
 
+class BindingWorkersBindingKindAISearch(BaseModel):
+    instance_name: str
+    """The user-chosen instance name.
+
+    Must exist at deploy time. The worker can search, chat, update, and manage
+    items/jobs on this instance.
+    """
+
+    name: str
+    """A JavaScript variable name for the binding."""
+
+    type: Literal["ai_search"]
+    """The kind of resource that the binding provides."""
+
+    namespace: Optional[str] = None
+    """The namespace the instance belongs to.
+
+    Defaults to "default" if omitted. Customers who don't use namespaces can simply
+    omit this field.
+    """
+
+
+class BindingWorkersBindingKindAISearchNamespace(BaseModel):
+    name: str
+    """A JavaScript variable name for the binding."""
+
+    namespace: str
+    """The user-chosen namespace name.
+
+    Must exist before deploy -- Wrangler handles auto-creation on deploy failure (R2
+    bucket pattern). The "default" namespace is auto-created by config-api for new
+    accounts. Grants full access (CRUD + search + chat) to all instances within the
+    namespace.
+    """
+
+    type: Literal["ai_search_namespace"]
+    """The kind of resource that the binding provides."""
+
+
 class BindingWorkersBindingKindAnalyticsEngine(BaseModel):
     dataset: str
     """The name of the dataset to bind to."""
@@ -155,7 +202,7 @@ class BindingWorkersBindingKindBrowser(BaseModel):
 
 
 class BindingWorkersBindingKindD1(BaseModel):
-    id: str
+    database_id: str
     """Identifier of the D1 database to bind to."""
 
     name: str
@@ -163,6 +210,9 @@ class BindingWorkersBindingKindD1(BaseModel):
 
     type: Literal["d1"]
     """The kind of resource that the binding provides."""
+
+    id: Optional[str] = None
+    """Identifier of the D1 database to bind to."""
 
 
 class BindingWorkersBindingKindDataBlob(BaseModel):
@@ -179,8 +229,16 @@ class BindingWorkersBindingKindDataBlob(BaseModel):
     """The kind of resource that the binding provides."""
 
 
+class BindingWorkersBindingKindDispatchNamespaceOutboundParam(BaseModel):
+    name: str
+    """Name of the parameter."""
+
+
 class BindingWorkersBindingKindDispatchNamespaceOutboundWorker(BaseModel):
     """Outbound worker."""
+
+    entrypoint: Optional[str] = None
+    """Entrypoint to invoke on the outbound worker."""
 
     environment: Optional[str] = None
     """Environment of the outbound worker."""
@@ -192,7 +250,7 @@ class BindingWorkersBindingKindDispatchNamespaceOutboundWorker(BaseModel):
 class BindingWorkersBindingKindDispatchNamespaceOutbound(BaseModel):
     """Outbound worker."""
 
-    params: Optional[List[str]] = None
+    params: Optional[List[BindingWorkersBindingKindDispatchNamespaceOutboundParam]] = None
     """
     Pass information from the Dispatch Worker to the Outbound Worker through the
     parameters.
@@ -225,6 +283,9 @@ class BindingWorkersBindingKindDurableObjectNamespace(BaseModel):
 
     class_name: Optional[str] = None
     """The exported class name of the Durable Object."""
+
+    dispatch_namespace: Optional[str] = None
+    """The dispatch namespace the Durable Object script belongs to."""
 
     environment: Optional[str] = None
     """The environment of the script_name to bind to."""
@@ -281,7 +342,7 @@ class BindingWorkersBindingKindImages(BaseModel):
 
 
 class BindingWorkersBindingKindJson(BaseModel):
-    json_: str = FieldInfo(alias="json")
+    json_: object = FieldInfo(alias="json")
     """JSON data to use."""
 
     name: str
@@ -299,6 +360,14 @@ class BindingWorkersBindingKindKVNamespace(BaseModel):
     """Namespace identifier tag."""
 
     type: Literal["kv_namespace"]
+    """The kind of resource that the binding provides."""
+
+
+class BindingWorkersBindingKindMedia(BaseModel):
+    name: str
+    """A JavaScript variable name for the binding."""
+
+    type: Literal["media"]
     """The kind of resource that the binding provides."""
 
 
@@ -380,7 +449,7 @@ class BindingWorkersBindingKindR2Bucket(BaseModel):
     type: Literal["r2_bucket"]
     """The kind of resource that the binding provides."""
 
-    jurisdiction: Optional[Literal["eu", "fedramp"]] = None
+    jurisdiction: Optional[Literal["eu", "fedramp", "fedramp-high"]] = None
     """
     The
     [jurisdiction](https://developers.cloudflare.com/r2/reference/data-location/#jurisdictional-restrictions)
@@ -422,6 +491,9 @@ class BindingWorkersBindingKindService(BaseModel):
 
     type: Literal["service"]
     """The kind of resource that the binding provides."""
+
+    entrypoint: Optional[str] = None
+    """Entrypoint to invoke on the target Worker."""
 
     environment: Optional[str] = None
     """Optional environment if the Worker utilizes one."""
@@ -471,6 +543,17 @@ class BindingWorkersBindingKindSecretsStoreSecret(BaseModel):
     """ID of the store containing the secret."""
 
     type: Literal["secrets_store_secret"]
+    """The kind of resource that the binding provides."""
+
+
+class BindingWorkersBindingKindFlagship(BaseModel):
+    app_id: str
+    """ID of the Flagship app to bind to for feature flag evaluation."""
+
+    name: str
+    """A JavaScript variable name for the binding."""
+
+    type: Literal["flagship"]
     """The kind of resource that the binding provides."""
 
 
@@ -537,9 +620,39 @@ class BindingWorkersBindingKindWasmModule(BaseModel):
     """The kind of resource that the binding provides."""
 
 
+class BindingWorkersBindingKindVPCService(BaseModel):
+    name: str
+    """A JavaScript variable name for the binding."""
+
+    service_id: str
+    """Identifier of the VPC service to bind to."""
+
+    type: Literal["vpc_service"]
+    """The kind of resource that the binding provides."""
+
+
+class BindingWorkersBindingKindVPCNetwork(BaseModel):
+    name: str
+    """A JavaScript variable name for the binding."""
+
+    type: Literal["vpc_network"]
+    """The kind of resource that the binding provides."""
+
+    network_id: Optional[str] = None
+    """Identifier of the network to bind to.
+
+    Only "cf1:network" is currently supported. Mutually exclusive with tunnel_id.
+    """
+
+    tunnel_id: Optional[str] = None
+    """UUID of the Cloudflare Tunnel to bind to. Mutually exclusive with network_id."""
+
+
 Binding: TypeAlias = Annotated[
     Union[
         BindingWorkersBindingKindAI,
+        BindingWorkersBindingKindAISearch,
+        BindingWorkersBindingKindAISearchNamespace,
         BindingWorkersBindingKindAnalyticsEngine,
         BindingWorkersBindingKindAssets,
         BindingWorkersBindingKindBrowser,
@@ -552,6 +665,7 @@ Binding: TypeAlias = Annotated[
         BindingWorkersBindingKindImages,
         BindingWorkersBindingKindJson,
         BindingWorkersBindingKindKVNamespace,
+        BindingWorkersBindingKindMedia,
         BindingWorkersBindingKindMTLSCertificate,
         BindingWorkersBindingKindPlainText,
         BindingWorkersBindingKindPipelines,
@@ -565,19 +679,32 @@ Binding: TypeAlias = Annotated[
         BindingWorkersBindingKindVectorize,
         BindingWorkersBindingKindVersionMetadata,
         BindingWorkersBindingKindSecretsStoreSecret,
+        BindingWorkersBindingKindFlagship,
         BindingWorkersBindingKindSecretKey,
         BindingWorkersBindingKindWorkflow,
         BindingWorkersBindingKindWasmModule,
+        BindingWorkersBindingKindVPCService,
+        BindingWorkersBindingKindVPCNetwork,
     ],
     PropertyInfo(discriminator="type"),
 ]
 
 
+class Container(BaseModel):
+    """Container configuration for a Worker."""
+
+    class_name: str
+    """Select which Durable Object class should get this container attached."""
+
+
 class Limits(BaseModel):
     """Resource limits enforced at runtime."""
 
-    cpu_ms: int
+    cpu_ms: Optional[int] = None
     """CPU time limit in milliseconds."""
+
+    subrequests: Optional[int] = None
+    """Subrequest limit per request."""
 
 
 class MigrationsWorkersMultipleStepMigrations(BaseModel):
@@ -695,6 +822,13 @@ class Version(BaseModel):
     number: int
     """The integer version number, starting from one."""
 
+    urls: List[str]
+    """All routable URLs that always point to this version.
+
+    Does not include alias URLs, since aliases can be updated to point to a
+    different version.
+    """
+
     annotations: Optional[Annotations] = None
     """Metadata about the version."""
 
@@ -729,6 +863,12 @@ class Version(BaseModel):
     included in a `compatibility_date`.
     """
 
+    containers: Optional[List[Container]] = None
+    """List of containers attached to a Worker.
+
+    Containers can only be attached to Durable Object classes of this Worker script.
+    """
+
     limits: Optional[Limits] = None
     """Resource limits enforced at runtime."""
 
@@ -736,6 +876,13 @@ class Version(BaseModel):
     """The name of the main module in the `modules` array (e.g.
 
     the name of the module that exports a `fetch` handler).
+    """
+
+    migration_tag: Optional[str] = None
+    """Durable Object migration tag.
+
+    Set when the version is deployed. Omitted if the version has not been deployed
+    or the Worker does not use Durable Objects.
     """
 
     migrations: Optional[Migrations] = None

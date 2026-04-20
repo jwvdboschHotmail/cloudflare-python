@@ -32,8 +32,6 @@ class TestInstances:
         instance = client.aisearch.instances.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
         )
         assert_matches_type(InstanceCreateResponse, instance, path=["response"])
 
@@ -42,10 +40,10 @@ class TestInstances:
         instance = client.aisearch.instances.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
             ai_gateway_id="ai_gateway_id",
             aisearch_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            cache=True,
+            cache_threshold="super_strict_match",
             chunk=True,
             chunk_overlap=0,
             chunk_size=64,
@@ -56,17 +54,31 @@ class TestInstances:
                 }
             ],
             embedding_model="@cf/qwen/qwen3-embedding-0.6b",
+            fusion_method="max",
             hybrid_search_enabled=True,
+            index_method={
+                "keyword": True,
+                "vector": True,
+            },
+            indexing_options={"keyword_tokenizer": "porter"},
             max_num_results=1,
             metadata={
                 "created_from_aisearch_wizard": True,
+                "search_for_agents": {
+                    "hostname": "hostname",
+                    "zone_id": "zone_id",
+                    "zone_name": "zone_name",
+                },
                 "worker_domain": "worker_domain",
             },
             public_endpoint_params={
                 "authorized_hosts": ["string"],
                 "chat_completions_endpoint": {"disabled": True},
                 "enabled": True,
-                "mcp": {"disabled": True},
+                "mcp": {
+                    "description": "description",
+                    "disabled": True,
+                },
                 "rate_limit": {
                     "period_ms": 60000,
                     "requests": 1,
@@ -76,16 +88,39 @@ class TestInstances:
             },
             reranking=True,
             reranking_model="@cf/baai/bge-reranker-base",
+            retrieval_options={
+                "boost_by": [
+                    {
+                        "field": "timestamp",
+                        "direction": "desc",
+                    }
+                ],
+                "keyword_match_mode": "and",
+            },
             rewrite_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
             rewrite_query=True,
             score_threshold=0,
+            source="source",
             source_params={
                 "exclude_items": ["/admin/**", "/private/**", "**\\temp\\**"],
                 "include_items": ["/blog/**", "/docs/**/*.html", "**\\blog\\**.html"],
                 "prefix": "prefix",
                 "r2_jurisdiction": "r2_jurisdiction",
                 "web_crawler": {
+                    "crawl_options": {
+                        "depth": 1,
+                        "include_external_links": True,
+                        "include_subdomains": True,
+                        "max_age": 0,
+                        "source": "all",
+                    },
                     "parse_options": {
+                        "content_selector": [
+                            {
+                                "path": "**/blog/**",
+                                "selector": "article .post-body",
+                            }
+                        ],
                         "include_headers": {"foo": "string"},
                         "include_images": True,
                         "specific_sitemaps": [
@@ -102,7 +137,9 @@ class TestInstances:
                     },
                 },
             },
+            sync_interval=900,
             token_id="182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+            type="r2",
         )
         assert_matches_type(InstanceCreateResponse, instance, path=["response"])
 
@@ -111,8 +148,6 @@ class TestInstances:
         response = client.aisearch.instances.with_raw_response.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
         )
 
         assert response.is_closed is True
@@ -125,8 +160,6 @@ class TestInstances:
         with client.aisearch.instances.with_streaming_response.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -142,8 +175,6 @@ class TestInstances:
             client.aisearch.instances.with_raw_response.create(
                 account_id="",
                 id="my-ai-search",
-                source="source",
-                type="r2",
             )
 
     @parametrize
@@ -173,10 +204,20 @@ class TestInstances:
                 }
             ],
             embedding_model="@cf/qwen/qwen3-embedding-0.6b",
-            hybrid_search_enabled=True,
+            fusion_method="max",
+            index_method={
+                "keyword": True,
+                "vector": True,
+            },
+            indexing_options={"keyword_tokenizer": "porter"},
             max_num_results=1,
             metadata={
                 "created_from_aisearch_wizard": True,
+                "search_for_agents": {
+                    "hostname": "hostname",
+                    "zone_id": "zone_id",
+                    "zone_name": "zone_name",
+                },
                 "worker_domain": "worker_domain",
             },
             paused=True,
@@ -184,7 +225,10 @@ class TestInstances:
                 "authorized_hosts": ["string"],
                 "chat_completions_endpoint": {"disabled": True},
                 "enabled": True,
-                "mcp": {"disabled": True},
+                "mcp": {
+                    "description": "description",
+                    "disabled": True,
+                },
                 "rate_limit": {
                     "period_ms": 60000,
                     "requests": 1,
@@ -194,6 +238,15 @@ class TestInstances:
             },
             reranking=True,
             reranking_model="@cf/baai/bge-reranker-base",
+            retrieval_options={
+                "boost_by": [
+                    {
+                        "field": "timestamp",
+                        "direction": "desc",
+                    }
+                ],
+                "keyword_match_mode": "and",
+            },
             rewrite_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
             rewrite_query=True,
             score_threshold=0,
@@ -203,7 +256,20 @@ class TestInstances:
                 "prefix": "prefix",
                 "r2_jurisdiction": "r2_jurisdiction",
                 "web_crawler": {
+                    "crawl_options": {
+                        "depth": 1,
+                        "include_external_links": True,
+                        "include_subdomains": True,
+                        "max_age": 0,
+                        "source": "all",
+                    },
                     "parse_options": {
+                        "content_selector": [
+                            {
+                                "path": "**/blog/**",
+                                "selector": "article .post-body",
+                            }
+                        ],
                         "include_headers": {"foo": "string"},
                         "include_images": True,
                         "specific_sitemaps": [
@@ -222,6 +288,7 @@ class TestInstances:
             },
             summarization=True,
             summarization_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            sync_interval=900,
             system_prompt_aisearch="system_prompt_ai_search",
             system_prompt_index_summarization="system_prompt_index_summarization",
             system_prompt_rewrite_query="system_prompt_rewrite_query",
@@ -280,6 +347,9 @@ class TestInstances:
     def test_method_list_with_all_params(self, client: Cloudflare) -> None:
         instance = client.aisearch.instances.list(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
+            namespace="namespace",
+            order_by="created_at",
+            order_by_direction="asc",
             page=1,
             per_page=1,
             search="search",
@@ -391,6 +461,10 @@ class TestInstances:
                 }
             ],
             aisearch_options={
+                "cache": {
+                    "cache_threshold": "super_strict_match",
+                    "enabled": True,
+                },
                 "query_rewrite": {
                     "enabled": True,
                     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -402,15 +476,20 @@ class TestInstances:
                     "model": "@cf/baai/bge-reranker-base",
                 },
                 "retrieval": {
+                    "boost_by": [
+                        {
+                            "field": "timestamp",
+                            "direction": "desc",
+                        }
+                    ],
                     "context_expansion": 0,
-                    "filters": {
-                        "key": "key",
-                        "type": "eq",
-                        "value": "string",
-                    },
+                    "filters": {"foo": "bar"},
+                    "fusion_method": "max",
+                    "keyword_match_mode": "and",
                     "match_threshold": 0,
                     "max_num_results": 1,
                     "retrieval_type": "vector",
+                    "return_on_failure": True,
                 },
             },
             model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -535,12 +614,6 @@ class TestInstances:
         instance = client.aisearch.instances.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
         )
         assert_matches_type(InstanceSearchResponse, instance, path=["response"])
 
@@ -549,13 +622,11 @@ class TestInstances:
         instance = client.aisearch.instances.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
             aisearch_options={
+                "cache": {
+                    "cache_threshold": "super_strict_match",
+                    "enabled": True,
+                },
                 "query_rewrite": {
                     "enabled": True,
                     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -567,17 +638,29 @@ class TestInstances:
                     "model": "@cf/baai/bge-reranker-base",
                 },
                 "retrieval": {
+                    "boost_by": [
+                        {
+                            "field": "timestamp",
+                            "direction": "desc",
+                        }
+                    ],
                     "context_expansion": 0,
-                    "filters": {
-                        "key": "key",
-                        "type": "eq",
-                        "value": "string",
-                    },
+                    "filters": {"foo": "bar"},
+                    "fusion_method": "max",
+                    "keyword_match_mode": "and",
                     "match_threshold": 0,
                     "max_num_results": 1,
                     "retrieval_type": "vector",
+                    "return_on_failure": True,
                 },
             },
+            messages=[
+                {
+                    "content": "content",
+                    "role": "system",
+                }
+            ],
+            query="x",
         )
         assert_matches_type(InstanceSearchResponse, instance, path=["response"])
 
@@ -586,12 +669,6 @@ class TestInstances:
         response = client.aisearch.instances.with_raw_response.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
         )
 
         assert response.is_closed is True
@@ -604,12 +681,6 @@ class TestInstances:
         with client.aisearch.instances.with_streaming_response.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -625,24 +696,12 @@ class TestInstances:
             client.aisearch.instances.with_raw_response.search(
                 id="my-ai-search",
                 account_id="",
-                messages=[
-                    {
-                        "content": "content",
-                        "role": "system",
-                    }
-                ],
             )
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `id` but received ''"):
             client.aisearch.instances.with_raw_response.search(
                 id="",
                 account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-                messages=[
-                    {
-                        "content": "content",
-                        "role": "system",
-                    }
-                ],
             )
 
     @parametrize
@@ -704,8 +763,6 @@ class TestAsyncInstances:
         instance = await async_client.aisearch.instances.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
         )
         assert_matches_type(InstanceCreateResponse, instance, path=["response"])
 
@@ -714,10 +771,10 @@ class TestAsyncInstances:
         instance = await async_client.aisearch.instances.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
             ai_gateway_id="ai_gateway_id",
             aisearch_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            cache=True,
+            cache_threshold="super_strict_match",
             chunk=True,
             chunk_overlap=0,
             chunk_size=64,
@@ -728,17 +785,31 @@ class TestAsyncInstances:
                 }
             ],
             embedding_model="@cf/qwen/qwen3-embedding-0.6b",
+            fusion_method="max",
             hybrid_search_enabled=True,
+            index_method={
+                "keyword": True,
+                "vector": True,
+            },
+            indexing_options={"keyword_tokenizer": "porter"},
             max_num_results=1,
             metadata={
                 "created_from_aisearch_wizard": True,
+                "search_for_agents": {
+                    "hostname": "hostname",
+                    "zone_id": "zone_id",
+                    "zone_name": "zone_name",
+                },
                 "worker_domain": "worker_domain",
             },
             public_endpoint_params={
                 "authorized_hosts": ["string"],
                 "chat_completions_endpoint": {"disabled": True},
                 "enabled": True,
-                "mcp": {"disabled": True},
+                "mcp": {
+                    "description": "description",
+                    "disabled": True,
+                },
                 "rate_limit": {
                     "period_ms": 60000,
                     "requests": 1,
@@ -748,16 +819,39 @@ class TestAsyncInstances:
             },
             reranking=True,
             reranking_model="@cf/baai/bge-reranker-base",
+            retrieval_options={
+                "boost_by": [
+                    {
+                        "field": "timestamp",
+                        "direction": "desc",
+                    }
+                ],
+                "keyword_match_mode": "and",
+            },
             rewrite_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
             rewrite_query=True,
             score_threshold=0,
+            source="source",
             source_params={
                 "exclude_items": ["/admin/**", "/private/**", "**\\temp\\**"],
                 "include_items": ["/blog/**", "/docs/**/*.html", "**\\blog\\**.html"],
                 "prefix": "prefix",
                 "r2_jurisdiction": "r2_jurisdiction",
                 "web_crawler": {
+                    "crawl_options": {
+                        "depth": 1,
+                        "include_external_links": True,
+                        "include_subdomains": True,
+                        "max_age": 0,
+                        "source": "all",
+                    },
                     "parse_options": {
+                        "content_selector": [
+                            {
+                                "path": "**/blog/**",
+                                "selector": "article .post-body",
+                            }
+                        ],
                         "include_headers": {"foo": "string"},
                         "include_images": True,
                         "specific_sitemaps": [
@@ -774,7 +868,9 @@ class TestAsyncInstances:
                     },
                 },
             },
+            sync_interval=900,
             token_id="182bd5e5-6e1a-4fe4-a799-aa6d9a6ab26e",
+            type="r2",
         )
         assert_matches_type(InstanceCreateResponse, instance, path=["response"])
 
@@ -783,8 +879,6 @@ class TestAsyncInstances:
         response = await async_client.aisearch.instances.with_raw_response.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
         )
 
         assert response.is_closed is True
@@ -797,8 +891,6 @@ class TestAsyncInstances:
         async with async_client.aisearch.instances.with_streaming_response.create(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
             id="my-ai-search",
-            source="source",
-            type="r2",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -814,8 +906,6 @@ class TestAsyncInstances:
             await async_client.aisearch.instances.with_raw_response.create(
                 account_id="",
                 id="my-ai-search",
-                source="source",
-                type="r2",
             )
 
     @parametrize
@@ -845,10 +935,20 @@ class TestAsyncInstances:
                 }
             ],
             embedding_model="@cf/qwen/qwen3-embedding-0.6b",
-            hybrid_search_enabled=True,
+            fusion_method="max",
+            index_method={
+                "keyword": True,
+                "vector": True,
+            },
+            indexing_options={"keyword_tokenizer": "porter"},
             max_num_results=1,
             metadata={
                 "created_from_aisearch_wizard": True,
+                "search_for_agents": {
+                    "hostname": "hostname",
+                    "zone_id": "zone_id",
+                    "zone_name": "zone_name",
+                },
                 "worker_domain": "worker_domain",
             },
             paused=True,
@@ -856,7 +956,10 @@ class TestAsyncInstances:
                 "authorized_hosts": ["string"],
                 "chat_completions_endpoint": {"disabled": True},
                 "enabled": True,
-                "mcp": {"disabled": True},
+                "mcp": {
+                    "description": "description",
+                    "disabled": True,
+                },
                 "rate_limit": {
                     "period_ms": 60000,
                     "requests": 1,
@@ -866,6 +969,15 @@ class TestAsyncInstances:
             },
             reranking=True,
             reranking_model="@cf/baai/bge-reranker-base",
+            retrieval_options={
+                "boost_by": [
+                    {
+                        "field": "timestamp",
+                        "direction": "desc",
+                    }
+                ],
+                "keyword_match_mode": "and",
+            },
             rewrite_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
             rewrite_query=True,
             score_threshold=0,
@@ -875,7 +987,20 @@ class TestAsyncInstances:
                 "prefix": "prefix",
                 "r2_jurisdiction": "r2_jurisdiction",
                 "web_crawler": {
+                    "crawl_options": {
+                        "depth": 1,
+                        "include_external_links": True,
+                        "include_subdomains": True,
+                        "max_age": 0,
+                        "source": "all",
+                    },
                     "parse_options": {
+                        "content_selector": [
+                            {
+                                "path": "**/blog/**",
+                                "selector": "article .post-body",
+                            }
+                        ],
                         "include_headers": {"foo": "string"},
                         "include_images": True,
                         "specific_sitemaps": [
@@ -894,6 +1019,7 @@ class TestAsyncInstances:
             },
             summarization=True,
             summarization_model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            sync_interval=900,
             system_prompt_aisearch="system_prompt_ai_search",
             system_prompt_index_summarization="system_prompt_index_summarization",
             system_prompt_rewrite_query="system_prompt_rewrite_query",
@@ -952,6 +1078,9 @@ class TestAsyncInstances:
     async def test_method_list_with_all_params(self, async_client: AsyncCloudflare) -> None:
         instance = await async_client.aisearch.instances.list(
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
+            namespace="namespace",
+            order_by="created_at",
+            order_by_direction="asc",
             page=1,
             per_page=1,
             search="search",
@@ -1063,6 +1192,10 @@ class TestAsyncInstances:
                 }
             ],
             aisearch_options={
+                "cache": {
+                    "cache_threshold": "super_strict_match",
+                    "enabled": True,
+                },
                 "query_rewrite": {
                     "enabled": True,
                     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -1074,15 +1207,20 @@ class TestAsyncInstances:
                     "model": "@cf/baai/bge-reranker-base",
                 },
                 "retrieval": {
+                    "boost_by": [
+                        {
+                            "field": "timestamp",
+                            "direction": "desc",
+                        }
+                    ],
                     "context_expansion": 0,
-                    "filters": {
-                        "key": "key",
-                        "type": "eq",
-                        "value": "string",
-                    },
+                    "filters": {"foo": "bar"},
+                    "fusion_method": "max",
+                    "keyword_match_mode": "and",
                     "match_threshold": 0,
                     "max_num_results": 1,
                     "retrieval_type": "vector",
+                    "return_on_failure": True,
                 },
             },
             model="@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -1207,12 +1345,6 @@ class TestAsyncInstances:
         instance = await async_client.aisearch.instances.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
         )
         assert_matches_type(InstanceSearchResponse, instance, path=["response"])
 
@@ -1221,13 +1353,11 @@ class TestAsyncInstances:
         instance = await async_client.aisearch.instances.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
             aisearch_options={
+                "cache": {
+                    "cache_threshold": "super_strict_match",
+                    "enabled": True,
+                },
                 "query_rewrite": {
                     "enabled": True,
                     "model": "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
@@ -1239,17 +1369,29 @@ class TestAsyncInstances:
                     "model": "@cf/baai/bge-reranker-base",
                 },
                 "retrieval": {
+                    "boost_by": [
+                        {
+                            "field": "timestamp",
+                            "direction": "desc",
+                        }
+                    ],
                     "context_expansion": 0,
-                    "filters": {
-                        "key": "key",
-                        "type": "eq",
-                        "value": "string",
-                    },
+                    "filters": {"foo": "bar"},
+                    "fusion_method": "max",
+                    "keyword_match_mode": "and",
                     "match_threshold": 0,
                     "max_num_results": 1,
                     "retrieval_type": "vector",
+                    "return_on_failure": True,
                 },
             },
+            messages=[
+                {
+                    "content": "content",
+                    "role": "system",
+                }
+            ],
+            query="x",
         )
         assert_matches_type(InstanceSearchResponse, instance, path=["response"])
 
@@ -1258,12 +1400,6 @@ class TestAsyncInstances:
         response = await async_client.aisearch.instances.with_raw_response.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
         )
 
         assert response.is_closed is True
@@ -1276,12 +1412,6 @@ class TestAsyncInstances:
         async with async_client.aisearch.instances.with_streaming_response.search(
             id="my-ai-search",
             account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-            messages=[
-                {
-                    "content": "content",
-                    "role": "system",
-                }
-            ],
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -1297,24 +1427,12 @@ class TestAsyncInstances:
             await async_client.aisearch.instances.with_raw_response.search(
                 id="my-ai-search",
                 account_id="",
-                messages=[
-                    {
-                        "content": "content",
-                        "role": "system",
-                    }
-                ],
             )
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `id` but received ''"):
             await async_client.aisearch.instances.with_raw_response.search(
                 id="",
                 account_id="c3dc5f0b34a14ff8e1b3ec04895e1b22",
-                messages=[
-                    {
-                        "content": "content",
-                        "role": "system",
-                    }
-                ],
             )
 
     @parametrize

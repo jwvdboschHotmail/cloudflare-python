@@ -8,9 +8,15 @@ __all__ = ["MoveCreateParams"]
 
 
 class MoveCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account Identifier"""
 
     destination: Required[
         Literal["Inbox", "JunkEmail", "DeletedItems", "RecoverableItemsDeletions", "RecoverableItemsPurges"]
     ]
+
+    submission: bool
+    """When true, search the submissions datastore only.
+
+    When false or omitted, search the regular datastore only.
+    """

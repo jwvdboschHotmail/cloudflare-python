@@ -7,7 +7,7 @@ from typing import List, Type, Optional, cast
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -49,8 +49,8 @@ class SeverityResource(SyncAPIResource):
     def get(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismissed: bool | Omit = omit,
         issue_class: SequenceNotStr[str] | Omit = omit,
         issue_class_neq: SequenceNotStr[str] | Omit = omit,
@@ -70,7 +70,8 @@ class SeverityResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[SeverityGetResponse]:
         """
-        Retrieves Security Center Insight Counts by Severity
+        Retrieves Security Center insight counts aggregated by severity level (critical,
+        high, medium, low).
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -85,6 +86,10 @@ class SeverityResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -98,7 +103,11 @@ class SeverityResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights/severity",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights/severity",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -149,8 +158,8 @@ class AsyncSeverityResource(AsyncAPIResource):
     async def get(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismissed: bool | Omit = omit,
         issue_class: SequenceNotStr[str] | Omit = omit,
         issue_class_neq: SequenceNotStr[str] | Omit = omit,
@@ -170,7 +179,8 @@ class AsyncSeverityResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[SeverityGetResponse]:
         """
-        Retrieves Security Center Insight Counts by Severity
+        Retrieves Security Center insight counts aggregated by severity level (critical,
+        high, medium, low).
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -185,6 +195,10 @@ class AsyncSeverityResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -198,7 +212,11 @@ class AsyncSeverityResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights/severity",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights/severity",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

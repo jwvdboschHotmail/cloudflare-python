@@ -1,12 +1,36 @@
 # File generated from our OpenAPI spec by Stainless. See CONTRIBUTING.md for details.
 
-from typing import Dict, List, Union, Optional
+from typing import Dict, List, Optional
 from datetime import datetime
 from typing_extensions import Literal
 
 from ......_models import BaseModel
 
-__all__ = ["PortalReadResponse", "Server"]
+__all__ = ["PortalReadResponse", "Server", "ServerUpdatedPrompt", "ServerUpdatedTool"]
+
+
+class ServerUpdatedPrompt(BaseModel):
+    name: str
+
+    description: Optional[str] = None
+
+    enabled: Optional[bool] = None
+
+    portal_alias: Optional[str] = None
+
+    server_alias: Optional[str] = None
+
+
+class ServerUpdatedTool(BaseModel):
+    name: str
+
+    description: Optional[str] = None
+
+    enabled: Optional[bool] = None
+
+    portal_alias: Optional[str] = None
+
+    server_alias: Optional[str] = None
 
 
 class Server(BaseModel):
@@ -22,10 +46,6 @@ class Server(BaseModel):
     prompts: List[Dict[str, object]]
 
     tools: List[Dict[str, object]]
-
-    updated_prompts: List[Dict[str, Union[float, str]]]
-
-    updated_tools: List[Dict[str, Union[float, str]]]
 
     created_at: Optional[datetime] = None
 
@@ -49,6 +69,10 @@ class Server(BaseModel):
 
     status: Optional[str] = None
 
+    updated_prompts: Optional[List[ServerUpdatedPrompt]] = None
+
+    updated_tools: Optional[List[ServerUpdatedTool]] = None
+
 
 class PortalReadResponse(BaseModel):
     id: str
@@ -59,6 +83,9 @@ class PortalReadResponse(BaseModel):
     name: str
 
     servers: List[Server]
+
+    allow_code_mode: Optional[bool] = None
+    """Allow remote code execution in Dynamic Workers (beta)"""
 
     created_at: Optional[datetime] = None
 

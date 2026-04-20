@@ -20,6 +20,7 @@ __all__ = [
     "PromptResponseFormat",
     "Messages",
     "MessagesMessage",
+    "MessagesMessageContentUnionMember1",
     "MessagesFunction",
     "MessagesResponseFormat",
     "MessagesTool",
@@ -36,19 +37,21 @@ __all__ = [
     "Variant12",
     "Variant13",
     "Variant13Message",
+    "Variant13MessageContentUnionMember1",
+    "Variant13MessageContentUnionMember1ImageURL",
     "MultimodalEmbeddings",
 ]
 
 
 class TextClassification(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     text: Required[str]
     """The text that you want to classify"""
 
 
 class TextToImage(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     prompt: Required[str]
     """A text description of the image you want to generate"""
@@ -100,7 +103,7 @@ class TextToImage(TypedDict, total=False):
 
 
 class TextToSpeech(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     prompt: Required[str]
     """A text description of the audio you want to generate"""
@@ -113,14 +116,14 @@ class TextToSpeech(TypedDict, total=False):
 
 
 class TextEmbeddings(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     text: Required[Union[str, SequenceNotStr[str]]]
     """The text to embed"""
 
 
 class AutomaticSpeechRecognition(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     audio: Required[Iterable[float]]
     """
@@ -139,7 +142,7 @@ class AutomaticSpeechRecognition(TypedDict, total=False):
 
 
 class ImageClassification(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     image: Required[Iterable[float]]
     """
@@ -149,7 +152,7 @@ class ImageClassification(TypedDict, total=False):
 
 
 class ObjectDetection(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     image: Iterable[float]
     """
@@ -159,7 +162,7 @@ class ObjectDetection(TypedDict, total=False):
 
 
 class Prompt(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     prompt: Required[str]
     """The input text prompt for the model to generate a response."""
@@ -224,7 +227,7 @@ class PromptResponseFormat(TypedDict, total=False):
 
 
 class Messages(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     messages: Required[Iterable[MessagesMessage]]
     """An array of message objects representing the conversation history."""
@@ -284,8 +287,16 @@ class Messages(TypedDict, total=False):
     """
 
 
+class MessagesMessageContentUnionMember1(TypedDict, total=False):
+    text: str
+    """Text content"""
+
+    type: str
+    """Type of the content (text)"""
+
+
 class MessagesMessage(TypedDict, total=False):
-    content: Required[str]
+    content: Required[Union[str, Iterable[MessagesMessageContentUnionMember1]]]
     """The content of the message as a string."""
 
     role: Required[str]
@@ -382,7 +393,7 @@ MessagesTool: TypeAlias = Union[MessagesToolUnionMember0, MessagesToolFunction]
 
 
 class Translation(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     target_lang: Required[str]
     """The language code to translate the text into (e.g., 'es' for Spanish)"""
@@ -398,7 +409,7 @@ class Translation(TypedDict, total=False):
 
 
 class Summarization(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     input_text: Required[str]
     """The text that you want the model to summarize"""
@@ -408,7 +419,7 @@ class Summarization(TypedDict, total=False):
 
 
 class ImageToText(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     image: Required[Iterable[float]]
     """
@@ -462,7 +473,7 @@ class ImageToText(TypedDict, total=False):
 
 
 class Variant12(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     image: Required[str]
     """Image in base64 encoded format."""
@@ -513,7 +524,7 @@ class Variant12(TypedDict, total=False):
 
 
 class Variant13(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     image: Required[str]
     """Image in base64 encoded format."""
@@ -563,8 +574,26 @@ class Variant13(TypedDict, total=False):
     """
 
 
+class Variant13MessageContentUnionMember1ImageURL(TypedDict, total=False):
+    """Image URL object (when type is 'image_url')."""
+
+    url: Required[str]
+    """Image URI with data (e.g. data:image/jpeg;base64,/9j/...)."""
+
+
+class Variant13MessageContentUnionMember1(TypedDict, total=False):
+    type: Required[str]
+    """Type of the content part (e.g. 'text', 'image_url')."""
+
+    image_url: Variant13MessageContentUnionMember1ImageURL
+    """Image URL object (when type is 'image_url')."""
+
+    text: str
+    """Text content (when type is 'text')."""
+
+
 class Variant13Message(TypedDict, total=False):
-    content: Required[str]
+    content: Required[Union[str, Iterable[Variant13MessageContentUnionMember1]]]
     """The content of the message as a string."""
 
     role: Required[str]
@@ -572,7 +601,7 @@ class Variant13Message(TypedDict, total=False):
 
 
 class MultimodalEmbeddings(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     image: str
     """Image in base64 encoded format."""

@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -30,9 +30,7 @@ from ....types.secrets_store.stores.secret_get_response import SecretGetResponse
 from ....types.secrets_store.stores.secret_edit_response import SecretEditResponse
 from ....types.secrets_store.stores.secret_list_response import SecretListResponse
 from ....types.secrets_store.stores.secret_create_response import SecretCreateResponse
-from ....types.secrets_store.stores.secret_delete_response import SecretDeleteResponse
 from ....types.secrets_store.stores.secret_duplicate_response import SecretDuplicateResponse
-from ....types.secrets_store.stores.secret_bulk_delete_response import SecretBulkDeleteResponse
 
 __all__ = ["SecretsResource", "AsyncSecretsResource"]
 
@@ -61,7 +59,7 @@ class SecretsResource(SyncAPIResource):
         self,
         store_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: Iterable[secret_create_params.Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -86,12 +84,18 @@ class SecretsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
             raise ValueError(f"Expected a non-empty value for `store_id` but received {store_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+                account_id=account_id,
+                store_id=store_id,
+            ),
             page=SyncSinglePage[SecretCreateResponse],
             body=maybe_transform(body, Iterable[secret_create_params.Body]),
             options=make_request_options(
@@ -105,7 +109,7 @@ class SecretsResource(SyncAPIResource):
         self,
         store_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         direction: Literal["asc", "desc"] | Omit = omit,
         order: Literal["name", "comment", "created", "modified", "status"] | Omit = omit,
         page: int | Omit = omit,
@@ -147,12 +151,18 @@ class SecretsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
             raise ValueError(f"Expected a non-empty value for `store_id` but received {store_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+                account_id=account_id,
+                store_id=store_id,
+            ),
             page=SyncV4PagePaginationArray[SecretListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -178,7 +188,7 @@ class SecretsResource(SyncAPIResource):
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -186,7 +196,7 @@ class SecretsResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[SecretDeleteResponse]:
+    ) -> object:
         """
         Deletes a single secret
 
@@ -205,6 +215,8 @@ class SecretsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -212,29 +224,34 @@ class SecretsResource(SyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[SecretDeleteResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[object]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[SecretDeleteResponse]], ResultWrapper[SecretDeleteResponse]),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     def bulk_delete(
         self,
         store_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncSinglePage[SecretBulkDeleteResponse]:
+    ) -> object:
         """
         Deletes one or more secrets
 
@@ -251,25 +268,33 @@ class SecretsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
             raise ValueError(f"Expected a non-empty value for `store_id` but received {store_id!r}")
-        return self._get_api_list(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
-            page=SyncSinglePage[SecretBulkDeleteResponse],
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        return self._delete(
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+                account_id=account_id,
+                store_id=store_id,
             ),
-            model=SecretBulkDeleteResponse,
-            method="delete",
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[Optional[object]]._unwrapper,
+            ),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     def duplicate(
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         name: str,
         scopes: SequenceNotStr[str],
@@ -305,6 +330,8 @@ class SecretsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -312,7 +339,12 @@ class SecretsResource(SyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return self._post(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}/duplicate",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}/duplicate",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             body=maybe_transform(
                 {
                     "name": name,
@@ -335,10 +367,11 @@ class SecretsResource(SyncAPIResource):
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         comment: str | Omit = omit,
         scopes: SequenceNotStr[str] | Omit = omit,
+        value: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -360,6 +393,9 @@ class SecretsResource(SyncAPIResource):
 
           scopes: The list of services that can use this secret.
 
+          value: The value of the secret. Note that this is 'write only' - no API reponse will
+              provide this value, it is only used to create/modify secrets.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -368,6 +404,8 @@ class SecretsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -375,11 +413,17 @@ class SecretsResource(SyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return self._patch(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             body=maybe_transform(
                 {
                     "comment": comment,
                     "scopes": scopes,
+                    "value": value,
                 },
                 secret_edit_params.SecretEditParams,
             ),
@@ -397,7 +441,7 @@ class SecretsResource(SyncAPIResource):
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -424,6 +468,8 @@ class SecretsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -431,7 +477,12 @@ class SecretsResource(SyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return self._get(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -467,7 +518,7 @@ class AsyncSecretsResource(AsyncAPIResource):
         self,
         store_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: Iterable[secret_create_params.Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -492,12 +543,18 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
             raise ValueError(f"Expected a non-empty value for `store_id` but received {store_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+                account_id=account_id,
+                store_id=store_id,
+            ),
             page=AsyncSinglePage[SecretCreateResponse],
             body=maybe_transform(body, Iterable[secret_create_params.Body]),
             options=make_request_options(
@@ -511,7 +568,7 @@ class AsyncSecretsResource(AsyncAPIResource):
         self,
         store_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         direction: Literal["asc", "desc"] | Omit = omit,
         order: Literal["name", "comment", "created", "modified", "status"] | Omit = omit,
         page: int | Omit = omit,
@@ -553,12 +610,18 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
             raise ValueError(f"Expected a non-empty value for `store_id` but received {store_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+                account_id=account_id,
+                store_id=store_id,
+            ),
             page=AsyncV4PagePaginationArray[SecretListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -584,7 +647,7 @@ class AsyncSecretsResource(AsyncAPIResource):
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -592,7 +655,7 @@ class AsyncSecretsResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[SecretDeleteResponse]:
+    ) -> object:
         """
         Deletes a single secret
 
@@ -611,6 +674,8 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -618,29 +683,34 @@ class AsyncSecretsResource(AsyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[SecretDeleteResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[object]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[SecretDeleteResponse]], ResultWrapper[SecretDeleteResponse]),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
-    def bulk_delete(
+    async def bulk_delete(
         self,
         store_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[SecretBulkDeleteResponse, AsyncSinglePage[SecretBulkDeleteResponse]]:
+    ) -> object:
         """
         Deletes one or more secrets
 
@@ -657,25 +727,33 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
             raise ValueError(f"Expected a non-empty value for `store_id` but received {store_id!r}")
-        return self._get_api_list(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
-            page=AsyncSinglePage[SecretBulkDeleteResponse],
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+        return await self._delete(
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets",
+                account_id=account_id,
+                store_id=store_id,
             ),
-            model=SecretBulkDeleteResponse,
-            method="delete",
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[Optional[object]]._unwrapper,
+            ),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     async def duplicate(
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         name: str,
         scopes: SequenceNotStr[str],
@@ -711,6 +789,8 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -718,7 +798,12 @@ class AsyncSecretsResource(AsyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}/duplicate",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}/duplicate",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "name": name,
@@ -741,10 +826,11 @@ class AsyncSecretsResource(AsyncAPIResource):
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         comment: str | Omit = omit,
         scopes: SequenceNotStr[str] | Omit = omit,
+        value: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -766,6 +852,9 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           scopes: The list of services that can use this secret.
 
+          value: The value of the secret. Note that this is 'write only' - no API reponse will
+              provide this value, it is only used to create/modify secrets.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -774,6 +863,8 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -781,11 +872,17 @@ class AsyncSecretsResource(AsyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return await self._patch(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "comment": comment,
                     "scopes": scopes,
+                    "value": value,
                 },
                 secret_edit_params.SecretEditParams,
             ),
@@ -803,7 +900,7 @@ class AsyncSecretsResource(AsyncAPIResource):
         self,
         secret_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         store_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -830,6 +927,8 @@ class AsyncSecretsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not store_id:
@@ -837,7 +936,12 @@ class AsyncSecretsResource(AsyncAPIResource):
         if not secret_id:
             raise ValueError(f"Expected a non-empty value for `secret_id` but received {secret_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+            path_template(
+                "/accounts/{account_id}/secrets_store/stores/{store_id}/secrets/{secret_id}",
+                account_id=account_id,
+                store_id=store_id,
+                secret_id=secret_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

@@ -2,14 +2,19 @@
 
 from __future__ import annotations
 
-from typing_extensions import Required, TypedDict
+from typing_extensions import TypedDict
 
 __all__ = ["TokenListParams"]
 
 
 class TokenListParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     page: int
+    """Page number (1-indexed)."""
 
     per_page: int
+    """Number of results per page."""
+
+    search: str
+    """Filter tokens whose name contains this string (case-insensitive)."""

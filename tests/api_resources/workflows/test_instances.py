@@ -39,8 +39,8 @@ class TestInstances:
             account_id="account_id",
             instance_id="instance_id",
             instance_retention={
-                "error_retention": 0,
-                "success_retention": 0,
+                "error_retention": "5 minutes",
+                "success_retention": "5 minutes",
             },
             params={},
         )
@@ -166,8 +166,8 @@ class TestInstances:
                 {
                     "instance_id": "instance_id",
                     "instance_retention": {
-                        "error_retention": 0,
-                        "success_retention": 0,
+                        "error_retention": "5 minutes",
+                        "success_retention": "5 minutes",
                     },
                     "params": {},
                 }
@@ -221,6 +221,17 @@ class TestInstances:
             instance_id="x",
             account_id="account_id",
             workflow_name="x",
+        )
+        assert_matches_type(InstanceGetResponse, instance, path=["response"])
+
+    @parametrize
+    def test_method_get_with_all_params(self, client: Cloudflare) -> None:
+        instance = client.workflows.instances.get(
+            instance_id="x",
+            account_id="account_id",
+            workflow_name="x",
+            order="asc",
+            simple="true",
         )
         assert_matches_type(InstanceGetResponse, instance, path=["response"])
 
@@ -296,8 +307,8 @@ class TestAsyncInstances:
             account_id="account_id",
             instance_id="instance_id",
             instance_retention={
-                "error_retention": 0,
-                "success_retention": 0,
+                "error_retention": "5 minutes",
+                "success_retention": "5 minutes",
             },
             params={},
         )
@@ -423,8 +434,8 @@ class TestAsyncInstances:
                 {
                     "instance_id": "instance_id",
                     "instance_retention": {
-                        "error_retention": 0,
-                        "success_retention": 0,
+                        "error_retention": "5 minutes",
+                        "success_retention": "5 minutes",
                     },
                     "params": {},
                 }
@@ -478,6 +489,17 @@ class TestAsyncInstances:
             instance_id="x",
             account_id="account_id",
             workflow_name="x",
+        )
+        assert_matches_type(InstanceGetResponse, instance, path=["response"])
+
+    @parametrize
+    async def test_method_get_with_all_params(self, async_client: AsyncCloudflare) -> None:
+        instance = await async_client.workflows.instances.get(
+            instance_id="x",
+            account_id="account_id",
+            workflow_name="x",
+            order="asc",
+            simple="true",
         )
         assert_matches_type(InstanceGetResponse, instance, path=["response"])
 

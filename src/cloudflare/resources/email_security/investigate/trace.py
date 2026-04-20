@@ -6,7 +6,8 @@ from typing import Type, cast
 
 import httpx
 
-from ...._types import Body, Query, Headers, NotGiven, not_given
+from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -17,6 +18,7 @@ from ...._response import (
 )
 from ...._wrappers import ResultWrapper
 from ...._base_client import make_request_options
+from ....types.email_security.investigate import trace_get_params
 from ....types.email_security.investigate.trace_get_response import TraceGetResponse
 
 __all__ = ["TraceResource", "AsyncTraceResource"]
@@ -46,7 +48,8 @@ class TraceResource(SyncAPIResource):
         self,
         postfix_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        submission: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -55,12 +58,16 @@ class TraceResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TraceGetResponse:
         """
-        Get email trace
+        Gets the delivery trace for an email message, showing its path through email
+        security processing.
 
         Args:
           account_id: Account Identifier
 
           postfix_id: The identifier of the message.
+
+          submission: When true, search the submissions datastore only. When false or omitted, search
+              the regular datastore only.
 
           extra_headers: Send extra headers
 
@@ -70,17 +77,24 @@ class TraceResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not postfix_id:
             raise ValueError(f"Expected a non-empty value for `postfix_id` but received {postfix_id!r}")
         return self._get(
-            f"/accounts/{account_id}/email-security/investigate/{postfix_id}/trace",
+            path_template(
+                "/accounts/{account_id}/email-security/investigate/{postfix_id}/trace",
+                account_id=account_id,
+                postfix_id=postfix_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
+                query=maybe_transform({"submission": submission}, trace_get_params.TraceGetParams),
                 post_parser=ResultWrapper[TraceGetResponse]._unwrapper,
             ),
             cast_to=cast(Type[TraceGetResponse], ResultWrapper[TraceGetResponse]),
@@ -111,7 +125,8 @@ class AsyncTraceResource(AsyncAPIResource):
         self,
         postfix_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        submission: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -120,12 +135,16 @@ class AsyncTraceResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TraceGetResponse:
         """
-        Get email trace
+        Gets the delivery trace for an email message, showing its path through email
+        security processing.
 
         Args:
           account_id: Account Identifier
 
           postfix_id: The identifier of the message.
+
+          submission: When true, search the submissions datastore only. When false or omitted, search
+              the regular datastore only.
 
           extra_headers: Send extra headers
 
@@ -135,17 +154,24 @@ class AsyncTraceResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not postfix_id:
             raise ValueError(f"Expected a non-empty value for `postfix_id` but received {postfix_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/email-security/investigate/{postfix_id}/trace",
+            path_template(
+                "/accounts/{account_id}/email-security/investigate/{postfix_id}/trace",
+                account_id=account_id,
+                postfix_id=postfix_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
+                query=await async_maybe_transform({"submission": submission}, trace_get_params.TraceGetParams),
                 post_parser=ResultWrapper[TraceGetResponse]._unwrapper,
             ),
             cast_to=cast(Type[TraceGetResponse], ResultWrapper[TraceGetResponse]),

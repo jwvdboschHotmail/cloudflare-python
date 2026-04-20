@@ -3,14 +3,14 @@
 from __future__ import annotations
 
 import typing_extensions
-from typing import Type, Union, cast
+from typing import List, Type, Union, cast
 from datetime import datetime
 from typing_extensions import Literal
 
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -60,9 +60,38 @@ class TimeseriesGroupsResource(SyncAPIResource):
     )
     def summary(
         self,
-        dimension: Literal["USER_AGENT", "CRAWL_PURPOSE", "INDUSTRY", "VERTICAL"],
+        dimension: Literal[
+            "USER_AGENT",
+            "CRAWL_PURPOSE",
+            "INDUSTRY",
+            "VERTICAL",
+            "CONTENT_TYPE",
+            "RESPONSE_STATUS",
+            "RESPONSE_STATUS_CATEGORY",
+        ],
         *,
         asn: SequenceNotStr[str] | Omit = omit,
+        content_type: List[
+            Literal[
+                "HTML",
+                "IMAGES",
+                "JSON",
+                "JAVASCRIPT",
+                "CSS",
+                "PLAIN_TEXT",
+                "FONTS",
+                "XML",
+                "YAML",
+                "VIDEO",
+                "AUDIO",
+                "MARKDOWN",
+                "DOCUMENTS",
+                "BINARY",
+                "SERIALIZATION",
+                "OTHER",
+            ]
+        ]
+        | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
         crawl_purpose: SequenceNotStr[str] | Omit = omit,
         date_end: SequenceNotStr[Union[str, datetime]] | Omit = omit,
@@ -73,6 +102,12 @@ class TimeseriesGroupsResource(SyncAPIResource):
         limit_per_group: int | Omit = omit,
         location: SequenceNotStr[str] | Omit = omit,
         name: SequenceNotStr[str] | Omit = omit,
+        response_status: SequenceNotStr[str] | Omit = omit,
+        response_status_category: List[
+            Literal["INFORMATIONAL", "SUCCESS", "REDIRECTION", "CLIENT_ERROR", "SERVER_ERROR"]
+        ]
+        | Omit = omit,
+        user_agent: SequenceNotStr[str] | Omit = omit,
         vertical: SequenceNotStr[str] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -92,6 +127,8 @@ class TimeseriesGroupsResource(SyncAPIResource):
               Numbers (ASNs) as a comma-separated list. Prefix with `-` to exclude ASNs from
               results. For example, `-174, 3356` excludes results from AS174, but includes
               results from AS3356.
+
+          content_type: Filters results by content type category.
 
           continent: Filters results by continent. Specify a comma-separated list of alpha-2 codes.
               Prefix with `-` to exclude continents from results. For example, `-EU,NA`
@@ -121,6 +158,14 @@ class TimeseriesGroupsResource(SyncAPIResource):
 
           name: Array of names used to label the series in the response.
 
+          response_status: Filters results by HTTP response status code (e.g. 200, 403, 404). Only
+              [IANA-registered codes](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+              are accepted.
+
+          response_status_category: Filters results by HTTP response status code category.
+
+          user_agent: Filters results by user agent.
+
           vertical: Filters results by vertical.
 
           extra_headers: Send extra headers
@@ -134,7 +179,7 @@ class TimeseriesGroupsResource(SyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return self._get(
-            f"/radar/ai/bots/summary/{dimension}",
+            path_template("/radar/ai/bots/summary/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -143,6 +188,7 @@ class TimeseriesGroupsResource(SyncAPIResource):
                 query=maybe_transform(
                     {
                         "asn": asn,
+                        "content_type": content_type,
                         "continent": continent,
                         "crawl_purpose": crawl_purpose,
                         "date_end": date_end,
@@ -153,6 +199,9 @@ class TimeseriesGroupsResource(SyncAPIResource):
                         "limit_per_group": limit_per_group,
                         "location": location,
                         "name": name,
+                        "response_status": response_status,
+                        "response_status_category": response_status_category,
+                        "user_agent": user_agent,
                         "vertical": vertical,
                     },
                     timeseries_group_summary_params.TimeseriesGroupSummaryParams,
@@ -170,6 +219,27 @@ class TimeseriesGroupsResource(SyncAPIResource):
         *,
         agg_interval: Literal["15m", "1h", "1d", "1w"] | Omit = omit,
         asn: SequenceNotStr[str] | Omit = omit,
+        content_type: List[
+            Literal[
+                "HTML",
+                "IMAGES",
+                "JSON",
+                "JAVASCRIPT",
+                "CSS",
+                "PLAIN_TEXT",
+                "FONTS",
+                "XML",
+                "YAML",
+                "VIDEO",
+                "AUDIO",
+                "MARKDOWN",
+                "DOCUMENTS",
+                "BINARY",
+                "SERIALIZATION",
+                "OTHER",
+            ]
+        ]
+        | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
         crawl_purpose: SequenceNotStr[str] | Omit = omit,
         date_end: SequenceNotStr[Union[str, datetime]] | Omit = omit,
@@ -180,6 +250,11 @@ class TimeseriesGroupsResource(SyncAPIResource):
         limit_per_group: int | Omit = omit,
         location: SequenceNotStr[str] | Omit = omit,
         name: SequenceNotStr[str] | Omit = omit,
+        response_status: SequenceNotStr[str] | Omit = omit,
+        response_status_category: List[
+            Literal["INFORMATIONAL", "SUCCESS", "REDIRECTION", "CLIENT_ERROR", "SERVER_ERROR"]
+        ]
+        | Omit = omit,
         user_agent: SequenceNotStr[str] | Omit = omit,
         vertical: SequenceNotStr[str] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -202,6 +277,8 @@ class TimeseriesGroupsResource(SyncAPIResource):
               results. For example, `-174, 3356` excludes results from AS174, but includes
               results from AS3356.
 
+          content_type: Filters results by content type category.
+
           continent: Filters results by continent. Specify a comma-separated list of alpha-2 codes.
               Prefix with `-` to exclude continents from results. For example, `-EU,NA`
               excludes results from EU, but includes results from NA.
@@ -229,6 +306,12 @@ class TimeseriesGroupsResource(SyncAPIResource):
               excludes results from the US, but includes results from PT.
 
           name: Array of names used to label the series in the response.
+
+          response_status: Filters results by HTTP response status code (e.g. 200, 403, 404). Only
+              [IANA-registered codes](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+              are accepted.
+
+          response_status_category: Filters results by HTTP response status code category.
 
           user_agent: Filters results by user agent.
 
@@ -253,6 +336,7 @@ class TimeseriesGroupsResource(SyncAPIResource):
                     {
                         "agg_interval": agg_interval,
                         "asn": asn,
+                        "content_type": content_type,
                         "continent": continent,
                         "crawl_purpose": crawl_purpose,
                         "date_end": date_end,
@@ -263,6 +347,8 @@ class TimeseriesGroupsResource(SyncAPIResource):
                         "limit_per_group": limit_per_group,
                         "location": location,
                         "name": name,
+                        "response_status": response_status,
+                        "response_status_category": response_status_category,
                         "user_agent": user_agent,
                         "vertical": vertical,
                     },
@@ -278,10 +364,39 @@ class TimeseriesGroupsResource(SyncAPIResource):
     )
     def timeseries_groups(
         self,
-        dimension: Literal["USER_AGENT", "CRAWL_PURPOSE", "INDUSTRY", "VERTICAL"],
+        dimension: Literal[
+            "USER_AGENT",
+            "CRAWL_PURPOSE",
+            "INDUSTRY",
+            "VERTICAL",
+            "CONTENT_TYPE",
+            "RESPONSE_STATUS",
+            "RESPONSE_STATUS_CATEGORY",
+        ],
         *,
         agg_interval: Literal["15m", "1h", "1d", "1w"] | Omit = omit,
         asn: SequenceNotStr[str] | Omit = omit,
+        content_type: List[
+            Literal[
+                "HTML",
+                "IMAGES",
+                "JSON",
+                "JAVASCRIPT",
+                "CSS",
+                "PLAIN_TEXT",
+                "FONTS",
+                "XML",
+                "YAML",
+                "VIDEO",
+                "AUDIO",
+                "MARKDOWN",
+                "DOCUMENTS",
+                "BINARY",
+                "SERIALIZATION",
+                "OTHER",
+            ]
+        ]
+        | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
         crawl_purpose: SequenceNotStr[str] | Omit = omit,
         date_end: SequenceNotStr[Union[str, datetime]] | Omit = omit,
@@ -292,7 +407,13 @@ class TimeseriesGroupsResource(SyncAPIResource):
         limit_per_group: int | Omit = omit,
         location: SequenceNotStr[str] | Omit = omit,
         name: SequenceNotStr[str] | Omit = omit,
-        normalization: Literal["PERCENTAGE_CHANGE", "MIN0_MAX"] | Omit = omit,
+        normalization: Literal["PERCENTAGE", "MIN0_MAX"] | Omit = omit,
+        response_status: SequenceNotStr[str] | Omit = omit,
+        response_status_category: List[
+            Literal["INFORMATIONAL", "SUCCESS", "REDIRECTION", "CLIENT_ERROR", "SERVER_ERROR"]
+        ]
+        | Omit = omit,
+        user_agent: SequenceNotStr[str] | Omit = omit,
         vertical: SequenceNotStr[str] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -302,7 +423,7 @@ class TimeseriesGroupsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TimeseriesGroupTimeseriesGroupsResponse:
         """
-        Retrieves the distribution of HTTP requests from AI bots, grouped by chosen the
+        Retrieves the distribution of HTTP requests from AI bots, grouped by the
         specified dimension over time.
 
         Args:
@@ -316,6 +437,8 @@ class TimeseriesGroupsResource(SyncAPIResource):
               Numbers (ASNs) as a comma-separated list. Prefix with `-` to exclude ASNs from
               results. For example, `-174, 3356` excludes results from AS174, but includes
               results from AS3356.
+
+          content_type: Filters results by content type category.
 
           continent: Filters results by continent. Specify a comma-separated list of alpha-2 codes.
               Prefix with `-` to exclude continents from results. For example, `-EU,NA`
@@ -348,6 +471,14 @@ class TimeseriesGroupsResource(SyncAPIResource):
           normalization: Normalization method applied to the results. Refer to
               [Normalization methods](https://developers.cloudflare.com/radar/concepts/normalization/).
 
+          response_status: Filters results by HTTP response status code (e.g. 200, 403, 404). Only
+              [IANA-registered codes](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+              are accepted.
+
+          response_status_category: Filters results by HTTP response status code category.
+
+          user_agent: Filters results by user agent.
+
           vertical: Filters results by vertical.
 
           extra_headers: Send extra headers
@@ -361,7 +492,7 @@ class TimeseriesGroupsResource(SyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return self._get(
-            f"/radar/ai/bots/timeseries_groups/{dimension}",
+            path_template("/radar/ai/bots/timeseries_groups/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -371,6 +502,7 @@ class TimeseriesGroupsResource(SyncAPIResource):
                     {
                         "agg_interval": agg_interval,
                         "asn": asn,
+                        "content_type": content_type,
                         "continent": continent,
                         "crawl_purpose": crawl_purpose,
                         "date_end": date_end,
@@ -382,6 +514,9 @@ class TimeseriesGroupsResource(SyncAPIResource):
                         "location": location,
                         "name": name,
                         "normalization": normalization,
+                        "response_status": response_status,
+                        "response_status_category": response_status_category,
+                        "user_agent": user_agent,
                         "vertical": vertical,
                     },
                     timeseries_group_timeseries_groups_params.TimeseriesGroupTimeseriesGroupsParams,
@@ -514,9 +649,38 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
     )
     async def summary(
         self,
-        dimension: Literal["USER_AGENT", "CRAWL_PURPOSE", "INDUSTRY", "VERTICAL"],
+        dimension: Literal[
+            "USER_AGENT",
+            "CRAWL_PURPOSE",
+            "INDUSTRY",
+            "VERTICAL",
+            "CONTENT_TYPE",
+            "RESPONSE_STATUS",
+            "RESPONSE_STATUS_CATEGORY",
+        ],
         *,
         asn: SequenceNotStr[str] | Omit = omit,
+        content_type: List[
+            Literal[
+                "HTML",
+                "IMAGES",
+                "JSON",
+                "JAVASCRIPT",
+                "CSS",
+                "PLAIN_TEXT",
+                "FONTS",
+                "XML",
+                "YAML",
+                "VIDEO",
+                "AUDIO",
+                "MARKDOWN",
+                "DOCUMENTS",
+                "BINARY",
+                "SERIALIZATION",
+                "OTHER",
+            ]
+        ]
+        | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
         crawl_purpose: SequenceNotStr[str] | Omit = omit,
         date_end: SequenceNotStr[Union[str, datetime]] | Omit = omit,
@@ -527,6 +691,12 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
         limit_per_group: int | Omit = omit,
         location: SequenceNotStr[str] | Omit = omit,
         name: SequenceNotStr[str] | Omit = omit,
+        response_status: SequenceNotStr[str] | Omit = omit,
+        response_status_category: List[
+            Literal["INFORMATIONAL", "SUCCESS", "REDIRECTION", "CLIENT_ERROR", "SERVER_ERROR"]
+        ]
+        | Omit = omit,
+        user_agent: SequenceNotStr[str] | Omit = omit,
         vertical: SequenceNotStr[str] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -546,6 +716,8 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
               Numbers (ASNs) as a comma-separated list. Prefix with `-` to exclude ASNs from
               results. For example, `-174, 3356` excludes results from AS174, but includes
               results from AS3356.
+
+          content_type: Filters results by content type category.
 
           continent: Filters results by continent. Specify a comma-separated list of alpha-2 codes.
               Prefix with `-` to exclude continents from results. For example, `-EU,NA`
@@ -575,6 +747,14 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
 
           name: Array of names used to label the series in the response.
 
+          response_status: Filters results by HTTP response status code (e.g. 200, 403, 404). Only
+              [IANA-registered codes](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+              are accepted.
+
+          response_status_category: Filters results by HTTP response status code category.
+
+          user_agent: Filters results by user agent.
+
           vertical: Filters results by vertical.
 
           extra_headers: Send extra headers
@@ -588,7 +768,7 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return await self._get(
-            f"/radar/ai/bots/summary/{dimension}",
+            path_template("/radar/ai/bots/summary/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -597,6 +777,7 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
                 query=await async_maybe_transform(
                     {
                         "asn": asn,
+                        "content_type": content_type,
                         "continent": continent,
                         "crawl_purpose": crawl_purpose,
                         "date_end": date_end,
@@ -607,6 +788,9 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
                         "limit_per_group": limit_per_group,
                         "location": location,
                         "name": name,
+                        "response_status": response_status,
+                        "response_status_category": response_status_category,
+                        "user_agent": user_agent,
                         "vertical": vertical,
                     },
                     timeseries_group_summary_params.TimeseriesGroupSummaryParams,
@@ -624,6 +808,27 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
         *,
         agg_interval: Literal["15m", "1h", "1d", "1w"] | Omit = omit,
         asn: SequenceNotStr[str] | Omit = omit,
+        content_type: List[
+            Literal[
+                "HTML",
+                "IMAGES",
+                "JSON",
+                "JAVASCRIPT",
+                "CSS",
+                "PLAIN_TEXT",
+                "FONTS",
+                "XML",
+                "YAML",
+                "VIDEO",
+                "AUDIO",
+                "MARKDOWN",
+                "DOCUMENTS",
+                "BINARY",
+                "SERIALIZATION",
+                "OTHER",
+            ]
+        ]
+        | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
         crawl_purpose: SequenceNotStr[str] | Omit = omit,
         date_end: SequenceNotStr[Union[str, datetime]] | Omit = omit,
@@ -634,6 +839,11 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
         limit_per_group: int | Omit = omit,
         location: SequenceNotStr[str] | Omit = omit,
         name: SequenceNotStr[str] | Omit = omit,
+        response_status: SequenceNotStr[str] | Omit = omit,
+        response_status_category: List[
+            Literal["INFORMATIONAL", "SUCCESS", "REDIRECTION", "CLIENT_ERROR", "SERVER_ERROR"]
+        ]
+        | Omit = omit,
         user_agent: SequenceNotStr[str] | Omit = omit,
         vertical: SequenceNotStr[str] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -656,6 +866,8 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
               results. For example, `-174, 3356` excludes results from AS174, but includes
               results from AS3356.
 
+          content_type: Filters results by content type category.
+
           continent: Filters results by continent. Specify a comma-separated list of alpha-2 codes.
               Prefix with `-` to exclude continents from results. For example, `-EU,NA`
               excludes results from EU, but includes results from NA.
@@ -683,6 +895,12 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
               excludes results from the US, but includes results from PT.
 
           name: Array of names used to label the series in the response.
+
+          response_status: Filters results by HTTP response status code (e.g. 200, 403, 404). Only
+              [IANA-registered codes](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+              are accepted.
+
+          response_status_category: Filters results by HTTP response status code category.
 
           user_agent: Filters results by user agent.
 
@@ -707,6 +925,7 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
                     {
                         "agg_interval": agg_interval,
                         "asn": asn,
+                        "content_type": content_type,
                         "continent": continent,
                         "crawl_purpose": crawl_purpose,
                         "date_end": date_end,
@@ -717,6 +936,8 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
                         "limit_per_group": limit_per_group,
                         "location": location,
                         "name": name,
+                        "response_status": response_status,
+                        "response_status_category": response_status_category,
                         "user_agent": user_agent,
                         "vertical": vertical,
                     },
@@ -732,10 +953,39 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
     )
     async def timeseries_groups(
         self,
-        dimension: Literal["USER_AGENT", "CRAWL_PURPOSE", "INDUSTRY", "VERTICAL"],
+        dimension: Literal[
+            "USER_AGENT",
+            "CRAWL_PURPOSE",
+            "INDUSTRY",
+            "VERTICAL",
+            "CONTENT_TYPE",
+            "RESPONSE_STATUS",
+            "RESPONSE_STATUS_CATEGORY",
+        ],
         *,
         agg_interval: Literal["15m", "1h", "1d", "1w"] | Omit = omit,
         asn: SequenceNotStr[str] | Omit = omit,
+        content_type: List[
+            Literal[
+                "HTML",
+                "IMAGES",
+                "JSON",
+                "JAVASCRIPT",
+                "CSS",
+                "PLAIN_TEXT",
+                "FONTS",
+                "XML",
+                "YAML",
+                "VIDEO",
+                "AUDIO",
+                "MARKDOWN",
+                "DOCUMENTS",
+                "BINARY",
+                "SERIALIZATION",
+                "OTHER",
+            ]
+        ]
+        | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
         crawl_purpose: SequenceNotStr[str] | Omit = omit,
         date_end: SequenceNotStr[Union[str, datetime]] | Omit = omit,
@@ -746,7 +996,13 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
         limit_per_group: int | Omit = omit,
         location: SequenceNotStr[str] | Omit = omit,
         name: SequenceNotStr[str] | Omit = omit,
-        normalization: Literal["PERCENTAGE_CHANGE", "MIN0_MAX"] | Omit = omit,
+        normalization: Literal["PERCENTAGE", "MIN0_MAX"] | Omit = omit,
+        response_status: SequenceNotStr[str] | Omit = omit,
+        response_status_category: List[
+            Literal["INFORMATIONAL", "SUCCESS", "REDIRECTION", "CLIENT_ERROR", "SERVER_ERROR"]
+        ]
+        | Omit = omit,
+        user_agent: SequenceNotStr[str] | Omit = omit,
         vertical: SequenceNotStr[str] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -756,7 +1012,7 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> TimeseriesGroupTimeseriesGroupsResponse:
         """
-        Retrieves the distribution of HTTP requests from AI bots, grouped by chosen the
+        Retrieves the distribution of HTTP requests from AI bots, grouped by the
         specified dimension over time.
 
         Args:
@@ -770,6 +1026,8 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
               Numbers (ASNs) as a comma-separated list. Prefix with `-` to exclude ASNs from
               results. For example, `-174, 3356` excludes results from AS174, but includes
               results from AS3356.
+
+          content_type: Filters results by content type category.
 
           continent: Filters results by continent. Specify a comma-separated list of alpha-2 codes.
               Prefix with `-` to exclude continents from results. For example, `-EU,NA`
@@ -802,6 +1060,14 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
           normalization: Normalization method applied to the results. Refer to
               [Normalization methods](https://developers.cloudflare.com/radar/concepts/normalization/).
 
+          response_status: Filters results by HTTP response status code (e.g. 200, 403, 404). Only
+              [IANA-registered codes](https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml)
+              are accepted.
+
+          response_status_category: Filters results by HTTP response status code category.
+
+          user_agent: Filters results by user agent.
+
           vertical: Filters results by vertical.
 
           extra_headers: Send extra headers
@@ -815,7 +1081,7 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return await self._get(
-            f"/radar/ai/bots/timeseries_groups/{dimension}",
+            path_template("/radar/ai/bots/timeseries_groups/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -825,6 +1091,7 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
                     {
                         "agg_interval": agg_interval,
                         "asn": asn,
+                        "content_type": content_type,
                         "continent": continent,
                         "crawl_purpose": crawl_purpose,
                         "date_end": date_end,
@@ -836,6 +1103,9 @@ class AsyncTimeseriesGroupsResource(AsyncAPIResource):
                         "location": location,
                         "name": name,
                         "normalization": normalization,
+                        "response_status": response_status,
+                        "response_status_category": response_status_category,
+                        "user_agent": user_agent,
                         "vertical": vertical,
                     },
                     timeseries_group_timeseries_groups_params.TimeseriesGroupTimeseriesGroupsParams,

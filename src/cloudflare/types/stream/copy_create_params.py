@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Union
 from datetime import datetime
-from typing_extensions import Required, Annotated, TypedDict
+from typing_extensions import Annotated, TypedDict
 
 from ..._types import SequenceNotStr
 from ..._utils import PropertyInfo
@@ -14,16 +14,8 @@ __all__ = ["CopyCreateParams", "Watermark"]
 
 
 class CopyCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """The account identifier tag."""
-
-    url: Required[str]
-    """A video's URL.
-
-    The server must be publicly routable and support `HTTP HEAD` requests and
-    `HTTP GET` range requests. The server should respond to `HTTP HEAD` requests
-    with a `content-range` header that includes the size of the file.
-    """
 
     allowed_origins: Annotated[SequenceNotStr[AllowedOrigins], PropertyInfo(alias="allowedOrigins")]
     """Lists the origins allowed to display the video.
@@ -35,11 +27,23 @@ class CopyCreateParams(TypedDict, total=False):
     creator: str
     """A user-defined identifier for the media creator."""
 
+    input: str
+    """A video's URL.
+
+    The server must be publicly routable and support `HTTP HEAD` requests and
+    `HTTP GET` range requests. The server should respond to `HTTP HEAD` requests
+    with a `content-range` header that includes the size of the file. This is the
+    preferred field over `url`.
+    """
+
     meta: object
     """
     A user modifiable key-value store used to reference other systems of record for
     managing videos.
     """
+
+    name: str
+    """A video's name. Used for legacy compatibility."""
 
     require_signed_urls: Annotated[bool, PropertyInfo(alias="requireSignedURLs")]
     """Indicates whether the video can be a accessed using the UID.
@@ -62,6 +66,15 @@ class CopyCreateParams(TypedDict, total=False):
     video's duration. To convert from a second-wise timestamp to a percentage,
     divide the desired timestamp by the total duration of the video. If this value
     is not set, the default thumbnail image is taken from 0s of the video.
+    """
+
+    url: str
+    """A video's URL.
+
+    The server must be publicly routable and support `HTTP HEAD` requests and
+    `HTTP GET` range requests. The server should respond to `HTTP HEAD` requests
+    with a `content-range` header that includes the size of the file. This field is
+    deprecated in favor of `input`.
     """
 
     watermark: Watermark

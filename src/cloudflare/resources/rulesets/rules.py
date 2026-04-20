@@ -8,7 +8,7 @@ from typing_extensions import Literal, overload
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import required_args, maybe_transform, async_maybe_transform
+from ..._utils import path_template, required_args, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -53,8 +53,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"] | Omit = omit,
         action_parameters: rule_create_params.BlockRuleActionParameters | Omit = omit,
@@ -122,8 +122,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -191,8 +191,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["compress_response"] | Omit = omit,
         action_parameters: rule_create_params.ResponseCompressionRuleActionParameters | Omit = omit,
@@ -260,8 +260,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["ddos_dynamic"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -329,8 +329,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["execute"] | Omit = omit,
         action_parameters: rule_create_params.ExecuteRuleActionParameters | Omit = omit,
@@ -398,8 +398,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["force_connection_close"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -467,8 +467,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["js_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -536,8 +536,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -605,8 +605,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log_custom_field"] | Omit = omit,
         action_parameters: rule_create_params.LogCustomFieldRuleActionParameters | Omit = omit,
@@ -674,8 +674,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["managed_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -743,8 +743,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["redirect"] | Omit = omit,
         action_parameters: rule_create_params.RedirectRuleActionParameters | Omit = omit,
@@ -812,8 +812,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["rewrite"] | Omit = omit,
         action_parameters: rule_create_params.RewriteRuleActionParameters | Omit = omit,
@@ -881,8 +881,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["route"] | Omit = omit,
         action_parameters: rule_create_params.RouteRuleActionParameters | Omit = omit,
@@ -950,8 +950,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["score"] | Omit = omit,
         action_parameters: rule_create_params.ScoreRuleActionParameters | Omit = omit,
@@ -1019,8 +1019,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["serve_error"] | Omit = omit,
         action_parameters: rule_create_params.ServeErrorRuleActionParameters | Omit = omit,
@@ -1088,8 +1088,77 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_control"] | Omit = omit,
+        action_parameters: rule_create_params.SetCacheControlRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_create_params.SetCacheControlRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_create_params.SetCacheControlRulePosition | Omit = omit,
+        ratelimit: rule_create_params.SetCacheControlRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleCreateResponse:
+        """Adds a new rule to an account or zone ruleset.
+
+        The rule will be added to the end
+        of the existing list of rules in the ruleset by default.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    def create(
+        self,
+        ruleset_id: str,
+        *,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_cache_settings"] | Omit = omit,
         action_parameters: rule_create_params.SetCacheSettingsRuleActionParameters | Omit = omit,
@@ -1157,8 +1226,77 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_tags"] | Omit = omit,
+        action_parameters: rule_create_params.SetCacheTagsRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_create_params.SetCacheTagsRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_create_params.SetCacheTagsRulePosition | Omit = omit,
+        ratelimit: rule_create_params.SetCacheTagsRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleCreateResponse:
+        """Adds a new rule to an account or zone ruleset.
+
+        The rule will be added to the end
+        of the existing list of rules in the ruleset by default.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    def create(
+        self,
+        ruleset_id: str,
+        *,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_config"] | Omit = omit,
         action_parameters: rule_create_params.SetConfigurationRuleActionParameters | Omit = omit,
@@ -1226,8 +1364,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["skip"] | Omit = omit,
         action_parameters: rule_create_params.SkipRuleActionParameters | Omit = omit,
@@ -1294,8 +1432,8 @@ class RulesResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"]
         | Literal["challenge"]
@@ -1312,7 +1450,9 @@ class RulesResource(SyncAPIResource):
         | Literal["route"]
         | Literal["score"]
         | Literal["serve_error"]
+        | Literal["set_cache_control"]
         | Literal["set_cache_settings"]
+        | Literal["set_cache_tags"]
         | Literal["set_config"]
         | Literal["skip"]
         | Omit = omit,
@@ -1326,7 +1466,9 @@ class RulesResource(SyncAPIResource):
         | rule_create_params.RouteRuleActionParameters
         | rule_create_params.ScoreRuleActionParameters
         | rule_create_params.ServeErrorRuleActionParameters
+        | rule_create_params.SetCacheControlRuleActionParameters
         | rule_create_params.SetCacheSettingsRuleActionParameters
+        | rule_create_params.SetCacheTagsRuleActionParameters
         | rule_create_params.SetConfigurationRuleActionParameters
         | rule_create_params.SkipRuleActionParameters
         | Omit = omit,
@@ -1347,7 +1489,9 @@ class RulesResource(SyncAPIResource):
         | rule_create_params.RouteRuleExposedCredentialCheck
         | rule_create_params.ScoreRuleExposedCredentialCheck
         | rule_create_params.ServeErrorRuleExposedCredentialCheck
+        | rule_create_params.SetCacheControlRuleExposedCredentialCheck
         | rule_create_params.SetCacheSettingsRuleExposedCredentialCheck
+        | rule_create_params.SetCacheTagsRuleExposedCredentialCheck
         | rule_create_params.SetConfigurationRuleExposedCredentialCheck
         | rule_create_params.SkipRuleExposedCredentialCheck
         | Omit = omit,
@@ -1368,7 +1512,9 @@ class RulesResource(SyncAPIResource):
         | rule_create_params.RouteRulePosition
         | rule_create_params.ScoreRulePosition
         | rule_create_params.ServeErrorRulePosition
+        | rule_create_params.SetCacheControlRulePosition
         | rule_create_params.SetCacheSettingsRulePosition
+        | rule_create_params.SetCacheTagsRulePosition
         | rule_create_params.SetConfigurationRulePosition
         | rule_create_params.SkipRulePosition
         | Omit = omit,
@@ -1387,7 +1533,9 @@ class RulesResource(SyncAPIResource):
         | rule_create_params.RouteRuleRatelimit
         | rule_create_params.ScoreRuleRatelimit
         | rule_create_params.ServeErrorRuleRatelimit
+        | rule_create_params.SetCacheControlRuleRatelimit
         | rule_create_params.SetCacheSettingsRuleRatelimit
+        | rule_create_params.SetCacheTagsRuleRatelimit
         | rule_create_params.SetConfigurationRuleRatelimit
         | rule_create_params.SkipRuleRatelimit
         | Omit = omit,
@@ -1401,6 +1549,10 @@ class RulesResource(SyncAPIResource):
     ) -> RuleCreateResponse:
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -1414,7 +1566,12 @@ class RulesResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform(
                 {
                     "id": id,
@@ -1446,8 +1603,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1479,6 +1636,10 @@ class RulesResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
         if not rule_id:
             raise ValueError(f"Expected a non-empty value for `rule_id` but received {rule_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -1492,7 +1653,13 @@ class RulesResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._delete(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+                ruleset_id=ruleset_id,
+                rule_id=rule_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -1509,8 +1676,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"] | Omit = omit,
         action_parameters: rule_edit_params.BlockRuleActionParameters | Omit = omit,
@@ -1579,8 +1746,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -1649,8 +1816,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["compress_response"] | Omit = omit,
         action_parameters: rule_edit_params.ResponseCompressionRuleActionParameters | Omit = omit,
@@ -1719,8 +1886,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["ddos_dynamic"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -1789,8 +1956,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["execute"] | Omit = omit,
         action_parameters: rule_edit_params.ExecuteRuleActionParameters | Omit = omit,
@@ -1859,8 +2026,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["force_connection_close"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -1929,8 +2096,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["js_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -1999,8 +2166,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -2069,8 +2236,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log_custom_field"] | Omit = omit,
         action_parameters: rule_edit_params.LogCustomFieldRuleActionParameters | Omit = omit,
@@ -2139,8 +2306,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["managed_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -2209,8 +2376,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["redirect"] | Omit = omit,
         action_parameters: rule_edit_params.RedirectRuleActionParameters | Omit = omit,
@@ -2279,8 +2446,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["rewrite"] | Omit = omit,
         action_parameters: rule_edit_params.RewriteRuleActionParameters | Omit = omit,
@@ -2349,8 +2516,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["route"] | Omit = omit,
         action_parameters: rule_edit_params.RouteRuleActionParameters | Omit = omit,
@@ -2419,8 +2586,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["score"] | Omit = omit,
         action_parameters: rule_edit_params.ScoreRuleActionParameters | Omit = omit,
@@ -2489,8 +2656,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["serve_error"] | Omit = omit,
         action_parameters: rule_edit_params.ServeErrorRuleActionParameters | Omit = omit,
@@ -2559,8 +2726,78 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_control"] | Omit = omit,
+        action_parameters: rule_edit_params.SetCacheControlRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_edit_params.SetCacheControlRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_edit_params.SetCacheControlRulePosition | Omit = omit,
+        ratelimit: rule_edit_params.SetCacheControlRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleEditResponse:
+        """
+        Updates an existing rule in an account or zone ruleset.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          rule_id: The unique ID of the rule.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    def edit(
+        self,
+        rule_id: str,
+        *,
+        ruleset_id: str,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_cache_settings"] | Omit = omit,
         action_parameters: rule_edit_params.SetCacheSettingsRuleActionParameters | Omit = omit,
@@ -2629,8 +2866,78 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_tags"] | Omit = omit,
+        action_parameters: rule_edit_params.SetCacheTagsRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_edit_params.SetCacheTagsRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_edit_params.SetCacheTagsRulePosition | Omit = omit,
+        ratelimit: rule_edit_params.SetCacheTagsRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleEditResponse:
+        """
+        Updates an existing rule in an account or zone ruleset.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          rule_id: The unique ID of the rule.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    def edit(
+        self,
+        rule_id: str,
+        *,
+        ruleset_id: str,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_config"] | Omit = omit,
         action_parameters: rule_edit_params.SetConfigurationRuleActionParameters | Omit = omit,
@@ -2699,8 +3006,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["skip"] | Omit = omit,
         action_parameters: rule_edit_params.SkipRuleActionParameters | Omit = omit,
@@ -2769,8 +3076,8 @@ class RulesResource(SyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"]
         | Literal["challenge"]
@@ -2787,7 +3094,9 @@ class RulesResource(SyncAPIResource):
         | Literal["route"]
         | Literal["score"]
         | Literal["serve_error"]
+        | Literal["set_cache_control"]
         | Literal["set_cache_settings"]
+        | Literal["set_cache_tags"]
         | Literal["set_config"]
         | Literal["skip"]
         | Omit = omit,
@@ -2801,7 +3110,9 @@ class RulesResource(SyncAPIResource):
         | rule_edit_params.RouteRuleActionParameters
         | rule_edit_params.ScoreRuleActionParameters
         | rule_edit_params.ServeErrorRuleActionParameters
+        | rule_edit_params.SetCacheControlRuleActionParameters
         | rule_edit_params.SetCacheSettingsRuleActionParameters
+        | rule_edit_params.SetCacheTagsRuleActionParameters
         | rule_edit_params.SetConfigurationRuleActionParameters
         | rule_edit_params.SkipRuleActionParameters
         | Omit = omit,
@@ -2822,7 +3133,9 @@ class RulesResource(SyncAPIResource):
         | rule_edit_params.RouteRuleExposedCredentialCheck
         | rule_edit_params.ScoreRuleExposedCredentialCheck
         | rule_edit_params.ServeErrorRuleExposedCredentialCheck
+        | rule_edit_params.SetCacheControlRuleExposedCredentialCheck
         | rule_edit_params.SetCacheSettingsRuleExposedCredentialCheck
+        | rule_edit_params.SetCacheTagsRuleExposedCredentialCheck
         | rule_edit_params.SetConfigurationRuleExposedCredentialCheck
         | rule_edit_params.SkipRuleExposedCredentialCheck
         | Omit = omit,
@@ -2843,7 +3156,9 @@ class RulesResource(SyncAPIResource):
         | rule_edit_params.RouteRulePosition
         | rule_edit_params.ScoreRulePosition
         | rule_edit_params.ServeErrorRulePosition
+        | rule_edit_params.SetCacheControlRulePosition
         | rule_edit_params.SetCacheSettingsRulePosition
+        | rule_edit_params.SetCacheTagsRulePosition
         | rule_edit_params.SetConfigurationRulePosition
         | rule_edit_params.SkipRulePosition
         | Omit = omit,
@@ -2862,7 +3177,9 @@ class RulesResource(SyncAPIResource):
         | rule_edit_params.RouteRuleRatelimit
         | rule_edit_params.ScoreRuleRatelimit
         | rule_edit_params.ServeErrorRuleRatelimit
+        | rule_edit_params.SetCacheControlRuleRatelimit
         | rule_edit_params.SetCacheSettingsRuleRatelimit
+        | rule_edit_params.SetCacheTagsRuleRatelimit
         | rule_edit_params.SetConfigurationRuleRatelimit
         | rule_edit_params.SkipRuleRatelimit
         | Omit = omit,
@@ -2878,6 +3195,10 @@ class RulesResource(SyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
         if not rule_id:
             raise ValueError(f"Expected a non-empty value for `rule_id` but received {rule_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -2891,7 +3212,13 @@ class RulesResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._patch(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+                ruleset_id=ruleset_id,
+                rule_id=rule_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform(
                 {
                     "id": id,
@@ -2944,8 +3271,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"] | Omit = omit,
         action_parameters: rule_create_params.BlockRuleActionParameters | Omit = omit,
@@ -3013,8 +3340,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -3082,8 +3409,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["compress_response"] | Omit = omit,
         action_parameters: rule_create_params.ResponseCompressionRuleActionParameters | Omit = omit,
@@ -3151,8 +3478,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["ddos_dynamic"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -3220,8 +3547,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["execute"] | Omit = omit,
         action_parameters: rule_create_params.ExecuteRuleActionParameters | Omit = omit,
@@ -3289,8 +3616,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["force_connection_close"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -3358,8 +3685,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["js_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -3427,8 +3754,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -3496,8 +3823,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log_custom_field"] | Omit = omit,
         action_parameters: rule_create_params.LogCustomFieldRuleActionParameters | Omit = omit,
@@ -3565,8 +3892,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["managed_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -3634,8 +3961,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["redirect"] | Omit = omit,
         action_parameters: rule_create_params.RedirectRuleActionParameters | Omit = omit,
@@ -3703,8 +4030,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["rewrite"] | Omit = omit,
         action_parameters: rule_create_params.RewriteRuleActionParameters | Omit = omit,
@@ -3772,8 +4099,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["route"] | Omit = omit,
         action_parameters: rule_create_params.RouteRuleActionParameters | Omit = omit,
@@ -3841,8 +4168,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["score"] | Omit = omit,
         action_parameters: rule_create_params.ScoreRuleActionParameters | Omit = omit,
@@ -3910,8 +4237,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["serve_error"] | Omit = omit,
         action_parameters: rule_create_params.ServeErrorRuleActionParameters | Omit = omit,
@@ -3979,8 +4306,77 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_control"] | Omit = omit,
+        action_parameters: rule_create_params.SetCacheControlRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_create_params.SetCacheControlRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_create_params.SetCacheControlRulePosition | Omit = omit,
+        ratelimit: rule_create_params.SetCacheControlRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleCreateResponse:
+        """Adds a new rule to an account or zone ruleset.
+
+        The rule will be added to the end
+        of the existing list of rules in the ruleset by default.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    async def create(
+        self,
+        ruleset_id: str,
+        *,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_cache_settings"] | Omit = omit,
         action_parameters: rule_create_params.SetCacheSettingsRuleActionParameters | Omit = omit,
@@ -4048,8 +4444,77 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_tags"] | Omit = omit,
+        action_parameters: rule_create_params.SetCacheTagsRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_create_params.SetCacheTagsRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_create_params.SetCacheTagsRulePosition | Omit = omit,
+        ratelimit: rule_create_params.SetCacheTagsRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleCreateResponse:
+        """Adds a new rule to an account or zone ruleset.
+
+        The rule will be added to the end
+        of the existing list of rules in the ruleset by default.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    async def create(
+        self,
+        ruleset_id: str,
+        *,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_config"] | Omit = omit,
         action_parameters: rule_create_params.SetConfigurationRuleActionParameters | Omit = omit,
@@ -4117,8 +4582,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["skip"] | Omit = omit,
         action_parameters: rule_create_params.SkipRuleActionParameters | Omit = omit,
@@ -4185,8 +4650,8 @@ class AsyncRulesResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"]
         | Literal["challenge"]
@@ -4203,7 +4668,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | Literal["route"]
         | Literal["score"]
         | Literal["serve_error"]
+        | Literal["set_cache_control"]
         | Literal["set_cache_settings"]
+        | Literal["set_cache_tags"]
         | Literal["set_config"]
         | Literal["skip"]
         | Omit = omit,
@@ -4217,7 +4684,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_create_params.RouteRuleActionParameters
         | rule_create_params.ScoreRuleActionParameters
         | rule_create_params.ServeErrorRuleActionParameters
+        | rule_create_params.SetCacheControlRuleActionParameters
         | rule_create_params.SetCacheSettingsRuleActionParameters
+        | rule_create_params.SetCacheTagsRuleActionParameters
         | rule_create_params.SetConfigurationRuleActionParameters
         | rule_create_params.SkipRuleActionParameters
         | Omit = omit,
@@ -4238,7 +4707,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_create_params.RouteRuleExposedCredentialCheck
         | rule_create_params.ScoreRuleExposedCredentialCheck
         | rule_create_params.ServeErrorRuleExposedCredentialCheck
+        | rule_create_params.SetCacheControlRuleExposedCredentialCheck
         | rule_create_params.SetCacheSettingsRuleExposedCredentialCheck
+        | rule_create_params.SetCacheTagsRuleExposedCredentialCheck
         | rule_create_params.SetConfigurationRuleExposedCredentialCheck
         | rule_create_params.SkipRuleExposedCredentialCheck
         | Omit = omit,
@@ -4259,7 +4730,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_create_params.RouteRulePosition
         | rule_create_params.ScoreRulePosition
         | rule_create_params.ServeErrorRulePosition
+        | rule_create_params.SetCacheControlRulePosition
         | rule_create_params.SetCacheSettingsRulePosition
+        | rule_create_params.SetCacheTagsRulePosition
         | rule_create_params.SetConfigurationRulePosition
         | rule_create_params.SkipRulePosition
         | Omit = omit,
@@ -4278,7 +4751,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_create_params.RouteRuleRatelimit
         | rule_create_params.ScoreRuleRatelimit
         | rule_create_params.ServeErrorRuleRatelimit
+        | rule_create_params.SetCacheControlRuleRatelimit
         | rule_create_params.SetCacheSettingsRuleRatelimit
+        | rule_create_params.SetCacheTagsRuleRatelimit
         | rule_create_params.SetConfigurationRuleRatelimit
         | rule_create_params.SkipRuleRatelimit
         | Omit = omit,
@@ -4292,6 +4767,10 @@ class AsyncRulesResource(AsyncAPIResource):
     ) -> RuleCreateResponse:
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -4305,7 +4784,12 @@ class AsyncRulesResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "id": id,
@@ -4337,8 +4821,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -4370,6 +4854,10 @@ class AsyncRulesResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
         if not rule_id:
             raise ValueError(f"Expected a non-empty value for `rule_id` but received {rule_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -4383,7 +4871,13 @@ class AsyncRulesResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._delete(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+                ruleset_id=ruleset_id,
+                rule_id=rule_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -4400,8 +4894,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"] | Omit = omit,
         action_parameters: rule_edit_params.BlockRuleActionParameters | Omit = omit,
@@ -4470,8 +4964,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -4540,8 +5034,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["compress_response"] | Omit = omit,
         action_parameters: rule_edit_params.ResponseCompressionRuleActionParameters | Omit = omit,
@@ -4610,8 +5104,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["ddos_dynamic"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -4680,8 +5174,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["execute"] | Omit = omit,
         action_parameters: rule_edit_params.ExecuteRuleActionParameters | Omit = omit,
@@ -4750,8 +5244,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["force_connection_close"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -4820,8 +5314,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["js_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -4890,8 +5384,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -4960,8 +5454,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["log_custom_field"] | Omit = omit,
         action_parameters: rule_edit_params.LogCustomFieldRuleActionParameters | Omit = omit,
@@ -5030,8 +5524,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["managed_challenge"] | Omit = omit,
         action_parameters: object | Omit = omit,
@@ -5100,8 +5594,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["redirect"] | Omit = omit,
         action_parameters: rule_edit_params.RedirectRuleActionParameters | Omit = omit,
@@ -5170,8 +5664,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["rewrite"] | Omit = omit,
         action_parameters: rule_edit_params.RewriteRuleActionParameters | Omit = omit,
@@ -5240,8 +5734,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["route"] | Omit = omit,
         action_parameters: rule_edit_params.RouteRuleActionParameters | Omit = omit,
@@ -5310,8 +5804,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["score"] | Omit = omit,
         action_parameters: rule_edit_params.ScoreRuleActionParameters | Omit = omit,
@@ -5380,8 +5874,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["serve_error"] | Omit = omit,
         action_parameters: rule_edit_params.ServeErrorRuleActionParameters | Omit = omit,
@@ -5450,8 +5944,78 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_control"] | Omit = omit,
+        action_parameters: rule_edit_params.SetCacheControlRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_edit_params.SetCacheControlRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_edit_params.SetCacheControlRulePosition | Omit = omit,
+        ratelimit: rule_edit_params.SetCacheControlRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleEditResponse:
+        """
+        Updates an existing rule in an account or zone ruleset.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          rule_id: The unique ID of the rule.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    async def edit(
+        self,
+        rule_id: str,
+        *,
+        ruleset_id: str,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_cache_settings"] | Omit = omit,
         action_parameters: rule_edit_params.SetCacheSettingsRuleActionParameters | Omit = omit,
@@ -5520,8 +6084,78 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        id: str | Omit = omit,
+        action: Literal["set_cache_tags"] | Omit = omit,
+        action_parameters: rule_edit_params.SetCacheTagsRuleActionParameters | Omit = omit,
+        description: str | Omit = omit,
+        enabled: bool | Omit = omit,
+        exposed_credential_check: rule_edit_params.SetCacheTagsRuleExposedCredentialCheck | Omit = omit,
+        expression: str | Omit = omit,
+        logging: LoggingParam | Omit = omit,
+        position: rule_edit_params.SetCacheTagsRulePosition | Omit = omit,
+        ratelimit: rule_edit_params.SetCacheTagsRuleRatelimit | Omit = omit,
+        ref: str | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> RuleEditResponse:
+        """
+        Updates an existing rule in an account or zone ruleset.
+
+        Args:
+          ruleset_id: The unique ID of the ruleset.
+
+          rule_id: The unique ID of the rule.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          id: The unique ID of the rule.
+
+          action: The action to perform when the rule matches.
+
+          action_parameters: The parameters configuring the rule's action.
+
+          description: An informative description of the rule.
+
+          enabled: Whether the rule should be executed.
+
+          exposed_credential_check: Configuration for exposed credential checking.
+
+          expression: The expression defining which traffic will match the rule.
+
+          logging: An object configuring the rule's logging behavior.
+
+          position: An object configuring where the rule will be placed.
+
+          ratelimit: An object configuring the rule's rate limit behavior.
+
+          ref: The reference of the rule (the rule's ID by default).
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    async def edit(
+        self,
+        rule_id: str,
+        *,
+        ruleset_id: str,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["set_config"] | Omit = omit,
         action_parameters: rule_edit_params.SetConfigurationRuleActionParameters | Omit = omit,
@@ -5590,8 +6224,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["skip"] | Omit = omit,
         action_parameters: rule_edit_params.SkipRuleActionParameters | Omit = omit,
@@ -5660,8 +6294,8 @@ class AsyncRulesResource(AsyncAPIResource):
         rule_id: str,
         *,
         ruleset_id: str,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         id: str | Omit = omit,
         action: Literal["block"]
         | Literal["challenge"]
@@ -5678,7 +6312,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | Literal["route"]
         | Literal["score"]
         | Literal["serve_error"]
+        | Literal["set_cache_control"]
         | Literal["set_cache_settings"]
+        | Literal["set_cache_tags"]
         | Literal["set_config"]
         | Literal["skip"]
         | Omit = omit,
@@ -5692,7 +6328,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_edit_params.RouteRuleActionParameters
         | rule_edit_params.ScoreRuleActionParameters
         | rule_edit_params.ServeErrorRuleActionParameters
+        | rule_edit_params.SetCacheControlRuleActionParameters
         | rule_edit_params.SetCacheSettingsRuleActionParameters
+        | rule_edit_params.SetCacheTagsRuleActionParameters
         | rule_edit_params.SetConfigurationRuleActionParameters
         | rule_edit_params.SkipRuleActionParameters
         | Omit = omit,
@@ -5713,7 +6351,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_edit_params.RouteRuleExposedCredentialCheck
         | rule_edit_params.ScoreRuleExposedCredentialCheck
         | rule_edit_params.ServeErrorRuleExposedCredentialCheck
+        | rule_edit_params.SetCacheControlRuleExposedCredentialCheck
         | rule_edit_params.SetCacheSettingsRuleExposedCredentialCheck
+        | rule_edit_params.SetCacheTagsRuleExposedCredentialCheck
         | rule_edit_params.SetConfigurationRuleExposedCredentialCheck
         | rule_edit_params.SkipRuleExposedCredentialCheck
         | Omit = omit,
@@ -5734,7 +6374,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_edit_params.RouteRulePosition
         | rule_edit_params.ScoreRulePosition
         | rule_edit_params.ServeErrorRulePosition
+        | rule_edit_params.SetCacheControlRulePosition
         | rule_edit_params.SetCacheSettingsRulePosition
+        | rule_edit_params.SetCacheTagsRulePosition
         | rule_edit_params.SetConfigurationRulePosition
         | rule_edit_params.SkipRulePosition
         | Omit = omit,
@@ -5753,7 +6395,9 @@ class AsyncRulesResource(AsyncAPIResource):
         | rule_edit_params.RouteRuleRatelimit
         | rule_edit_params.ScoreRuleRatelimit
         | rule_edit_params.ServeErrorRuleRatelimit
+        | rule_edit_params.SetCacheControlRuleRatelimit
         | rule_edit_params.SetCacheSettingsRuleRatelimit
+        | rule_edit_params.SetCacheTagsRuleRatelimit
         | rule_edit_params.SetConfigurationRuleRatelimit
         | rule_edit_params.SkipRuleRatelimit
         | Omit = omit,
@@ -5769,6 +6413,10 @@ class AsyncRulesResource(AsyncAPIResource):
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
         if not rule_id:
             raise ValueError(f"Expected a non-empty value for `rule_id` but received {rule_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -5782,7 +6430,13 @@ class AsyncRulesResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._patch(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}/rules/{rule_id}",
+                ruleset_id=ruleset_id,
+                rule_id=rule_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "id": id,

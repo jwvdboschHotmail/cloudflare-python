@@ -31,7 +31,7 @@ from .severity import (
     AsyncSeverityResourceWithStreamingResponse,
 )
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -86,8 +86,8 @@ class InsightsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismissed: bool | Omit = omit,
         issue_class: SequenceNotStr[str] | Omit = omit,
         issue_class_neq: SequenceNotStr[str] | Omit = omit,
@@ -109,7 +109,8 @@ class InsightsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncV4PagePagination[Optional[InsightListResponse]]:
         """
-        Retrieves Security Center Insights
+        Lists all Security Center insights for the account or zone, showing security
+        findings and recommendations.
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -128,6 +129,10 @@ class InsightsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -141,7 +146,11 @@ class InsightsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             page=SyncV4PagePagination[Optional[InsightListResponse]],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -174,8 +183,8 @@ class InsightsResource(SyncAPIResource):
         self,
         issue_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismiss: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -185,7 +194,8 @@ class InsightsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InsightDismissResponse:
         """
-        Archives Security Center Insight
+        Archives a Security Center insight for an account or zone, removing it from the
+        active insights list while preserving historical data.
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -202,6 +212,10 @@ class InsightsResource(SyncAPIResource):
         """
         if not issue_id:
             raise ValueError(f"Expected a non-empty value for `issue_id` but received {issue_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -215,7 +229,12 @@ class InsightsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._put(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights/{issue_id}/dismiss",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights/{issue_id}/dismiss",
+                issue_id=issue_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform({"dismiss": dismiss}, insight_dismiss_params.InsightDismissParams),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -259,8 +278,8 @@ class AsyncInsightsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismissed: bool | Omit = omit,
         issue_class: SequenceNotStr[str] | Omit = omit,
         issue_class_neq: SequenceNotStr[str] | Omit = omit,
@@ -282,7 +301,8 @@ class AsyncInsightsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[Optional[InsightListResponse], AsyncV4PagePagination[Optional[InsightListResponse]]]:
         """
-        Retrieves Security Center Insights
+        Lists all Security Center insights for the account or zone, showing security
+        findings and recommendations.
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -301,6 +321,10 @@ class AsyncInsightsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -314,7 +338,11 @@ class AsyncInsightsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             page=AsyncV4PagePagination[Optional[InsightListResponse]],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -347,8 +375,8 @@ class AsyncInsightsResource(AsyncAPIResource):
         self,
         issue_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         dismiss: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -358,7 +386,8 @@ class AsyncInsightsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InsightDismissResponse:
         """
-        Archives Security Center Insight
+        Archives a Security Center insight for an account or zone, removing it from the
+        active insights list while preserving historical data.
 
         Args:
           account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
@@ -375,6 +404,10 @@ class AsyncInsightsResource(AsyncAPIResource):
         """
         if not issue_id:
             raise ValueError(f"Expected a non-empty value for `issue_id` but received {issue_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -388,7 +421,12 @@ class AsyncInsightsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._put(
-            f"/{account_or_zone}/{account_or_zone_id}/security-center/insights/{issue_id}/dismiss",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/security-center/insights/{issue_id}/dismiss",
+                issue_id=issue_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform({"dismiss": dismiss}, insight_dismiss_params.InsightDismissParams),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout

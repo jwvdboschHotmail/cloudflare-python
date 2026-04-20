@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from typing import Type, Iterable, cast
+from typing_extensions import Literal
 
 import httpx
 
@@ -15,7 +16,7 @@ from .versions import (
     AsyncVersionsResourceWithStreamingResponse,
 )
 from ....._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ....._utils import maybe_transform, async_maybe_transform
+from ....._utils import path_template, maybe_transform, async_maybe_transform
 from ....._compat import cached_property
 from ....._resource import SyncAPIResource, AsyncAPIResource
 from ....._response import (
@@ -61,7 +62,7 @@ class WorkersResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         logpush: bool | Omit = omit,
         observability: worker_create_params.Observability | Omit = omit,
@@ -101,10 +102,12 @@ class WorkersResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/workers/workers",
+            path_template("/accounts/{account_id}/workers/workers", account_id=account_id),
             body=maybe_transform(
                 {
                     "name": name,
@@ -130,7 +133,7 @@ class WorkersResource(SyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         logpush: bool | Omit = omit,
         observability: worker_update_params.Observability | Omit = omit,
@@ -175,12 +178,16 @@ class WorkersResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return self._put(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             body=maybe_transform(
                 {
                     "name": name,
@@ -205,7 +212,9 @@ class WorkersResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        order: Literal["asc", "desc"] | Omit = omit,
+        order_by: Literal["deployed_on", "updated_on", "created_on", "name"] | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -221,6 +230,10 @@ class WorkersResource(SyncAPIResource):
         Args:
           account_id: Identifier.
 
+          order: Sort direction.
+
+          order_by: Property to sort results by.
+
           page: Current page.
 
           per_page: Items per-page.
@@ -233,10 +246,12 @@ class WorkersResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/workers/workers",
+            path_template("/accounts/{account_id}/workers/workers", account_id=account_id),
             page=SyncV4PagePaginationArray[Worker],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -245,6 +260,8 @@ class WorkersResource(SyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "order": order,
+                        "order_by": order_by,
                         "page": page,
                         "per_page": per_page,
                     },
@@ -258,7 +275,7 @@ class WorkersResource(SyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -282,12 +299,16 @@ class WorkersResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -298,7 +319,7 @@ class WorkersResource(SyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         logpush: bool,
         name: str,
         observability: worker_edit_params.Observability,
@@ -341,12 +362,16 @@ class WorkersResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return self._patch(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             body=maybe_transform(
                 {
                     "logpush": logpush,
@@ -372,7 +397,7 @@ class WorkersResource(SyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -396,12 +421,16 @@ class WorkersResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return self._get(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -440,7 +469,7 @@ class AsyncWorkersResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         logpush: bool | Omit = omit,
         observability: worker_create_params.Observability | Omit = omit,
@@ -480,10 +509,12 @@ class AsyncWorkersResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/workers/workers",
+            path_template("/accounts/{account_id}/workers/workers", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "name": name,
@@ -509,7 +540,7 @@ class AsyncWorkersResource(AsyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         logpush: bool | Omit = omit,
         observability: worker_update_params.Observability | Omit = omit,
@@ -554,12 +585,16 @@ class AsyncWorkersResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return await self._put(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             body=await async_maybe_transform(
                 {
                     "name": name,
@@ -584,7 +619,9 @@ class AsyncWorkersResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        order: Literal["asc", "desc"] | Omit = omit,
+        order_by: Literal["deployed_on", "updated_on", "created_on", "name"] | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -600,6 +637,10 @@ class AsyncWorkersResource(AsyncAPIResource):
         Args:
           account_id: Identifier.
 
+          order: Sort direction.
+
+          order_by: Property to sort results by.
+
           page: Current page.
 
           per_page: Items per-page.
@@ -612,10 +653,12 @@ class AsyncWorkersResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/workers/workers",
+            path_template("/accounts/{account_id}/workers/workers", account_id=account_id),
             page=AsyncV4PagePaginationArray[Worker],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -624,6 +667,8 @@ class AsyncWorkersResource(AsyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "order": order,
+                        "order_by": order_by,
                         "page": page,
                         "per_page": per_page,
                     },
@@ -637,7 +682,7 @@ class AsyncWorkersResource(AsyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -661,12 +706,16 @@ class AsyncWorkersResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -677,7 +726,7 @@ class AsyncWorkersResource(AsyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         logpush: bool,
         name: str,
         observability: worker_edit_params.Observability,
@@ -720,12 +769,16 @@ class AsyncWorkersResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return await self._patch(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             body=await async_maybe_transform(
                 {
                     "logpush": logpush,
@@ -751,7 +804,7 @@ class AsyncWorkersResource(AsyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -775,12 +828,16 @@ class AsyncWorkersResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/workers/workers/{worker_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}", account_id=account_id, worker_id=worker_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

@@ -18,6 +18,8 @@ __all__ = [
     "AssetsConfig",
     "Binding",
     "BindingWorkersBindingKindAI",
+    "BindingWorkersBindingKindAISearch",
+    "BindingWorkersBindingKindAISearchNamespace",
     "BindingWorkersBindingKindAnalyticsEngine",
     "BindingWorkersBindingKindAssets",
     "BindingWorkersBindingKindBrowser",
@@ -25,6 +27,7 @@ __all__ = [
     "BindingWorkersBindingKindDataBlob",
     "BindingWorkersBindingKindDispatchNamespace",
     "BindingWorkersBindingKindDispatchNamespaceOutbound",
+    "BindingWorkersBindingKindDispatchNamespaceOutboundParam",
     "BindingWorkersBindingKindDispatchNamespaceOutboundWorker",
     "BindingWorkersBindingKindDurableObjectNamespace",
     "BindingWorkersBindingKindHyperdrive",
@@ -32,6 +35,7 @@ __all__ = [
     "BindingWorkersBindingKindImages",
     "BindingWorkersBindingKindJson",
     "BindingWorkersBindingKindKVNamespace",
+    "BindingWorkersBindingKindMedia",
     "BindingWorkersBindingKindMTLSCertificate",
     "BindingWorkersBindingKindPlainText",
     "BindingWorkersBindingKindPipelines",
@@ -46,9 +50,13 @@ __all__ = [
     "BindingWorkersBindingKindVectorize",
     "BindingWorkersBindingKindVersionMetadata",
     "BindingWorkersBindingKindSecretsStoreSecret",
+    "BindingWorkersBindingKindFlagship",
     "BindingWorkersBindingKindSecretKey",
     "BindingWorkersBindingKindWorkflow",
     "BindingWorkersBindingKindWasmModule",
+    "BindingWorkersBindingKindVPCService",
+    "BindingWorkersBindingKindVPCNetwork",
+    "Container",
     "Limits",
     "Migrations",
     "MigrationsWorkersMultipleStepMigrations",
@@ -70,7 +78,7 @@ __all__ = [
 
 
 class VersionCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Identifier."""
 
     deploy: bool
@@ -111,6 +119,12 @@ class VersionCreateParams(TypedDict, total=False):
 
     Used to enable upcoming features or opt in or out of specific changes not
     included in a `compatibility_date`.
+    """
+
+    containers: Iterable[Container]
+    """List of containers attached to a Worker.
+
+    Containers can only be attached to Durable Object classes of this Worker script.
     """
 
     limits: Limits
@@ -156,10 +170,10 @@ class Annotations(TypedDict, total=False):
     """Metadata about the version."""
 
     workers_message: Annotated[str, PropertyInfo(alias="workers/message")]
-    """Human-readable message about the version."""
+    """Human-readable message about the version. Truncated to 1000 bytes if longer."""
 
     workers_tag: Annotated[str, PropertyInfo(alias="workers/tag")]
-    """User-provided identifier for the version."""
+    """User-provided identifier for the version. Maximum 100 bytes."""
 
 
 class AssetsConfig(TypedDict, total=False):
@@ -206,6 +220,45 @@ class BindingWorkersBindingKindAI(TypedDict, total=False):
     """The kind of resource that the binding provides."""
 
 
+class BindingWorkersBindingKindAISearch(TypedDict, total=False):
+    instance_name: Required[str]
+    """The user-chosen instance name.
+
+    Must exist at deploy time. The worker can search, chat, update, and manage
+    items/jobs on this instance.
+    """
+
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["ai_search"]]
+    """The kind of resource that the binding provides."""
+
+    namespace: str
+    """The namespace the instance belongs to.
+
+    Defaults to "default" if omitted. Customers who don't use namespaces can simply
+    omit this field.
+    """
+
+
+class BindingWorkersBindingKindAISearchNamespace(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    namespace: Required[str]
+    """The user-chosen namespace name.
+
+    Must exist before deploy -- Wrangler handles auto-creation on deploy failure (R2
+    bucket pattern). The "default" namespace is auto-created by config-api for new
+    accounts. Grants full access (CRUD + search + chat) to all instances within the
+    namespace.
+    """
+
+    type: Required[Literal["ai_search_namespace"]]
+    """The kind of resource that the binding provides."""
+
+
 class BindingWorkersBindingKindAnalyticsEngine(TypedDict, total=False):
     dataset: Required[str]
     """The name of the dataset to bind to."""
@@ -234,7 +287,7 @@ class BindingWorkersBindingKindBrowser(TypedDict, total=False):
 
 
 class BindingWorkersBindingKindD1(TypedDict, total=False):
-    id: Required[str]
+    database_id: Required[str]
     """Identifier of the D1 database to bind to."""
 
     name: Required[str]
@@ -242,6 +295,9 @@ class BindingWorkersBindingKindD1(TypedDict, total=False):
 
     type: Required[Literal["d1"]]
     """The kind of resource that the binding provides."""
+
+    id: str
+    """Identifier of the D1 database to bind to."""
 
 
 class BindingWorkersBindingKindDataBlob(TypedDict, total=False):
@@ -258,8 +314,16 @@ class BindingWorkersBindingKindDataBlob(TypedDict, total=False):
     """The kind of resource that the binding provides."""
 
 
+class BindingWorkersBindingKindDispatchNamespaceOutboundParam(TypedDict, total=False):
+    name: Required[str]
+    """Name of the parameter."""
+
+
 class BindingWorkersBindingKindDispatchNamespaceOutboundWorker(TypedDict, total=False):
     """Outbound worker."""
+
+    entrypoint: str
+    """Entrypoint to invoke on the outbound worker."""
 
     environment: str
     """Environment of the outbound worker."""
@@ -271,7 +335,7 @@ class BindingWorkersBindingKindDispatchNamespaceOutboundWorker(TypedDict, total=
 class BindingWorkersBindingKindDispatchNamespaceOutbound(TypedDict, total=False):
     """Outbound worker."""
 
-    params: SequenceNotStr[str]
+    params: Iterable[BindingWorkersBindingKindDispatchNamespaceOutboundParam]
     """
     Pass information from the Dispatch Worker to the Outbound Worker through the
     parameters.
@@ -304,6 +368,9 @@ class BindingWorkersBindingKindDurableObjectNamespace(TypedDict, total=False):
 
     class_name: str
     """The exported class name of the Durable Object."""
+
+    dispatch_namespace: str
+    """The dispatch namespace the Durable Object script belongs to."""
 
     environment: str
     """The environment of the script_name to bind to."""
@@ -360,7 +427,7 @@ class BindingWorkersBindingKindImages(TypedDict, total=False):
 
 
 class BindingWorkersBindingKindJson(TypedDict, total=False):
-    json: Required[str]
+    json: Required[object]
     """JSON data to use."""
 
     name: Required[str]
@@ -378,6 +445,14 @@ class BindingWorkersBindingKindKVNamespace(TypedDict, total=False):
     """Namespace identifier tag."""
 
     type: Required[Literal["kv_namespace"]]
+    """The kind of resource that the binding provides."""
+
+
+class BindingWorkersBindingKindMedia(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["media"]]
     """The kind of resource that the binding provides."""
 
 
@@ -459,7 +534,7 @@ class BindingWorkersBindingKindR2Bucket(TypedDict, total=False):
     type: Required[Literal["r2_bucket"]]
     """The kind of resource that the binding provides."""
 
-    jurisdiction: Literal["eu", "fedramp"]
+    jurisdiction: Literal["eu", "fedramp", "fedramp-high"]
     """
     The
     [jurisdiction](https://developers.cloudflare.com/r2/reference/data-location/#jurisdictional-restrictions)
@@ -504,6 +579,9 @@ class BindingWorkersBindingKindService(TypedDict, total=False):
 
     type: Required[Literal["service"]]
     """The kind of resource that the binding provides."""
+
+    entrypoint: str
+    """Entrypoint to invoke on the target Worker."""
 
     environment: str
     """Optional environment if the Worker utilizes one."""
@@ -553,6 +631,17 @@ class BindingWorkersBindingKindSecretsStoreSecret(TypedDict, total=False):
     """ID of the store containing the secret."""
 
     type: Required[Literal["secrets_store_secret"]]
+    """The kind of resource that the binding provides."""
+
+
+class BindingWorkersBindingKindFlagship(TypedDict, total=False):
+    app_id: Required[str]
+    """ID of the Flagship app to bind to for feature flag evaluation."""
+
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["flagship"]]
     """The kind of resource that the binding provides."""
 
 
@@ -631,8 +720,38 @@ class BindingWorkersBindingKindWasmModule(TypedDict, total=False):
     """The kind of resource that the binding provides."""
 
 
+class BindingWorkersBindingKindVPCService(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    service_id: Required[str]
+    """Identifier of the VPC service to bind to."""
+
+    type: Required[Literal["vpc_service"]]
+    """The kind of resource that the binding provides."""
+
+
+class BindingWorkersBindingKindVPCNetwork(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["vpc_network"]]
+    """The kind of resource that the binding provides."""
+
+    network_id: str
+    """Identifier of the network to bind to.
+
+    Only "cf1:network" is currently supported. Mutually exclusive with tunnel_id.
+    """
+
+    tunnel_id: str
+    """UUID of the Cloudflare Tunnel to bind to. Mutually exclusive with network_id."""
+
+
 Binding: TypeAlias = Union[
     BindingWorkersBindingKindAI,
+    BindingWorkersBindingKindAISearch,
+    BindingWorkersBindingKindAISearchNamespace,
     BindingWorkersBindingKindAnalyticsEngine,
     BindingWorkersBindingKindAssets,
     BindingWorkersBindingKindBrowser,
@@ -645,6 +764,7 @@ Binding: TypeAlias = Union[
     BindingWorkersBindingKindImages,
     BindingWorkersBindingKindJson,
     BindingWorkersBindingKindKVNamespace,
+    BindingWorkersBindingKindMedia,
     BindingWorkersBindingKindMTLSCertificate,
     BindingWorkersBindingKindPlainText,
     BindingWorkersBindingKindPipelines,
@@ -658,17 +778,30 @@ Binding: TypeAlias = Union[
     BindingWorkersBindingKindVectorize,
     BindingWorkersBindingKindVersionMetadata,
     BindingWorkersBindingKindSecretsStoreSecret,
+    BindingWorkersBindingKindFlagship,
     BindingWorkersBindingKindSecretKey,
     BindingWorkersBindingKindWorkflow,
     BindingWorkersBindingKindWasmModule,
+    BindingWorkersBindingKindVPCService,
+    BindingWorkersBindingKindVPCNetwork,
 ]
+
+
+class Container(TypedDict, total=False):
+    """Container configuration for a Worker."""
+
+    class_name: Required[str]
+    """Select which Durable Object class should get this container attached."""
 
 
 class Limits(TypedDict, total=False):
     """Resource limits enforced at runtime."""
 
-    cpu_ms: Required[int]
+    cpu_ms: int
     """CPU time limit in milliseconds."""
+
+    subrequests: int
+    """Subrequest limit per request."""
 
 
 class MigrationsWorkersMultipleStepMigrations(TypedDict, total=False):

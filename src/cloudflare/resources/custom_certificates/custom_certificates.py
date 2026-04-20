@@ -3,12 +3,12 @@
 from __future__ import annotations
 
 from typing import Type, Optional, cast
-from typing_extensions import Literal, overload
+from typing_extensions import Literal
 
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import required_args, maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from .prioritize import (
     PrioritizeResource,
@@ -69,10 +69,12 @@ class CustomCertificatesResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         certificate: str,
         private_key: str,
         bundle_method: BundleMethod | Omit = omit,
+        custom_csr_id: str | Omit = omit,
+        deploy: Literal["staging", "production"] | Omit = omit,
         geo_restrictions: GeoRestrictionsParam | Omit = omit,
         policy: str | Omit = omit,
         type: Literal["legacy_custom", "sni_custom"] | Omit = omit,
@@ -98,6 +100,10 @@ class CustomCertificatesResource(SyncAPIResource):
               the shortest chain and newest intermediates. And the force bundle verifies the
               chain, but does not otherwise modify it.
 
+          custom_csr_id: The identifier for the Custom CSR that was used.
+
+          deploy: The environment to deploy the certificate to, defaults to production
+
           geo_restrictions: Specify the region where your private key can be held locally for optimal TLS
               performance. HTTPS connections to any excluded data center will still be fully
               encrypted, but will incur some latency while Keyless SSL is used to complete the
@@ -114,7 +120,9 @@ class CustomCertificatesResource(SyncAPIResource):
               (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements)
               can be chosen, such as 'country: IN', as well as 'region: EU' which refers to
               the EU region. If there are too few data centers satisfying the policy, it will
-              be rejected.
+              be rejected. Note: The API accepts this field as either "policy" or
+              "policy_restrictions" in requests. Responses return this field as
+              "policy_restrictions".
 
           type: The type 'legacy_custom' enables support for legacy clients which do not include
               SNI in the TLS handshake.
@@ -127,15 +135,19 @@ class CustomCertificatesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            f"/zones/{zone_id}/custom_certificates",
+            path_template("/zones/{zone_id}/custom_certificates", zone_id=zone_id),
             body=maybe_transform(
                 {
                     "certificate": certificate,
                     "private_key": private_key,
                     "bundle_method": bundle_method,
+                    "custom_csr_id": custom_csr_id,
+                    "deploy": deploy,
                     "geo_restrictions": geo_restrictions,
                     "policy": policy,
                     "type": type,
@@ -155,7 +167,7 @@ class CustomCertificatesResource(SyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         match: Literal["any", "all"] | Omit = omit,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
@@ -192,10 +204,12 @@ class CustomCertificatesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/custom_certificates",
+            path_template("/zones/{zone_id}/custom_certificates", zone_id=zone_id),
             page=SyncV4PagePaginationArray[CustomCertificate],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -219,7 +233,7 @@ class CustomCertificatesResource(SyncAPIResource):
         self,
         custom_certificate_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -243,6 +257,8 @@ class CustomCertificatesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_certificate_id:
@@ -250,7 +266,11 @@ class CustomCertificatesResource(SyncAPIResource):
                 f"Expected a non-empty value for `custom_certificate_id` but received {custom_certificate_id!r}"
             )
         return self._delete(
-            f"/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+            path_template(
+                "/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+                zone_id=zone_id,
+                custom_certificate_id=custom_certificate_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -263,13 +283,18 @@ class CustomCertificatesResource(SyncAPIResource):
             ),
         )
 
-    @overload
     def edit(
         self,
         custom_certificate_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         bundle_method: BundleMethod | Omit = omit,
+        certificate: str | Omit = omit,
+        custom_csr_id: str | Omit = omit,
+        deploy: Literal["staging", "production"] | Omit = omit,
+        geo_restrictions: GeoRestrictionsParam | Omit = omit,
+        policy: str | Omit = omit,
+        private_key: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -292,54 +317,12 @@ class CustomCertificatesResource(SyncAPIResource):
               even by clients using outdated or unusual trust stores. An optimal bundle uses
               the shortest chain and newest intermediates. And the force bundle verifies the
               chain, but does not otherwise modify it.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        ...
-
-    @overload
-    def edit(
-        self,
-        custom_certificate_id: str,
-        *,
-        zone_id: str,
-        certificate: str,
-        private_key: str,
-        bundle_method: BundleMethod | Omit = omit,
-        geo_restrictions: GeoRestrictionsParam | Omit = omit,
-        policy: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomCertificate]:
-        """Upload a new private key and/or PEM/CRT for the SSL certificate.
-
-        Note: PATCHing
-        a configuration for sni_custom certificates will result in a new resource id
-        being returned, and the previous one being deleted.
-
-        Args:
-          zone_id: Identifier.
-
-          custom_certificate_id: Identifier.
 
           certificate: The zone's SSL certificate or certificate and the intermediate(s).
 
-          private_key: The zone's private key.
+          custom_csr_id: The identifier for the Custom CSR that was used.
 
-          bundle_method: A ubiquitous bundle has the highest probability of being verified everywhere,
-              even by clients using outdated or unusual trust stores. An optimal bundle uses
-              the shortest chain and newest intermediates. And the force bundle verifies the
-              chain, but does not otherwise modify it.
+          deploy: The environment to deploy the certificate to, defaults to production
 
           geo_restrictions: Specify the region where your private key can be held locally for optimal TLS
               performance. HTTPS connections to any excluded data center will still be fully
@@ -357,7 +340,11 @@ class CustomCertificatesResource(SyncAPIResource):
               (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements)
               can be chosen, such as 'country: IN', as well as 'region: EU' which refers to
               the EU region. If there are too few data centers satisfying the policy, it will
-              be rejected.
+              be rejected. Note: The API accepts this field as either "policy" or
+              "policy_restrictions" in requests. Responses return this field as
+              "policy_restrictions".
+
+          private_key: The zone's private key.
 
           extra_headers: Send extra headers
 
@@ -367,26 +354,8 @@ class CustomCertificatesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        ...
-
-    @required_args(["zone_id"], ["zone_id", "certificate", "private_key"])
-    def edit(
-        self,
-        custom_certificate_id: str,
-        *,
-        zone_id: str,
-        bundle_method: BundleMethod | Omit = omit,
-        certificate: str | Omit = omit,
-        private_key: str | Omit = omit,
-        geo_restrictions: GeoRestrictionsParam | Omit = omit,
-        policy: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomCertificate]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_certificate_id:
@@ -394,14 +363,20 @@ class CustomCertificatesResource(SyncAPIResource):
                 f"Expected a non-empty value for `custom_certificate_id` but received {custom_certificate_id!r}"
             )
         return self._patch(
-            f"/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+            path_template(
+                "/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+                zone_id=zone_id,
+                custom_certificate_id=custom_certificate_id,
+            ),
             body=maybe_transform(
                 {
                     "bundle_method": bundle_method,
                     "certificate": certificate,
-                    "private_key": private_key,
+                    "custom_csr_id": custom_csr_id,
+                    "deploy": deploy,
                     "geo_restrictions": geo_restrictions,
                     "policy": policy,
+                    "private_key": private_key,
                 },
                 custom_certificate_edit_params.CustomCertificateEditParams,
             ),
@@ -419,7 +394,7 @@ class CustomCertificatesResource(SyncAPIResource):
         self,
         custom_certificate_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -428,7 +403,9 @@ class CustomCertificatesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[CustomCertificate]:
         """
-        SSL Configuration Details
+        Retrieves details for a specific custom SSL certificate, including certificate
+        metadata, bundle method, geographic restrictions, and associated keyless server
+        configuration.
 
         Args:
           zone_id: Identifier.
@@ -443,6 +420,8 @@ class CustomCertificatesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_certificate_id:
@@ -450,7 +429,11 @@ class CustomCertificatesResource(SyncAPIResource):
                 f"Expected a non-empty value for `custom_certificate_id` but received {custom_certificate_id!r}"
             )
         return self._get(
-            f"/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+            path_template(
+                "/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+                zone_id=zone_id,
+                custom_certificate_id=custom_certificate_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -489,10 +472,12 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         certificate: str,
         private_key: str,
         bundle_method: BundleMethod | Omit = omit,
+        custom_csr_id: str | Omit = omit,
+        deploy: Literal["staging", "production"] | Omit = omit,
         geo_restrictions: GeoRestrictionsParam | Omit = omit,
         policy: str | Omit = omit,
         type: Literal["legacy_custom", "sni_custom"] | Omit = omit,
@@ -518,6 +503,10 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
               the shortest chain and newest intermediates. And the force bundle verifies the
               chain, but does not otherwise modify it.
 
+          custom_csr_id: The identifier for the Custom CSR that was used.
+
+          deploy: The environment to deploy the certificate to, defaults to production
+
           geo_restrictions: Specify the region where your private key can be held locally for optimal TLS
               performance. HTTPS connections to any excluded data center will still be fully
               encrypted, but will incur some latency while Keyless SSL is used to complete the
@@ -534,7 +523,9 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
               (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements)
               can be chosen, such as 'country: IN', as well as 'region: EU' which refers to
               the EU region. If there are too few data centers satisfying the policy, it will
-              be rejected.
+              be rejected. Note: The API accepts this field as either "policy" or
+              "policy_restrictions" in requests. Responses return this field as
+              "policy_restrictions".
 
           type: The type 'legacy_custom' enables support for legacy clients which do not include
               SNI in the TLS handshake.
@@ -547,15 +538,19 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            f"/zones/{zone_id}/custom_certificates",
+            path_template("/zones/{zone_id}/custom_certificates", zone_id=zone_id),
             body=await async_maybe_transform(
                 {
                     "certificate": certificate,
                     "private_key": private_key,
                     "bundle_method": bundle_method,
+                    "custom_csr_id": custom_csr_id,
+                    "deploy": deploy,
                     "geo_restrictions": geo_restrictions,
                     "policy": policy,
                     "type": type,
@@ -575,7 +570,7 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         match: Literal["any", "all"] | Omit = omit,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
@@ -612,10 +607,12 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/custom_certificates",
+            path_template("/zones/{zone_id}/custom_certificates", zone_id=zone_id),
             page=AsyncV4PagePaginationArray[CustomCertificate],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -639,7 +636,7 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
         self,
         custom_certificate_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -663,6 +660,8 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_certificate_id:
@@ -670,7 +669,11 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
                 f"Expected a non-empty value for `custom_certificate_id` but received {custom_certificate_id!r}"
             )
         return await self._delete(
-            f"/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+            path_template(
+                "/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+                zone_id=zone_id,
+                custom_certificate_id=custom_certificate_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -683,13 +686,18 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
             ),
         )
 
-    @overload
     async def edit(
         self,
         custom_certificate_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         bundle_method: BundleMethod | Omit = omit,
+        certificate: str | Omit = omit,
+        custom_csr_id: str | Omit = omit,
+        deploy: Literal["staging", "production"] | Omit = omit,
+        geo_restrictions: GeoRestrictionsParam | Omit = omit,
+        policy: str | Omit = omit,
+        private_key: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -712,54 +720,12 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
               even by clients using outdated or unusual trust stores. An optimal bundle uses
               the shortest chain and newest intermediates. And the force bundle verifies the
               chain, but does not otherwise modify it.
-
-          extra_headers: Send extra headers
-
-          extra_query: Add additional query parameters to the request
-
-          extra_body: Add additional JSON properties to the request
-
-          timeout: Override the client-level default timeout for this request, in seconds
-        """
-        ...
-
-    @overload
-    async def edit(
-        self,
-        custom_certificate_id: str,
-        *,
-        zone_id: str,
-        certificate: str,
-        private_key: str,
-        bundle_method: BundleMethod | Omit = omit,
-        geo_restrictions: GeoRestrictionsParam | Omit = omit,
-        policy: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomCertificate]:
-        """Upload a new private key and/or PEM/CRT for the SSL certificate.
-
-        Note: PATCHing
-        a configuration for sni_custom certificates will result in a new resource id
-        being returned, and the previous one being deleted.
-
-        Args:
-          zone_id: Identifier.
-
-          custom_certificate_id: Identifier.
 
           certificate: The zone's SSL certificate or certificate and the intermediate(s).
 
-          private_key: The zone's private key.
+          custom_csr_id: The identifier for the Custom CSR that was used.
 
-          bundle_method: A ubiquitous bundle has the highest probability of being verified everywhere,
-              even by clients using outdated or unusual trust stores. An optimal bundle uses
-              the shortest chain and newest intermediates. And the force bundle verifies the
-              chain, but does not otherwise modify it.
+          deploy: The environment to deploy the certificate to, defaults to production
 
           geo_restrictions: Specify the region where your private key can be held locally for optimal TLS
               performance. HTTPS connections to any excluded data center will still be fully
@@ -777,7 +743,11 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
               (https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2#Officially_assigned_code_elements)
               can be chosen, such as 'country: IN', as well as 'region: EU' which refers to
               the EU region. If there are too few data centers satisfying the policy, it will
-              be rejected.
+              be rejected. Note: The API accepts this field as either "policy" or
+              "policy_restrictions" in requests. Responses return this field as
+              "policy_restrictions".
+
+          private_key: The zone's private key.
 
           extra_headers: Send extra headers
 
@@ -787,26 +757,8 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
-        ...
-
-    @required_args(["zone_id"], ["zone_id", "certificate", "private_key"])
-    async def edit(
-        self,
-        custom_certificate_id: str,
-        *,
-        zone_id: str,
-        bundle_method: BundleMethod | Omit = omit,
-        certificate: str | Omit = omit,
-        private_key: str | Omit = omit,
-        geo_restrictions: GeoRestrictionsParam | Omit = omit,
-        policy: str | Omit = omit,
-        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
-        # The extra values given here take precedence over values defined on the client or passed to this method.
-        extra_headers: Headers | None = None,
-        extra_query: Query | None = None,
-        extra_body: Body | None = None,
-        timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomCertificate]:
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_certificate_id:
@@ -814,14 +766,20 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
                 f"Expected a non-empty value for `custom_certificate_id` but received {custom_certificate_id!r}"
             )
         return await self._patch(
-            f"/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+            path_template(
+                "/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+                zone_id=zone_id,
+                custom_certificate_id=custom_certificate_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "bundle_method": bundle_method,
                     "certificate": certificate,
-                    "private_key": private_key,
+                    "custom_csr_id": custom_csr_id,
+                    "deploy": deploy,
                     "geo_restrictions": geo_restrictions,
                     "policy": policy,
+                    "private_key": private_key,
                 },
                 custom_certificate_edit_params.CustomCertificateEditParams,
             ),
@@ -839,7 +797,7 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
         self,
         custom_certificate_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -848,7 +806,9 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[CustomCertificate]:
         """
-        SSL Configuration Details
+        Retrieves details for a specific custom SSL certificate, including certificate
+        metadata, bundle method, geographic restrictions, and associated keyless server
+        configuration.
 
         Args:
           zone_id: Identifier.
@@ -863,6 +823,8 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_certificate_id:
@@ -870,7 +832,11 @@ class AsyncCustomCertificatesResource(AsyncAPIResource):
                 f"Expected a non-empty value for `custom_certificate_id` but received {custom_certificate_id!r}"
             )
         return await self._get(
-            f"/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+            path_template(
+                "/zones/{zone_id}/custom_certificates/{custom_certificate_id}",
+                zone_id=zone_id,
+                custom_certificate_id=custom_certificate_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

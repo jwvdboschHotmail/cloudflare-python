@@ -70,7 +70,7 @@ __all__ = [
 
 
 class ARecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -94,6 +94,9 @@ class ARecord(TypedDict, total=False):
 
     content: str
     """A valid IPv4 address."""
+
+    private_routing: bool
+    """Enables private network routing to the origin."""
 
     proxied: bool
     """
@@ -129,7 +132,7 @@ class ARecordSettings(TypedDict, total=False):
 
 
 class AAAARecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -153,6 +156,9 @@ class AAAARecord(TypedDict, total=False):
 
     content: str
     """A valid IPv6 address."""
+
+    private_routing: bool
+    """Enables private network routing to the origin."""
 
     proxied: bool
     """
@@ -188,7 +194,7 @@ class AAAARecordSettings(TypedDict, total=False):
 
 
 class CNAMERecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -255,7 +261,7 @@ class CNAMERecordSettings(TypedDict, total=False):
 
 
 class MXRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -281,9 +287,10 @@ class MXRecord(TypedDict, total=False):
     """A valid mail server hostname."""
 
     priority: float
-    """Required for MX, SRV and URI records; unused by other record types.
-
-    Records with lower priorities are preferred.
+    """
+    Required for MX and URI records; ignored for other record types (but may still
+    be returned by the API). Records with lower priorities are preferred. This field
+    is to be deprecated in favor of the priority field within the data map.
     """
 
     proxied: bool
@@ -320,7 +327,7 @@ class MXRecordSettings(TypedDict, total=False):
 
 
 class NSRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -379,7 +386,7 @@ class NSRecordSettings(TypedDict, total=False):
 
 
 class DNSRecordsOpenpgpkeyRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -438,7 +445,7 @@ class DNSRecordsOpenpgpkeyRecordSettings(TypedDict, total=False):
 
 
 class PTRRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -497,7 +504,7 @@ class PTRRecordSettings(TypedDict, total=False):
 
 
 class TXTRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -564,7 +571,7 @@ class TXTRecordSettings(TypedDict, total=False):
 
 
 class CAARecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -636,7 +643,7 @@ class CAARecordSettings(TypedDict, total=False):
 
 
 class CERTRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -711,7 +718,7 @@ class CERTRecordSettings(TypedDict, total=False):
 
 
 class DNSKEYRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -786,7 +793,7 @@ class DNSKEYRecordSettings(TypedDict, total=False):
 
 
 class DSRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -861,7 +868,7 @@ class DSRecordSettings(TypedDict, total=False):
 
 
 class HTTPSRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -933,7 +940,7 @@ class HTTPSRecordSettings(TypedDict, total=False):
 
 
 class LOCRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1032,7 +1039,7 @@ class LOCRecordSettings(TypedDict, total=False):
 
 
 class NAPTRRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1113,7 +1120,7 @@ class NAPTRRecordSettings(TypedDict, total=False):
 
 
 class SMIMEARecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1188,7 +1195,7 @@ class SMIMEARecordSettings(TypedDict, total=False):
 
 
 class SRVRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1233,9 +1240,10 @@ class SRVRecordData(TypedDict, total=False):
     """The port of the service."""
 
     priority: float
-    """Required for MX, SRV and URI records; unused by other record types.
-
-    Records with lower priorities are preferred.
+    """
+    Required for MX and URI records; ignored for other record types (but may still
+    be returned by the API). Records with lower priorities are preferred. This field
+    is to be deprecated in favor of the priority field within the data map.
     """
 
     target: str
@@ -1266,7 +1274,7 @@ class SRVRecordSettings(TypedDict, total=False):
 
 
 class SSHFPRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1338,7 +1346,7 @@ class SSHFPRecordSettings(TypedDict, total=False):
 
 
 class SVCBRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1410,7 +1418,7 @@ class SVCBRecordSettings(TypedDict, total=False):
 
 
 class TLSARecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1485,7 +1493,7 @@ class TLSARecordSettings(TypedDict, total=False):
 
 
 class URIRecord(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     name: Required[str]
@@ -1511,9 +1519,10 @@ class URIRecord(TypedDict, total=False):
     """Components of a URI record."""
 
     priority: float
-    """Required for MX, SRV and URI records; unused by other record types.
-
-    Records with lower priorities are preferred.
+    """
+    Required for MX and URI records; ignored for other record types (but may still
+    be returned by the API). Records with lower priorities are preferred. This field
+    is to be deprecated in favor of the priority field within the data map.
     """
 
     proxied: bool

@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Iterable
-from typing_extensions import Required, TypedDict
+from typing import List, Iterable
+from typing_extensions import Literal, Required, TypedDict
 
 from ..approval_group_param import ApprovalGroupParam
 
-__all__ = ["PolicyUpdateParams"]
+__all__ = ["PolicyUpdateParams", "ConnectionRules", "ConnectionRulesRDP", "MfaConfig"]
 
 
 class PolicyUpdateParams(TypedDict, total=False):
@@ -29,12 +29,21 @@ class PolicyUpdateParams(TypedDict, total=False):
     session.
     """
 
+    connection_rules: ConnectionRules
+    """
+    The rules that define how users may connect to targets secured by your
+    application.
+    """
+
     isolation_required: bool
     """
     Require this application to be served in an isolated browser for users matching
     this policy. 'Client Web Isolation' must be on for the account in order to use
     this feature.
     """
+
+    mfa_config: MfaConfig
+    """Configures multi-factor authentication (MFA) settings."""
 
     precedence: int
     """The order of execution for this policy.
@@ -53,4 +62,47 @@ class PolicyUpdateParams(TypedDict, total=False):
 
     Must be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs),
     ms, s, m, h.
+    """
+
+
+class ConnectionRulesRDP(TypedDict, total=False):
+    """The RDP-specific rules that define clipboard behavior for RDP connections."""
+
+    allowed_clipboard_local_to_remote_formats: List[Literal["text"]]
+    """
+    Clipboard formats allowed when copying from local machine to remote RDP session.
+    """
+
+    allowed_clipboard_remote_to_local_formats: List[Literal["text"]]
+    """
+    Clipboard formats allowed when copying from remote RDP session to local machine.
+    """
+
+
+class ConnectionRules(TypedDict, total=False):
+    """
+    The rules that define how users may connect to targets secured by your application.
+    """
+
+    rdp: ConnectionRulesRDP
+    """The RDP-specific rules that define clipboard behavior for RDP connections."""
+
+
+class MfaConfig(TypedDict, total=False):
+    """Configures multi-factor authentication (MFA) settings."""
+
+    allowed_authenticators: List[Literal["totp", "biometrics", "security_key"]]
+    """Lists the MFA methods that users can authenticate with."""
+
+    mfa_disabled: bool
+    """Indicates whether to disable MFA for this resource.
+
+    This option is available at the application and policy level.
+    """
+
+    session_duration: str
+    """Defines the duration of an MFA session.
+
+    Must be in minutes (m) or hours (h). Minimum: 0m. Maximum: 720h (30 days).
+    Examples:`5m` or `24h`.
     """

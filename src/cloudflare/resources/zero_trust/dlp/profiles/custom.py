@@ -6,8 +6,8 @@ from typing import Any, Type, Iterable, Optional, cast
 
 import httpx
 
-from ....._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ....._utils import maybe_transform, async_maybe_transform
+from ....._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
+from ....._utils import path_template, maybe_transform, async_maybe_transform
 from ....._compat import cached_property
 from ....._resource import SyncAPIResource, AsyncAPIResource
 from ....._response import (
@@ -18,11 +18,9 @@ from ....._response import (
 )
 from ....._wrappers import ResultWrapper
 from ....._base_client import make_request_options
+from .....types.zero_trust.dlp.profile import Profile
 from .....types.zero_trust.dlp.profiles import custom_create_params, custom_update_params
 from .....types.zero_trust.dlp.context_awareness_param import ContextAwarenessParam
-from .....types.zero_trust.dlp.profiles.custom_get_response import CustomGetResponse
-from .....types.zero_trust.dlp.profiles.custom_create_response import CustomCreateResponse
-from .....types.zero_trust.dlp.profiles.custom_update_response import CustomUpdateResponse
 
 __all__ = ["CustomResource", "AsyncCustomResource"]
 
@@ -50,15 +48,18 @@ class CustomResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         ai_context_enabled: bool | Omit = omit,
         allowed_match_count: int | Omit = omit,
         confidence_threshold: Optional[str] | Omit = omit,
         context_awareness: ContextAwarenessParam | Omit = omit,
+        data_classes: SequenceNotStr[str] | Omit = omit,
+        data_tags: SequenceNotStr[str] | Omit = omit,
         description: Optional[str] | Omit = omit,
         entries: Iterable[custom_create_params.Entry] | Omit = omit,
         ocr_enabled: bool | Omit = omit,
+        sensitivity_levels: Iterable[custom_create_params.SensitivityLevel] | Omit = omit,
         shared_entries: Iterable[custom_create_params.SharedEntry] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -66,7 +67,7 @@ class CustomResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomCreateResponse]:
+    ) -> Optional[Profile]:
         """
         Creates a DLP custom profile.
 
@@ -76,7 +77,13 @@ class CustomResource(SyncAPIResource):
           context_awareness: Scan the context of predefined entries to only return matches surrounded by
               keywords.
 
+          data_classes: Data class IDs to associate with the profile.
+
+          data_tags: Data tag IDs to associate with the profile.
+
           description: The description of the profile.
+
+          sensitivity_levels: Sensitivity levels to associate with the profile.
 
           shared_entries: Entries from other profiles (e.g. pre-defined Cloudflare profiles, or your
               Microsoft Information Protection profiles).
@@ -89,12 +96,14 @@ class CustomResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return cast(
-            Optional[CustomCreateResponse],
+            Optional[Profile],
             self._post(
-                f"/accounts/{account_id}/dlp/profiles/custom",
+                path_template("/accounts/{account_id}/dlp/profiles/custom", account_id=account_id),
                 body=maybe_transform(
                     {
                         "name": name,
@@ -102,9 +111,12 @@ class CustomResource(SyncAPIResource):
                         "allowed_match_count": allowed_match_count,
                         "confidence_threshold": confidence_threshold,
                         "context_awareness": context_awareness,
+                        "data_classes": data_classes,
+                        "data_tags": data_tags,
                         "description": description,
                         "entries": entries,
                         "ocr_enabled": ocr_enabled,
+                        "sensitivity_levels": sensitivity_levels,
                         "shared_entries": shared_entries,
                     },
                     custom_create_params.CustomCreateParams,
@@ -114,10 +126,10 @@ class CustomResource(SyncAPIResource):
                     extra_query=extra_query,
                     extra_body=extra_body,
                     timeout=timeout,
-                    post_parser=ResultWrapper[Optional[CustomCreateResponse]]._unwrapper,
+                    post_parser=ResultWrapper[Optional[Profile]]._unwrapper,
                 ),
                 cast_to=cast(
-                    Any, ResultWrapper[CustomCreateResponse]
+                    Any, ResultWrapper[Profile]
                 ),  # Union types cannot be passed in as arguments in the type system
             ),
         )
@@ -126,15 +138,18 @@ class CustomResource(SyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         ai_context_enabled: bool | Omit = omit,
         allowed_match_count: Optional[int] | Omit = omit,
         confidence_threshold: Optional[str] | Omit = omit,
         context_awareness: ContextAwarenessParam | Omit = omit,
+        data_classes: Optional[SequenceNotStr[str]] | Omit = omit,
+        data_tags: Optional[SequenceNotStr[str]] | Omit = omit,
         description: Optional[str] | Omit = omit,
         entries: Optional[Iterable[custom_update_params.Entry]] | Omit = omit,
         ocr_enabled: bool | Omit = omit,
+        sensitivity_levels: Optional[Iterable[custom_update_params.SensitivityLevel]] | Omit = omit,
         shared_entries: Iterable[custom_update_params.SharedEntry] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -142,7 +157,7 @@ class CustomResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomUpdateResponse]:
+    ) -> Optional[Profile]:
         """
         Updates a DLP custom profile.
 
@@ -150,10 +165,19 @@ class CustomResource(SyncAPIResource):
           context_awareness: Scan the context of predefined entries to only return matches surrounded by
               keywords.
 
+          data_classes: Data class IDs to associate with the profile. If omitted, existing associations
+              are unchanged.
+
+          data_tags: Data tag IDs to associate with the profile. If omitted, existing associations
+              are unchanged.
+
           description: The description of the profile.
 
           entries: Custom entries from this profile. If this field is omitted, entries owned by
               this profile will not be changed.
+
+          sensitivity_levels: Sensitivity levels to associate with the profile. If omitted, existing
+              associations are unchanged.
 
           shared_entries: Other entries, e.g. predefined or integration.
 
@@ -165,14 +189,20 @@ class CustomResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return cast(
-            Optional[CustomUpdateResponse],
+            Optional[Profile],
             self._put(
-                f"/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                path_template(
+                    "/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                    account_id=account_id,
+                    profile_id=profile_id,
+                ),
                 body=maybe_transform(
                     {
                         "name": name,
@@ -180,9 +210,12 @@ class CustomResource(SyncAPIResource):
                         "allowed_match_count": allowed_match_count,
                         "confidence_threshold": confidence_threshold,
                         "context_awareness": context_awareness,
+                        "data_classes": data_classes,
+                        "data_tags": data_tags,
                         "description": description,
                         "entries": entries,
                         "ocr_enabled": ocr_enabled,
+                        "sensitivity_levels": sensitivity_levels,
                         "shared_entries": shared_entries,
                     },
                     custom_update_params.CustomUpdateParams,
@@ -192,10 +225,10 @@ class CustomResource(SyncAPIResource):
                     extra_query=extra_query,
                     extra_body=extra_body,
                     timeout=timeout,
-                    post_parser=ResultWrapper[Optional[CustomUpdateResponse]]._unwrapper,
+                    post_parser=ResultWrapper[Optional[Profile]]._unwrapper,
                 ),
                 cast_to=cast(
-                    Any, ResultWrapper[CustomUpdateResponse]
+                    Any, ResultWrapper[Profile]
                 ),  # Union types cannot be passed in as arguments in the type system
             ),
         )
@@ -204,7 +237,7 @@ class CustomResource(SyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -224,12 +257,16 @@ class CustomResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/custom/{profile_id}", account_id=account_id, profile_id=profile_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -244,14 +281,14 @@ class CustomResource(SyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomGetResponse]:
+    ) -> Optional[Profile]:
         """
         Fetches a custom DLP profile by id.
 
@@ -264,23 +301,29 @@ class CustomResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return cast(
-            Optional[CustomGetResponse],
+            Optional[Profile],
             self._get(
-                f"/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                path_template(
+                    "/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                    account_id=account_id,
+                    profile_id=profile_id,
+                ),
                 options=make_request_options(
                     extra_headers=extra_headers,
                     extra_query=extra_query,
                     extra_body=extra_body,
                     timeout=timeout,
-                    post_parser=ResultWrapper[Optional[CustomGetResponse]]._unwrapper,
+                    post_parser=ResultWrapper[Optional[Profile]]._unwrapper,
                 ),
                 cast_to=cast(
-                    Any, ResultWrapper[CustomGetResponse]
+                    Any, ResultWrapper[Profile]
                 ),  # Union types cannot be passed in as arguments in the type system
             ),
         )
@@ -309,15 +352,18 @@ class AsyncCustomResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         ai_context_enabled: bool | Omit = omit,
         allowed_match_count: int | Omit = omit,
         confidence_threshold: Optional[str] | Omit = omit,
         context_awareness: ContextAwarenessParam | Omit = omit,
+        data_classes: SequenceNotStr[str] | Omit = omit,
+        data_tags: SequenceNotStr[str] | Omit = omit,
         description: Optional[str] | Omit = omit,
         entries: Iterable[custom_create_params.Entry] | Omit = omit,
         ocr_enabled: bool | Omit = omit,
+        sensitivity_levels: Iterable[custom_create_params.SensitivityLevel] | Omit = omit,
         shared_entries: Iterable[custom_create_params.SharedEntry] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -325,7 +371,7 @@ class AsyncCustomResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomCreateResponse]:
+    ) -> Optional[Profile]:
         """
         Creates a DLP custom profile.
 
@@ -335,7 +381,13 @@ class AsyncCustomResource(AsyncAPIResource):
           context_awareness: Scan the context of predefined entries to only return matches surrounded by
               keywords.
 
+          data_classes: Data class IDs to associate with the profile.
+
+          data_tags: Data tag IDs to associate with the profile.
+
           description: The description of the profile.
+
+          sensitivity_levels: Sensitivity levels to associate with the profile.
 
           shared_entries: Entries from other profiles (e.g. pre-defined Cloudflare profiles, or your
               Microsoft Information Protection profiles).
@@ -348,12 +400,14 @@ class AsyncCustomResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return cast(
-            Optional[CustomCreateResponse],
+            Optional[Profile],
             await self._post(
-                f"/accounts/{account_id}/dlp/profiles/custom",
+                path_template("/accounts/{account_id}/dlp/profiles/custom", account_id=account_id),
                 body=await async_maybe_transform(
                     {
                         "name": name,
@@ -361,9 +415,12 @@ class AsyncCustomResource(AsyncAPIResource):
                         "allowed_match_count": allowed_match_count,
                         "confidence_threshold": confidence_threshold,
                         "context_awareness": context_awareness,
+                        "data_classes": data_classes,
+                        "data_tags": data_tags,
                         "description": description,
                         "entries": entries,
                         "ocr_enabled": ocr_enabled,
+                        "sensitivity_levels": sensitivity_levels,
                         "shared_entries": shared_entries,
                     },
                     custom_create_params.CustomCreateParams,
@@ -373,10 +430,10 @@ class AsyncCustomResource(AsyncAPIResource):
                     extra_query=extra_query,
                     extra_body=extra_body,
                     timeout=timeout,
-                    post_parser=ResultWrapper[Optional[CustomCreateResponse]]._unwrapper,
+                    post_parser=ResultWrapper[Optional[Profile]]._unwrapper,
                 ),
                 cast_to=cast(
-                    Any, ResultWrapper[CustomCreateResponse]
+                    Any, ResultWrapper[Profile]
                 ),  # Union types cannot be passed in as arguments in the type system
             ),
         )
@@ -385,15 +442,18 @@ class AsyncCustomResource(AsyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         ai_context_enabled: bool | Omit = omit,
         allowed_match_count: Optional[int] | Omit = omit,
         confidence_threshold: Optional[str] | Omit = omit,
         context_awareness: ContextAwarenessParam | Omit = omit,
+        data_classes: Optional[SequenceNotStr[str]] | Omit = omit,
+        data_tags: Optional[SequenceNotStr[str]] | Omit = omit,
         description: Optional[str] | Omit = omit,
         entries: Optional[Iterable[custom_update_params.Entry]] | Omit = omit,
         ocr_enabled: bool | Omit = omit,
+        sensitivity_levels: Optional[Iterable[custom_update_params.SensitivityLevel]] | Omit = omit,
         shared_entries: Iterable[custom_update_params.SharedEntry] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -401,7 +461,7 @@ class AsyncCustomResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomUpdateResponse]:
+    ) -> Optional[Profile]:
         """
         Updates a DLP custom profile.
 
@@ -409,10 +469,19 @@ class AsyncCustomResource(AsyncAPIResource):
           context_awareness: Scan the context of predefined entries to only return matches surrounded by
               keywords.
 
+          data_classes: Data class IDs to associate with the profile. If omitted, existing associations
+              are unchanged.
+
+          data_tags: Data tag IDs to associate with the profile. If omitted, existing associations
+              are unchanged.
+
           description: The description of the profile.
 
           entries: Custom entries from this profile. If this field is omitted, entries owned by
               this profile will not be changed.
+
+          sensitivity_levels: Sensitivity levels to associate with the profile. If omitted, existing
+              associations are unchanged.
 
           shared_entries: Other entries, e.g. predefined or integration.
 
@@ -424,14 +493,20 @@ class AsyncCustomResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return cast(
-            Optional[CustomUpdateResponse],
+            Optional[Profile],
             await self._put(
-                f"/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                path_template(
+                    "/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                    account_id=account_id,
+                    profile_id=profile_id,
+                ),
                 body=await async_maybe_transform(
                     {
                         "name": name,
@@ -439,9 +514,12 @@ class AsyncCustomResource(AsyncAPIResource):
                         "allowed_match_count": allowed_match_count,
                         "confidence_threshold": confidence_threshold,
                         "context_awareness": context_awareness,
+                        "data_classes": data_classes,
+                        "data_tags": data_tags,
                         "description": description,
                         "entries": entries,
                         "ocr_enabled": ocr_enabled,
+                        "sensitivity_levels": sensitivity_levels,
                         "shared_entries": shared_entries,
                     },
                     custom_update_params.CustomUpdateParams,
@@ -451,10 +529,10 @@ class AsyncCustomResource(AsyncAPIResource):
                     extra_query=extra_query,
                     extra_body=extra_body,
                     timeout=timeout,
-                    post_parser=ResultWrapper[Optional[CustomUpdateResponse]]._unwrapper,
+                    post_parser=ResultWrapper[Optional[Profile]]._unwrapper,
                 ),
                 cast_to=cast(
-                    Any, ResultWrapper[CustomUpdateResponse]
+                    Any, ResultWrapper[Profile]
                 ),  # Union types cannot be passed in as arguments in the type system
             ),
         )
@@ -463,7 +541,7 @@ class AsyncCustomResource(AsyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -483,12 +561,16 @@ class AsyncCustomResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/custom/{profile_id}", account_id=account_id, profile_id=profile_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -503,14 +585,14 @@ class AsyncCustomResource(AsyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[CustomGetResponse]:
+    ) -> Optional[Profile]:
         """
         Fetches a custom DLP profile by id.
 
@@ -523,23 +605,29 @@ class AsyncCustomResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return cast(
-            Optional[CustomGetResponse],
+            Optional[Profile],
             await self._get(
-                f"/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                path_template(
+                    "/accounts/{account_id}/dlp/profiles/custom/{profile_id}",
+                    account_id=account_id,
+                    profile_id=profile_id,
+                ),
                 options=make_request_options(
                     extra_headers=extra_headers,
                     extra_query=extra_query,
                     extra_body=extra_body,
                     timeout=timeout,
-                    post_parser=ResultWrapper[Optional[CustomGetResponse]]._unwrapper,
+                    post_parser=ResultWrapper[Optional[Profile]]._unwrapper,
                 ),
                 cast_to=cast(
-                    Any, ResultWrapper[CustomGetResponse]
+                    Any, ResultWrapper[Profile]
                 ),  # Union types cannot be passed in as arguments in the type system
             ),
         )

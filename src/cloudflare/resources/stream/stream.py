@@ -57,7 +57,7 @@ from .videos import (
     AsyncVideosResourceWithStreamingResponse,
 )
 from ..._types import Body, Omit, Query, Headers, NoneType, NotGiven, SequenceNotStr, omit, not_given
-from ..._utils import maybe_transform, strip_not_given, async_maybe_transform
+from ..._utils import path_template, maybe_transform, strip_not_given, async_maybe_transform
 from .webhooks import (
     WebhooksResource,
     AsyncWebhooksResource,
@@ -207,8 +207,7 @@ class StreamResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
-        body: object,
+        account_id: str | None = None,
         tus_resumable: Literal["1.0.0"],
         upload_length: int,
         direct_user: bool | Omit = omit,
@@ -255,6 +254,8 @@ class StreamResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
@@ -270,8 +271,7 @@ class StreamResource(SyncAPIResource):
             **(extra_headers or {}),
         }
         return self._post(
-            f"/accounts/{account_id}/stream",
-            body=maybe_transform(body, stream_create_params.StreamCreateParams),
+            path_template("/accounts/{account_id}/stream", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -285,11 +285,17 @@ class StreamResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        id: str | Omit = omit,
+        after: Union[str, datetime] | Omit = omit,
         asc: bool | Omit = omit,
+        before: Union[str, datetime] | Omit = omit,
         creator: str | Omit = omit,
         end: Union[str, datetime] | Omit = omit,
         include_counts: bool | Omit = omit,
+        limit: int | Omit = omit,
+        live_input_id: str | Omit = omit,
+        name: str | Omit = omit,
         search: str | Omit = omit,
         start: Union[str, datetime] | Omit = omit,
         status: Literal["pendingupload", "downloading", "queued", "inprogress", "ready", "error", "live-inprogress"]
@@ -311,7 +317,14 @@ class StreamResource(SyncAPIResource):
         Args:
           account_id: The account identifier tag.
 
+          id: Filter by video ID(s). Can be a single ID or a comma-separated list of IDs.
+
+          after: Alias for 'start'. Returns videos created after this date/time (RFC 3339
+              format).
+
           asc: Lists videos in ascending order of creation.
+
+          before: Alias for 'end'. Returns videos created before this date/time (RFC 3339 format).
 
           creator: A user-defined identifier for the media creator.
 
@@ -319,6 +332,12 @@ class StreamResource(SyncAPIResource):
 
           include_counts: Includes the total number of videos associated with the submitted query
               parameters.
+
+          limit: Maximum number of videos to return (default 1000, max 1000).
+
+          live_input_id: Filter by live input ID to find videos associated with a specific live stream.
+
+          name: Filter by video name/UID(s). Can be a single name or a comma-separated list.
 
           search: Provides a partial word match of the `name` key in the `meta` field. Slow for
               medium to large video libraries. May be unavailable for very large libraries.
@@ -339,10 +358,12 @@ class StreamResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/stream",
+            path_template("/accounts/{account_id}/stream", account_id=account_id),
             page=SyncSinglePage[Video],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -351,10 +372,16 @@ class StreamResource(SyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "id": id,
+                        "after": after,
                         "asc": asc,
+                        "before": before,
                         "creator": creator,
                         "end": end,
                         "include_counts": include_counts,
+                        "limit": limit,
+                        "live_input_id": live_input_id,
+                        "name": name,
                         "search": search,
                         "start": start,
                         "status": status,
@@ -371,7 +398,7 @@ class StreamResource(SyncAPIResource):
         self,
         identifier: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -395,13 +422,15 @@ class StreamResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not identifier:
             raise ValueError(f"Expected a non-empty value for `identifier` but received {identifier!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return self._delete(
-            f"/accounts/{account_id}/stream/{identifier}",
+            path_template("/accounts/{account_id}/stream/{identifier}", account_id=account_id, identifier=identifier),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -412,14 +441,16 @@ class StreamResource(SyncAPIResource):
         self,
         identifier: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         allowed_origins: SequenceNotStr[AllowedOrigins] | Omit = omit,
         creator: str | Omit = omit,
         max_duration_seconds: int | Omit = omit,
         meta: object | Omit = omit,
+        public_details: stream_edit_params.PublicDetails | Omit = omit,
         require_signed_urls: bool | Omit = omit,
         scheduled_deletion: Union[str, datetime] | Omit = omit,
         thumbnail_timestamp_pct: float | Omit = omit,
+        uid: str | Omit = omit,
         upload_expiry: Union[str, datetime] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -450,6 +481,9 @@ class StreamResource(SyncAPIResource):
           meta: A user modifiable key-value store used to reference other systems of record for
               managing videos.
 
+          public_details: Public details for the video including title, share link, channel link, and
+              logo.
+
           require_signed_urls: Indicates whether the video can be a accessed using the UID. When set to `true`,
               a signed token must be generated with a signing key to view the video.
 
@@ -462,6 +496,9 @@ class StreamResource(SyncAPIResource):
               divide the desired timestamp by the total duration of the video. If this value
               is not set, the default thumbnail image is taken from 0s of the video.
 
+          uid: The unique identifier for the video. Can be used to verify the video being
+              updated.
+
           upload_expiry: The date and time when the video upload URL is no longer valid for direct user
               uploads.
 
@@ -473,21 +510,25 @@ class StreamResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not identifier:
             raise ValueError(f"Expected a non-empty value for `identifier` but received {identifier!r}")
         return self._post(
-            f"/accounts/{account_id}/stream/{identifier}",
+            path_template("/accounts/{account_id}/stream/{identifier}", account_id=account_id, identifier=identifier),
             body=maybe_transform(
                 {
                     "allowed_origins": allowed_origins,
                     "creator": creator,
                     "max_duration_seconds": max_duration_seconds,
                     "meta": meta,
+                    "public_details": public_details,
                     "require_signed_urls": require_signed_urls,
                     "scheduled_deletion": scheduled_deletion,
                     "thumbnail_timestamp_pct": thumbnail_timestamp_pct,
+                    "uid": uid,
                     "upload_expiry": upload_expiry,
                 },
                 stream_edit_params.StreamEditParams,
@@ -506,7 +547,7 @@ class StreamResource(SyncAPIResource):
         self,
         identifier: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -530,12 +571,14 @@ class StreamResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not identifier:
             raise ValueError(f"Expected a non-empty value for `identifier` but received {identifier!r}")
         return self._get(
-            f"/accounts/{account_id}/stream/{identifier}",
+            path_template("/accounts/{account_id}/stream/{identifier}", account_id=account_id, identifier=identifier),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -622,8 +665,7 @@ class AsyncStreamResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
-        body: object,
+        account_id: str | None = None,
         tus_resumable: Literal["1.0.0"],
         upload_length: int,
         direct_user: bool | Omit = omit,
@@ -670,6 +712,8 @@ class AsyncStreamResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
@@ -685,8 +729,7 @@ class AsyncStreamResource(AsyncAPIResource):
             **(extra_headers or {}),
         }
         return await self._post(
-            f"/accounts/{account_id}/stream",
-            body=await async_maybe_transform(body, stream_create_params.StreamCreateParams),
+            path_template("/accounts/{account_id}/stream", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -702,11 +745,17 @@ class AsyncStreamResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        id: str | Omit = omit,
+        after: Union[str, datetime] | Omit = omit,
         asc: bool | Omit = omit,
+        before: Union[str, datetime] | Omit = omit,
         creator: str | Omit = omit,
         end: Union[str, datetime] | Omit = omit,
         include_counts: bool | Omit = omit,
+        limit: int | Omit = omit,
+        live_input_id: str | Omit = omit,
+        name: str | Omit = omit,
         search: str | Omit = omit,
         start: Union[str, datetime] | Omit = omit,
         status: Literal["pendingupload", "downloading", "queued", "inprogress", "ready", "error", "live-inprogress"]
@@ -728,7 +777,14 @@ class AsyncStreamResource(AsyncAPIResource):
         Args:
           account_id: The account identifier tag.
 
+          id: Filter by video ID(s). Can be a single ID or a comma-separated list of IDs.
+
+          after: Alias for 'start'. Returns videos created after this date/time (RFC 3339
+              format).
+
           asc: Lists videos in ascending order of creation.
+
+          before: Alias for 'end'. Returns videos created before this date/time (RFC 3339 format).
 
           creator: A user-defined identifier for the media creator.
 
@@ -736,6 +792,12 @@ class AsyncStreamResource(AsyncAPIResource):
 
           include_counts: Includes the total number of videos associated with the submitted query
               parameters.
+
+          limit: Maximum number of videos to return (default 1000, max 1000).
+
+          live_input_id: Filter by live input ID to find videos associated with a specific live stream.
+
+          name: Filter by video name/UID(s). Can be a single name or a comma-separated list.
 
           search: Provides a partial word match of the `name` key in the `meta` field. Slow for
               medium to large video libraries. May be unavailable for very large libraries.
@@ -756,10 +818,12 @@ class AsyncStreamResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/stream",
+            path_template("/accounts/{account_id}/stream", account_id=account_id),
             page=AsyncSinglePage[Video],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -768,10 +832,16 @@ class AsyncStreamResource(AsyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "id": id,
+                        "after": after,
                         "asc": asc,
+                        "before": before,
                         "creator": creator,
                         "end": end,
                         "include_counts": include_counts,
+                        "limit": limit,
+                        "live_input_id": live_input_id,
+                        "name": name,
                         "search": search,
                         "start": start,
                         "status": status,
@@ -788,7 +858,7 @@ class AsyncStreamResource(AsyncAPIResource):
         self,
         identifier: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -812,13 +882,15 @@ class AsyncStreamResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not identifier:
             raise ValueError(f"Expected a non-empty value for `identifier` but received {identifier!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return await self._delete(
-            f"/accounts/{account_id}/stream/{identifier}",
+            path_template("/accounts/{account_id}/stream/{identifier}", account_id=account_id, identifier=identifier),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -829,14 +901,16 @@ class AsyncStreamResource(AsyncAPIResource):
         self,
         identifier: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         allowed_origins: SequenceNotStr[AllowedOrigins] | Omit = omit,
         creator: str | Omit = omit,
         max_duration_seconds: int | Omit = omit,
         meta: object | Omit = omit,
+        public_details: stream_edit_params.PublicDetails | Omit = omit,
         require_signed_urls: bool | Omit = omit,
         scheduled_deletion: Union[str, datetime] | Omit = omit,
         thumbnail_timestamp_pct: float | Omit = omit,
+        uid: str | Omit = omit,
         upload_expiry: Union[str, datetime] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -867,6 +941,9 @@ class AsyncStreamResource(AsyncAPIResource):
           meta: A user modifiable key-value store used to reference other systems of record for
               managing videos.
 
+          public_details: Public details for the video including title, share link, channel link, and
+              logo.
+
           require_signed_urls: Indicates whether the video can be a accessed using the UID. When set to `true`,
               a signed token must be generated with a signing key to view the video.
 
@@ -879,6 +956,9 @@ class AsyncStreamResource(AsyncAPIResource):
               divide the desired timestamp by the total duration of the video. If this value
               is not set, the default thumbnail image is taken from 0s of the video.
 
+          uid: The unique identifier for the video. Can be used to verify the video being
+              updated.
+
           upload_expiry: The date and time when the video upload URL is no longer valid for direct user
               uploads.
 
@@ -890,21 +970,25 @@ class AsyncStreamResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not identifier:
             raise ValueError(f"Expected a non-empty value for `identifier` but received {identifier!r}")
         return await self._post(
-            f"/accounts/{account_id}/stream/{identifier}",
+            path_template("/accounts/{account_id}/stream/{identifier}", account_id=account_id, identifier=identifier),
             body=await async_maybe_transform(
                 {
                     "allowed_origins": allowed_origins,
                     "creator": creator,
                     "max_duration_seconds": max_duration_seconds,
                     "meta": meta,
+                    "public_details": public_details,
                     "require_signed_urls": require_signed_urls,
                     "scheduled_deletion": scheduled_deletion,
                     "thumbnail_timestamp_pct": thumbnail_timestamp_pct,
+                    "uid": uid,
                     "upload_expiry": upload_expiry,
                 },
                 stream_edit_params.StreamEditParams,
@@ -923,7 +1007,7 @@ class AsyncStreamResource(AsyncAPIResource):
         self,
         identifier: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -947,12 +1031,14 @@ class AsyncStreamResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not identifier:
             raise ValueError(f"Expected a non-empty value for `identifier` but received {identifier!r}")
         return await self._get(
-            f"/accounts/{account_id}/stream/{identifier}",
+            path_template("/accounts/{account_id}/stream/{identifier}", account_id=account_id, identifier=identifier),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Type, Optional, cast
+from typing import Type, Union, Optional, cast
+from datetime import datetime
 
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -19,7 +20,7 @@ from ..._response import (
 from ..._wrappers import ResultWrapper
 from ..._base_client import make_request_options
 from ...types.stream import clip_create_params
-from ...types.stream.clip import Clip
+from ...types.stream.video import Video
 from ...types.stream.allowed_origins import AllowedOrigins
 
 __all__ = ["ClipResource", "AsyncClipResource"]
@@ -48,15 +49,19 @@ class ClipResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         clipped_from_video_uid: str,
         end_time_seconds: int,
         start_time_seconds: int,
         allowed_origins: SequenceNotStr[AllowedOrigins] | Omit = omit,
         creator: str | Omit = omit,
-        max_duration_seconds: int | Omit = omit,
+        input: str | Omit = omit,
+        meta: object | Omit = omit,
+        name: str | Omit = omit,
         require_signed_urls: bool | Omit = omit,
+        scheduled_deletion: Union[str, datetime] | Omit = omit,
         thumbnail_timestamp_pct: float | Omit = omit,
+        url: str | Omit = omit,
         watermark: clip_create_params.Watermark | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -64,7 +69,7 @@ class ClipResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[Clip]:
+    ) -> Optional[Video]:
         """
         Clips a video based on the specified start and end times provided in seconds.
 
@@ -83,18 +88,26 @@ class ClipResource(SyncAPIResource):
 
           creator: A user-defined identifier for the media creator.
 
-          max_duration_seconds: The maximum duration in seconds for a video upload. Can be set for a video that
-              is not yet uploaded to limit its duration. Uploads that exceed the specified
-              duration will fail during processing. A value of `-1` means the value is
-              unknown.
+          input: A video's URL. Preferred over 'url'.
+
+          meta: A user modifiable key-value store used to reference other systems of record for
+              managing videos.
+
+          name: A name for the video.
 
           require_signed_urls: Indicates whether the video can be a accessed using the UID. When set to `true`,
               a signed token must be generated with a signing key to view the video.
+
+          scheduled_deletion: Indicates the date and time at which the video will be deleted. Omit the field
+              to indicate no change, or include with a `null` value to remove an existing
+              scheduled deletion. If specified, must be at least 30 days from upload time.
 
           thumbnail_timestamp_pct: The timestamp for a thumbnail image calculated as a percentage value of the
               video's duration. To convert from a second-wise timestamp to a percentage,
               divide the desired timestamp by the total duration of the video. If this value
               is not set, the default thumbnail image is taken from 0s of the video.
+
+          url: A video's URL (legacy field, use 'input' instead).
 
           extra_headers: Send extra headers
 
@@ -104,10 +117,12 @@ class ClipResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/stream/clip",
+            path_template("/accounts/{account_id}/stream/clip", account_id=account_id),
             body=maybe_transform(
                 {
                     "clipped_from_video_uid": clipped_from_video_uid,
@@ -115,9 +130,13 @@ class ClipResource(SyncAPIResource):
                     "start_time_seconds": start_time_seconds,
                     "allowed_origins": allowed_origins,
                     "creator": creator,
-                    "max_duration_seconds": max_duration_seconds,
+                    "input": input,
+                    "meta": meta,
+                    "name": name,
                     "require_signed_urls": require_signed_urls,
+                    "scheduled_deletion": scheduled_deletion,
                     "thumbnail_timestamp_pct": thumbnail_timestamp_pct,
+                    "url": url,
                     "watermark": watermark,
                 },
                 clip_create_params.ClipCreateParams,
@@ -127,9 +146,9 @@ class ClipResource(SyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[Clip]]._unwrapper,
+                post_parser=ResultWrapper[Optional[Video]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[Clip]], ResultWrapper[Clip]),
+            cast_to=cast(Type[Optional[Video]], ResultWrapper[Video]),
         )
 
 
@@ -156,15 +175,19 @@ class AsyncClipResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         clipped_from_video_uid: str,
         end_time_seconds: int,
         start_time_seconds: int,
         allowed_origins: SequenceNotStr[AllowedOrigins] | Omit = omit,
         creator: str | Omit = omit,
-        max_duration_seconds: int | Omit = omit,
+        input: str | Omit = omit,
+        meta: object | Omit = omit,
+        name: str | Omit = omit,
         require_signed_urls: bool | Omit = omit,
+        scheduled_deletion: Union[str, datetime] | Omit = omit,
         thumbnail_timestamp_pct: float | Omit = omit,
+        url: str | Omit = omit,
         watermark: clip_create_params.Watermark | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -172,7 +195,7 @@ class AsyncClipResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[Clip]:
+    ) -> Optional[Video]:
         """
         Clips a video based on the specified start and end times provided in seconds.
 
@@ -191,18 +214,26 @@ class AsyncClipResource(AsyncAPIResource):
 
           creator: A user-defined identifier for the media creator.
 
-          max_duration_seconds: The maximum duration in seconds for a video upload. Can be set for a video that
-              is not yet uploaded to limit its duration. Uploads that exceed the specified
-              duration will fail during processing. A value of `-1` means the value is
-              unknown.
+          input: A video's URL. Preferred over 'url'.
+
+          meta: A user modifiable key-value store used to reference other systems of record for
+              managing videos.
+
+          name: A name for the video.
 
           require_signed_urls: Indicates whether the video can be a accessed using the UID. When set to `true`,
               a signed token must be generated with a signing key to view the video.
+
+          scheduled_deletion: Indicates the date and time at which the video will be deleted. Omit the field
+              to indicate no change, or include with a `null` value to remove an existing
+              scheduled deletion. If specified, must be at least 30 days from upload time.
 
           thumbnail_timestamp_pct: The timestamp for a thumbnail image calculated as a percentage value of the
               video's duration. To convert from a second-wise timestamp to a percentage,
               divide the desired timestamp by the total duration of the video. If this value
               is not set, the default thumbnail image is taken from 0s of the video.
+
+          url: A video's URL (legacy field, use 'input' instead).
 
           extra_headers: Send extra headers
 
@@ -212,10 +243,12 @@ class AsyncClipResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/stream/clip",
+            path_template("/accounts/{account_id}/stream/clip", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "clipped_from_video_uid": clipped_from_video_uid,
@@ -223,9 +256,13 @@ class AsyncClipResource(AsyncAPIResource):
                     "start_time_seconds": start_time_seconds,
                     "allowed_origins": allowed_origins,
                     "creator": creator,
-                    "max_duration_seconds": max_duration_seconds,
+                    "input": input,
+                    "meta": meta,
+                    "name": name,
                     "require_signed_urls": require_signed_urls,
+                    "scheduled_deletion": scheduled_deletion,
                     "thumbnail_timestamp_pct": thumbnail_timestamp_pct,
+                    "url": url,
                     "watermark": watermark,
                 },
                 clip_create_params.ClipCreateParams,
@@ -235,9 +272,9 @@ class AsyncClipResource(AsyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[Clip]]._unwrapper,
+                post_parser=ResultWrapper[Optional[Video]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[Clip]], ResultWrapper[Clip]),
+            cast_to=cast(Type[Optional[Video]], ResultWrapper[Video]),
         )
 
 

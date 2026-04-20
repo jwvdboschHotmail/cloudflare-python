@@ -31,32 +31,7 @@ class TestPolicyTests:
     def test_method_create_with_all_params(self, client: Cloudflare) -> None:
         policy_test = client.zero_trust.access.applications.policy_tests.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
-            policies=[
-                {
-                    "decision": "allow",
-                    "include": [{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
-                    "name": "Allow devs",
-                    "approval_groups": [
-                        {
-                            "approvals_needed": 1,
-                            "email_addresses": ["test1@cloudflare.com", "test2@cloudflare.com"],
-                            "email_list_uuid": "email_list_uuid",
-                        },
-                        {
-                            "approvals_needed": 3,
-                            "email_addresses": ["test@cloudflare.com", "test2@cloudflare.com"],
-                            "email_list_uuid": "597147a1-976b-4ef2-9af0-81d5d007fc34",
-                        },
-                    ],
-                    "approval_required": True,
-                    "exclude": [{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
-                    "isolation_required": False,
-                    "purpose_justification_prompt": "Please enter a justification for entering this protected domain.",
-                    "purpose_justification_required": True,
-                    "require": [{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
-                    "session_duration": "24h",
-                }
-            ],
+            policies=["f1a8b3c9d4e5f6789a0b1c2d3e4f5678a9b0c1d2e3f4a5b67890c1d2e3f4b5a6"],
         )
         assert_matches_type(Optional[PolicyTestCreateResponse], policy_test, path=["response"])
 
@@ -156,32 +131,7 @@ class TestAsyncPolicyTests:
     async def test_method_create_with_all_params(self, async_client: AsyncCloudflare) -> None:
         policy_test = await async_client.zero_trust.access.applications.policy_tests.create(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
-            policies=[
-                {
-                    "decision": "allow",
-                    "include": [{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
-                    "name": "Allow devs",
-                    "approval_groups": [
-                        {
-                            "approvals_needed": 1,
-                            "email_addresses": ["test1@cloudflare.com", "test2@cloudflare.com"],
-                            "email_list_uuid": "email_list_uuid",
-                        },
-                        {
-                            "approvals_needed": 3,
-                            "email_addresses": ["test@cloudflare.com", "test2@cloudflare.com"],
-                            "email_list_uuid": "597147a1-976b-4ef2-9af0-81d5d007fc34",
-                        },
-                    ],
-                    "approval_required": True,
-                    "exclude": [{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
-                    "isolation_required": False,
-                    "purpose_justification_prompt": "Please enter a justification for entering this protected domain.",
-                    "purpose_justification_required": True,
-                    "require": [{"group": {"id": "aa0a4aab-672b-4bdb-bc33-a59f1130a11f"}}],
-                    "session_duration": "24h",
-                }
-            ],
+            policies=["f1a8b3c9d4e5f6789a0b1c2d3e4f5678a9b0c1d2e3f4a5b67890c1d2e3f4b5a6"],
         )
         assert_matches_type(Optional[PolicyTestCreateResponse], policy_test, path=["response"])
 

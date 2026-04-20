@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -48,8 +48,9 @@ class ReclassifyResource(SyncAPIResource):
         self,
         postfix_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         expected_disposition: Literal["NONE", "BULK", "MALICIOUS", "SPAM", "SPOOF", "SUSPICIOUS"],
+        submission: bool | Omit = omit,
         eml_content: str | Omit = omit,
         escalated_submission_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -60,12 +61,16 @@ class ReclassifyResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> object:
         """
-        Change email classfication
+        Submits an email message for reclassification, updating its threat assessment
+        based on new analysis.
 
         Args:
           account_id: Account Identifier
 
           postfix_id: The identifier of the message.
+
+          submission: When true, search the submissions datastore only. When false or omitted, search
+              the regular datastore only.
 
           eml_content: Base64 encoded content of the EML file
 
@@ -77,12 +82,18 @@ class ReclassifyResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not postfix_id:
             raise ValueError(f"Expected a non-empty value for `postfix_id` but received {postfix_id!r}")
         return self._post(
-            f"/accounts/{account_id}/email-security/investigate/{postfix_id}/reclassify",
+            path_template(
+                "/accounts/{account_id}/email-security/investigate/{postfix_id}/reclassify",
+                account_id=account_id,
+                postfix_id=postfix_id,
+            ),
             body=maybe_transform(
                 {
                     "expected_disposition": expected_disposition,
@@ -96,6 +107,7 @@ class ReclassifyResource(SyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
+                query=maybe_transform({"submission": submission}, reclassify_create_params.ReclassifyCreateParams),
                 post_parser=ResultWrapper[object]._unwrapper,
             ),
             cast_to=cast(Type[object], ResultWrapper[object]),
@@ -126,8 +138,9 @@ class AsyncReclassifyResource(AsyncAPIResource):
         self,
         postfix_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         expected_disposition: Literal["NONE", "BULK", "MALICIOUS", "SPAM", "SPOOF", "SUSPICIOUS"],
+        submission: bool | Omit = omit,
         eml_content: str | Omit = omit,
         escalated_submission_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -138,12 +151,16 @@ class AsyncReclassifyResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> object:
         """
-        Change email classfication
+        Submits an email message for reclassification, updating its threat assessment
+        based on new analysis.
 
         Args:
           account_id: Account Identifier
 
           postfix_id: The identifier of the message.
+
+          submission: When true, search the submissions datastore only. When false or omitted, search
+              the regular datastore only.
 
           eml_content: Base64 encoded content of the EML file
 
@@ -155,12 +172,18 @@ class AsyncReclassifyResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not postfix_id:
             raise ValueError(f"Expected a non-empty value for `postfix_id` but received {postfix_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/email-security/investigate/{postfix_id}/reclassify",
+            path_template(
+                "/accounts/{account_id}/email-security/investigate/{postfix_id}/reclassify",
+                account_id=account_id,
+                postfix_id=postfix_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "expected_disposition": expected_disposition,
@@ -174,6 +197,9 @@ class AsyncReclassifyResource(AsyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
+                query=await async_maybe_transform(
+                    {"submission": submission}, reclassify_create_params.ReclassifyCreateParams
+                ),
                 post_parser=ResultWrapper[object]._unwrapper,
             ),
             cast_to=cast(Type[object], ResultWrapper[object]),

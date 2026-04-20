@@ -8,17 +8,27 @@ __all__ = ["DomainUpdateParams"]
 
 
 class DomainUpdateParams(TypedDict, total=False):
-    account_id: Required[str]
-    """Identifer of the account."""
+    account_id: str
+    """Identifier."""
 
     hostname: Required[str]
-    """Hostname of the Worker Domain."""
+    """Hostname of the domain.
+
+    Can be either the zone apex or a subdomain of the zone. Requests to this
+    hostname will be routed to the configured Worker.
+    """
 
     service: Required[str]
-    """Worker service associated with the zone and hostname."""
+    """Name of the Worker associated with the domain.
 
-    zone_id: Required[str]
-    """Identifier of the zone."""
+    Requests to the configured hostname will be routed to this Worker.
+    """
 
     environment: str
-    """Worker environment associated with the zone and hostname."""
+    """Worker environment associated with the domain."""
+
+    zone_id: str
+    """ID of the zone containing the domain hostname."""
+
+    zone_name: str
+    """Name of the zone containing the domain hostname."""

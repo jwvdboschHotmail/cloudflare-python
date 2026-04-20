@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -54,13 +54,12 @@ class ResourcesResource(SyncAPIResource):
         self,
         share_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         meta: object,
         resource_account_id: str,
         resource_id: str,
         resource_type: Literal[
             "custom-ruleset",
-            "widget",
             "gateway-policy",
             "gateway-destination-ip",
             "gateway-block-page-settings",
@@ -74,7 +73,7 @@ class ResourcesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[ResourceCreateResponse]:
         """
-        Create a new share resource
+        Adds a resource to an existing share, making it available to share recipients.
 
         Args:
           account_id: Account identifier.
@@ -97,12 +96,16 @@ class ResourcesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
             raise ValueError(f"Expected a non-empty value for `share_id` but received {share_id!r}")
         return self._post(
-            f"/accounts/{account_id}/shares/{share_id}/resources",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources", account_id=account_id, share_id=share_id
+            ),
             body=maybe_transform(
                 {
                     "meta": meta,
@@ -126,7 +129,7 @@ class ResourcesResource(SyncAPIResource):
         self,
         resource_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         share_id: str,
         meta: object,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -157,6 +160,8 @@ class ResourcesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
@@ -164,7 +169,12 @@ class ResourcesResource(SyncAPIResource):
         if not resource_id:
             raise ValueError(f"Expected a non-empty value for `resource_id` but received {resource_id!r}")
         return self._put(
-            f"/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+                account_id=account_id,
+                share_id=share_id,
+                resource_id=resource_id,
+            ),
             body=maybe_transform({"meta": meta}, resource_update_params.ResourceUpdateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -180,12 +190,11 @@ class ResourcesResource(SyncAPIResource):
         self,
         share_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         resource_type: Literal[
             "custom-ruleset",
-            "widget",
             "gateway-policy",
             "gateway-destination-ip",
             "gateway-block-page-settings",
@@ -224,12 +233,16 @@ class ResourcesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
             raise ValueError(f"Expected a non-empty value for `share_id` but received {share_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/shares/{share_id}/resources",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources", account_id=account_id, share_id=share_id
+            ),
             page=SyncV4PagePaginationArray[ResourceListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -253,7 +266,7 @@ class ResourcesResource(SyncAPIResource):
         self,
         resource_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         share_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -281,6 +294,8 @@ class ResourcesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
@@ -288,7 +303,12 @@ class ResourcesResource(SyncAPIResource):
         if not resource_id:
             raise ValueError(f"Expected a non-empty value for `resource_id` but received {resource_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+                account_id=account_id,
+                share_id=share_id,
+                resource_id=resource_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -303,7 +323,7 @@ class ResourcesResource(SyncAPIResource):
         self,
         resource_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         share_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -330,6 +350,8 @@ class ResourcesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
@@ -337,7 +359,12 @@ class ResourcesResource(SyncAPIResource):
         if not resource_id:
             raise ValueError(f"Expected a non-empty value for `resource_id` but received {resource_id!r}")
         return self._get(
-            f"/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+                account_id=account_id,
+                share_id=share_id,
+                resource_id=resource_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -373,13 +400,12 @@ class AsyncResourcesResource(AsyncAPIResource):
         self,
         share_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         meta: object,
         resource_account_id: str,
         resource_id: str,
         resource_type: Literal[
             "custom-ruleset",
-            "widget",
             "gateway-policy",
             "gateway-destination-ip",
             "gateway-block-page-settings",
@@ -393,7 +419,7 @@ class AsyncResourcesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[ResourceCreateResponse]:
         """
-        Create a new share resource
+        Adds a resource to an existing share, making it available to share recipients.
 
         Args:
           account_id: Account identifier.
@@ -416,12 +442,16 @@ class AsyncResourcesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
             raise ValueError(f"Expected a non-empty value for `share_id` but received {share_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/shares/{share_id}/resources",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources", account_id=account_id, share_id=share_id
+            ),
             body=await async_maybe_transform(
                 {
                     "meta": meta,
@@ -445,7 +475,7 @@ class AsyncResourcesResource(AsyncAPIResource):
         self,
         resource_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         share_id: str,
         meta: object,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -476,6 +506,8 @@ class AsyncResourcesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
@@ -483,7 +515,12 @@ class AsyncResourcesResource(AsyncAPIResource):
         if not resource_id:
             raise ValueError(f"Expected a non-empty value for `resource_id` but received {resource_id!r}")
         return await self._put(
-            f"/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+                account_id=account_id,
+                share_id=share_id,
+                resource_id=resource_id,
+            ),
             body=await async_maybe_transform({"meta": meta}, resource_update_params.ResourceUpdateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -499,12 +536,11 @@ class AsyncResourcesResource(AsyncAPIResource):
         self,
         share_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         resource_type: Literal[
             "custom-ruleset",
-            "widget",
             "gateway-policy",
             "gateway-destination-ip",
             "gateway-block-page-settings",
@@ -543,12 +579,16 @@ class AsyncResourcesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
             raise ValueError(f"Expected a non-empty value for `share_id` but received {share_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/shares/{share_id}/resources",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources", account_id=account_id, share_id=share_id
+            ),
             page=AsyncV4PagePaginationArray[ResourceListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -572,7 +612,7 @@ class AsyncResourcesResource(AsyncAPIResource):
         self,
         resource_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         share_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -600,6 +640,8 @@ class AsyncResourcesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
@@ -607,7 +649,12 @@ class AsyncResourcesResource(AsyncAPIResource):
         if not resource_id:
             raise ValueError(f"Expected a non-empty value for `resource_id` but received {resource_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+                account_id=account_id,
+                share_id=share_id,
+                resource_id=resource_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -622,7 +669,7 @@ class AsyncResourcesResource(AsyncAPIResource):
         self,
         resource_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         share_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -649,6 +696,8 @@ class AsyncResourcesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not share_id:
@@ -656,7 +705,12 @@ class AsyncResourcesResource(AsyncAPIResource):
         if not resource_id:
             raise ValueError(f"Expected a non-empty value for `resource_id` but received {resource_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+            path_template(
+                "/accounts/{account_id}/shares/{share_id}/resources/{resource_id}",
+                account_id=account_id,
+                share_id=share_id,
+                resource_id=resource_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

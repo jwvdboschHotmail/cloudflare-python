@@ -54,6 +54,8 @@ class Otel(BaseModel):
 
     url: str
 
+    content_type: Optional[Literal["json", "protobuf"]] = None
+
 
 class StripeUsageEvent(BaseModel):
     payload: str
@@ -69,10 +71,6 @@ class AIGatewayCreateResponse(BaseModel):
     id: str
     """gateway id"""
 
-    account_id: str
-
-    account_tag: str
-
     cache_invalidate_on_update: bool
 
     cache_ttl: Optional[int] = None
@@ -81,15 +79,11 @@ class AIGatewayCreateResponse(BaseModel):
 
     created_at: datetime
 
-    internal_id: str
-
     modified_at: datetime
 
     rate_limiting_interval: Optional[int] = None
 
     rate_limiting_limit: Optional[int] = None
-
-    rate_limiting_technique: Literal["fixed", "sliding"]
 
     authentication: Optional[bool] = None
 
@@ -107,8 +101,25 @@ class AIGatewayCreateResponse(BaseModel):
 
     otel: Optional[List[Otel]] = None
 
+    rate_limiting_technique: Optional[Literal["fixed", "sliding"]] = None
+
+    retry_backoff: Optional[Literal["constant", "linear", "exponential"]] = None
+    """Backoff strategy for retry delays"""
+
+    retry_delay: Optional[int] = None
+    """Delay between retry attempts in milliseconds (0-5000)"""
+
+    retry_max_attempts: Optional[int] = None
+    """Maximum number of retry attempts for failed requests (1-5)"""
+
     store_id: Optional[str] = None
 
     stripe: Optional[Stripe] = None
+
+    workers_ai_billing_mode: Optional[Literal["postpaid"]] = None
+    """Controls how Workers AI inference calls routed through this gateway are billed.
+
+    Only 'postpaid' is currently supported.
+    """
 
     zdr: Optional[bool] = None

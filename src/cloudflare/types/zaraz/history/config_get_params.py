@@ -9,8 +9,8 @@ __all__ = ["ConfigGetParams"]
 
 
 class ConfigGetParams(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
 
     ids: Required[Iterable[int]]
-    """Comma separated list of Zaraz configuration IDs"""
+    """Comma separated list of Zaraz configuration IDs."""

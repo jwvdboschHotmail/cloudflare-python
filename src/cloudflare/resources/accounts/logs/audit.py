@@ -9,7 +9,7 @@ from typing_extensions import Literal
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import maybe_transform
+from ...._utils import path_template, maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -49,7 +49,7 @@ class AuditResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         before: Union[str, date],
         since: Union[str, date],
         id: audit_list_params.ID | Omit = omit,
@@ -84,13 +84,8 @@ class AuditResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncCursorPaginationAfter[AuditListResponse]:
-        """Gets a list of audit logs for an account.
-
-        <br /> <br /> This is the beta release
-        of Audit Logs Version 2. Since this is a beta version, there may be gaps or
-        missing entries in the available audit logs. Be aware of the following
-        limitations. <br /> <ul> <li>Audit logs are available only for the past 30 days.
-        <br /></li> <li>Error handling is not yet implemented. <br /> </li> </ul>
+        """
+        Gets a list of audit logs for an account.
 
         Args:
           account_id: The unique id that identifies the account.
@@ -121,10 +116,12 @@ class AuditResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/logs/audit",
+            path_template("/accounts/{account_id}/logs/audit", account_id=account_id),
             page=SyncCursorPaginationAfter[AuditListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -191,7 +188,7 @@ class AsyncAuditResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         before: Union[str, date],
         since: Union[str, date],
         id: audit_list_params.ID | Omit = omit,
@@ -226,13 +223,8 @@ class AsyncAuditResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[AuditListResponse, AsyncCursorPaginationAfter[AuditListResponse]]:
-        """Gets a list of audit logs for an account.
-
-        <br /> <br /> This is the beta release
-        of Audit Logs Version 2. Since this is a beta version, there may be gaps or
-        missing entries in the available audit logs. Be aware of the following
-        limitations. <br /> <ul> <li>Audit logs are available only for the past 30 days.
-        <br /></li> <li>Error handling is not yet implemented. <br /> </li> </ul>
+        """
+        Gets a list of audit logs for an account.
 
         Args:
           account_id: The unique id that identifies the account.
@@ -263,10 +255,12 @@ class AsyncAuditResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/logs/audit",
+            path_template("/accounts/{account_id}/logs/audit", account_id=account_id),
             page=AsyncCursorPaginationAfter[AuditListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,

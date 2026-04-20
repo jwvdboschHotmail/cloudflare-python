@@ -7,7 +7,7 @@ from typing import Type, Iterable, Optional, cast
 import httpx
 
 from ....._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ....._utils import maybe_transform, async_maybe_transform
+from ....._utils import path_template, maybe_transform, async_maybe_transform
 from ....._compat import cached_property
 from ....._resource import SyncAPIResource, AsyncAPIResource
 from ....._response import (
@@ -19,8 +19,7 @@ from ....._response import (
 from ....._wrappers import ResultWrapper
 from ....._base_client import make_request_options
 from .....types.zero_trust.dlp.profiles import predefined_update_params
-from .....types.zero_trust.dlp.profiles.predefined_get_response import PredefinedGetResponse
-from .....types.zero_trust.dlp.profiles.predefined_update_response import PredefinedUpdateResponse
+from .....types.zero_trust.dlp.profiles.predefined_profile import PredefinedProfile
 
 __all__ = ["PredefinedResource", "AsyncPredefinedResource"]
 
@@ -49,7 +48,7 @@ class PredefinedResource(SyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         ai_context_enabled: bool | Omit = omit,
         allowed_match_count: Optional[int] | Omit = omit,
         confidence_threshold: Optional[str] | Omit = omit,
@@ -62,7 +61,7 @@ class PredefinedResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[PredefinedUpdateResponse]:
+    ) -> Optional[PredefinedProfile]:
         """This is similar to `update_predefined` but only returns entries that are
         enabled.
 
@@ -78,12 +77,18 @@ class PredefinedResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return self._put(
-            f"/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+                account_id=account_id,
+                profile_id=profile_id,
+            ),
             body=maybe_transform(
                 {
                     "ai_context_enabled": ai_context_enabled,
@@ -100,16 +105,16 @@ class PredefinedResource(SyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[PredefinedUpdateResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[PredefinedProfile]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[PredefinedUpdateResponse]], ResultWrapper[PredefinedUpdateResponse]),
+            cast_to=cast(Type[Optional[PredefinedProfile]], ResultWrapper[PredefinedProfile]),
         )
 
     def delete(
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -130,12 +135,18 @@ class PredefinedResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/dlp/profiles/predefined/{profile_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/predefined/{profile_id}",
+                account_id=account_id,
+                profile_id=profile_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -150,14 +161,14 @@ class PredefinedResource(SyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[PredefinedGetResponse]:
+    ) -> Optional[PredefinedProfile]:
         """
         This is similar to `get_predefined` but only returns entries that are enabled.
         This is needed for our terraform API Fetches a predefined DLP profile by id.
@@ -171,20 +182,26 @@ class PredefinedResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return self._get(
-            f"/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+                account_id=account_id,
+                profile_id=profile_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[PredefinedGetResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[PredefinedProfile]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[PredefinedGetResponse]], ResultWrapper[PredefinedGetResponse]),
+            cast_to=cast(Type[Optional[PredefinedProfile]], ResultWrapper[PredefinedProfile]),
         )
 
 
@@ -212,7 +229,7 @@ class AsyncPredefinedResource(AsyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         ai_context_enabled: bool | Omit = omit,
         allowed_match_count: Optional[int] | Omit = omit,
         confidence_threshold: Optional[str] | Omit = omit,
@@ -225,7 +242,7 @@ class AsyncPredefinedResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[PredefinedUpdateResponse]:
+    ) -> Optional[PredefinedProfile]:
         """This is similar to `update_predefined` but only returns entries that are
         enabled.
 
@@ -241,12 +258,18 @@ class AsyncPredefinedResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return await self._put(
-            f"/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+                account_id=account_id,
+                profile_id=profile_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "ai_context_enabled": ai_context_enabled,
@@ -263,16 +286,16 @@ class AsyncPredefinedResource(AsyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[PredefinedUpdateResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[PredefinedProfile]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[PredefinedUpdateResponse]], ResultWrapper[PredefinedUpdateResponse]),
+            cast_to=cast(Type[Optional[PredefinedProfile]], ResultWrapper[PredefinedProfile]),
         )
 
     async def delete(
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -293,12 +316,18 @@ class AsyncPredefinedResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/dlp/profiles/predefined/{profile_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/predefined/{profile_id}",
+                account_id=account_id,
+                profile_id=profile_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -313,14 +342,14 @@ class AsyncPredefinedResource(AsyncAPIResource):
         self,
         profile_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[PredefinedGetResponse]:
+    ) -> Optional[PredefinedProfile]:
         """
         This is similar to `get_predefined` but only returns entries that are enabled.
         This is needed for our terraform API Fetches a predefined DLP profile by id.
@@ -334,20 +363,26 @@ class AsyncPredefinedResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not profile_id:
             raise ValueError(f"Expected a non-empty value for `profile_id` but received {profile_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+            path_template(
+                "/accounts/{account_id}/dlp/profiles/predefined/{profile_id}/config",
+                account_id=account_id,
+                profile_id=profile_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[PredefinedGetResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[PredefinedProfile]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[PredefinedGetResponse]], ResultWrapper[PredefinedGetResponse]),
+            cast_to=cast(Type[Optional[PredefinedProfile]], ResultWrapper[PredefinedProfile]),
         )
 
 

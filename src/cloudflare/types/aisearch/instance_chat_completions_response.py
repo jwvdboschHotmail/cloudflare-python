@@ -44,9 +44,13 @@ class ChunkItem(BaseModel):
 
 
 class ChunkScoringDetails(BaseModel):
+    fusion_method: Optional[Literal["rrf", "max"]] = None
+
     keyword_rank: Optional[float] = None
 
     keyword_score: Optional[float] = None
+
+    reranking_score: Optional[float] = None
 
     vector_rank: Optional[float] = None
 

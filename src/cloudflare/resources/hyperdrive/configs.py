@@ -7,7 +7,7 @@ from typing import Type, Optional, cast
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -48,7 +48,7 @@ class ConfigsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         origin: config_create_params.Origin,
         caching: config_create_params.Caching | Omit = omit,
@@ -70,8 +70,15 @@ class ConfigsResource(SyncAPIResource):
           name: The name of the Hyperdrive configuration. Used to identify the configuration in
               the Cloudflare dashboard and API.
 
+          mtls: mTLS configuration for the origin connection. Cannot be used with VPC Service
+              origins; TLS must be managed on the VPC Service.
+
           origin_connection_limit: The (soft) maximum number of connections the Hyperdrive is allowed to make to
               the origin database.
+
+              Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+              specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+              if you need a higher limit.
 
           extra_headers: Send extra headers
 
@@ -81,10 +88,12 @@ class ConfigsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/hyperdrive/configs",
+            path_template("/accounts/{account_id}/hyperdrive/configs", account_id=account_id),
             body=maybe_transform(
                 {
                     "name": name,
@@ -109,7 +118,7 @@ class ConfigsResource(SyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         origin: config_update_params.Origin,
         caching: config_update_params.Caching | Omit = omit,
@@ -133,8 +142,15 @@ class ConfigsResource(SyncAPIResource):
           name: The name of the Hyperdrive configuration. Used to identify the configuration in
               the Cloudflare dashboard and API.
 
+          mtls: mTLS configuration for the origin connection. Cannot be used with VPC Service
+              origins; TLS must be managed on the VPC Service.
+
           origin_connection_limit: The (soft) maximum number of connections the Hyperdrive is allowed to make to
               the origin database.
+
+              Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+              specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+              if you need a higher limit.
 
           extra_headers: Send extra headers
 
@@ -144,12 +160,18 @@ class ConfigsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return self._put(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             body=maybe_transform(
                 {
                     "name": name,
@@ -173,7 +195,7 @@ class ConfigsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -195,10 +217,12 @@ class ConfigsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/hyperdrive/configs",
+            path_template("/accounts/{account_id}/hyperdrive/configs", account_id=account_id),
             page=SyncSinglePage[Hyperdrive],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -210,7 +234,7 @@ class ConfigsResource(SyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -234,12 +258,18 @@ class ConfigsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -254,7 +284,7 @@ class ConfigsResource(SyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         caching: config_edit_params.Caching | Omit = omit,
         mtls: config_edit_params.MTLS | Omit = omit,
         name: str | Omit = omit,
@@ -277,11 +307,22 @@ class ConfigsResource(SyncAPIResource):
 
           hyperdrive_id: Define configurations using a unique string identifier.
 
+          mtls: mTLS configuration for the origin connection. Cannot be used with VPC Service
+              origins; TLS must be managed on the VPC Service.
+
           name: The name of the Hyperdrive configuration. Used to identify the configuration in
               the Cloudflare dashboard and API.
 
+          origin: Connect to a database through a Workers VPC Service. TLS settings (mTLS,
+              sslmode) cannot be configured on the Hyperdrive when using a VPC Service origin;
+              TLS must be managed on the VPC Service itself.
+
           origin_connection_limit: The (soft) maximum number of connections the Hyperdrive is allowed to make to
               the origin database.
+
+              Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+              specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+              if you need a higher limit.
 
           extra_headers: Send extra headers
 
@@ -291,12 +332,18 @@ class ConfigsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return self._patch(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             body=maybe_transform(
                 {
                     "caching": caching,
@@ -321,7 +368,7 @@ class ConfigsResource(SyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -345,12 +392,18 @@ class ConfigsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return self._get(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -385,7 +438,7 @@ class AsyncConfigsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         origin: config_create_params.Origin,
         caching: config_create_params.Caching | Omit = omit,
@@ -407,8 +460,15 @@ class AsyncConfigsResource(AsyncAPIResource):
           name: The name of the Hyperdrive configuration. Used to identify the configuration in
               the Cloudflare dashboard and API.
 
+          mtls: mTLS configuration for the origin connection. Cannot be used with VPC Service
+              origins; TLS must be managed on the VPC Service.
+
           origin_connection_limit: The (soft) maximum number of connections the Hyperdrive is allowed to make to
               the origin database.
+
+              Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+              specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+              if you need a higher limit.
 
           extra_headers: Send extra headers
 
@@ -418,10 +478,12 @@ class AsyncConfigsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/hyperdrive/configs",
+            path_template("/accounts/{account_id}/hyperdrive/configs", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "name": name,
@@ -446,7 +508,7 @@ class AsyncConfigsResource(AsyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         origin: config_update_params.Origin,
         caching: config_update_params.Caching | Omit = omit,
@@ -470,8 +532,15 @@ class AsyncConfigsResource(AsyncAPIResource):
           name: The name of the Hyperdrive configuration. Used to identify the configuration in
               the Cloudflare dashboard and API.
 
+          mtls: mTLS configuration for the origin connection. Cannot be used with VPC Service
+              origins; TLS must be managed on the VPC Service.
+
           origin_connection_limit: The (soft) maximum number of connections the Hyperdrive is allowed to make to
               the origin database.
+
+              Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+              specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+              if you need a higher limit.
 
           extra_headers: Send extra headers
 
@@ -481,12 +550,18 @@ class AsyncConfigsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return await self._put(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "name": name,
@@ -510,7 +585,7 @@ class AsyncConfigsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -532,10 +607,12 @@ class AsyncConfigsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/hyperdrive/configs",
+            path_template("/accounts/{account_id}/hyperdrive/configs", account_id=account_id),
             page=AsyncSinglePage[Hyperdrive],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -547,7 +624,7 @@ class AsyncConfigsResource(AsyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -571,12 +648,18 @@ class AsyncConfigsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -591,7 +674,7 @@ class AsyncConfigsResource(AsyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         caching: config_edit_params.Caching | Omit = omit,
         mtls: config_edit_params.MTLS | Omit = omit,
         name: str | Omit = omit,
@@ -614,11 +697,22 @@ class AsyncConfigsResource(AsyncAPIResource):
 
           hyperdrive_id: Define configurations using a unique string identifier.
 
+          mtls: mTLS configuration for the origin connection. Cannot be used with VPC Service
+              origins; TLS must be managed on the VPC Service.
+
           name: The name of the Hyperdrive configuration. Used to identify the configuration in
               the Cloudflare dashboard and API.
 
+          origin: Connect to a database through a Workers VPC Service. TLS settings (mTLS,
+              sslmode) cannot be configured on the Hyperdrive when using a VPC Service origin;
+              TLS must be managed on the VPC Service itself.
+
           origin_connection_limit: The (soft) maximum number of connections the Hyperdrive is allowed to make to
               the origin database.
+
+              Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+              specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+              if you need a higher limit.
 
           extra_headers: Send extra headers
 
@@ -628,12 +722,18 @@ class AsyncConfigsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return await self._patch(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "caching": caching,
@@ -658,7 +758,7 @@ class AsyncConfigsResource(AsyncAPIResource):
         self,
         hyperdrive_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -682,12 +782,18 @@ class AsyncConfigsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not hyperdrive_id:
             raise ValueError(f"Expected a non-empty value for `hyperdrive_id` but received {hyperdrive_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+            path_template(
+                "/accounts/{account_id}/hyperdrive/configs/{hyperdrive_id}",
+                account_id=account_id,
+                hyperdrive_id=hyperdrive_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

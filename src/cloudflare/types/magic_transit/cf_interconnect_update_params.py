@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing_extensions import Required, Annotated, TypedDict
+from typing_extensions import Annotated, TypedDict
 
 from ..._utils import PropertyInfo
 from .health_check_param import HealthCheckParam
@@ -11,7 +11,7 @@ __all__ = ["CfInterconnectUpdateParams", "GRE"]
 
 
 class CfInterconnectUpdateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Identifier"""
 
     automatic_return_routing: bool
@@ -48,6 +48,9 @@ class CfInterconnectUpdateParams(TypedDict, total=False):
 
     The minimum value is 576.
     """
+
+    name: str
+    """The name of the interconnect. The name cannot share a name with other tunnels."""
 
     x_magic_new_hc_target: Annotated[bool, PropertyInfo(alias="x-magic-new-hc-target")]
 

@@ -32,7 +32,7 @@ from .settings import (
     AsyncSettingsResourceWithStreamingResponse,
 )
 from ....._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ....._utils import maybe_transform, async_maybe_transform
+from ....._utils import path_template, maybe_transform, async_maybe_transform
 from ....._compat import cached_property
 from ....._resource import SyncAPIResource, AsyncAPIResource
 from ....._response import (
@@ -127,8 +127,8 @@ class ApplicationsResource(SyncAPIResource):
         *,
         domain: str,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -143,7 +143,9 @@ class ApplicationsResource(SyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.SelfHostedApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.SelfHostedApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.SelfHostedApplicationPolicy] | Omit = omit,
@@ -214,7 +216,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -224,7 +234,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -274,8 +285,8 @@ class ApplicationsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_visible: bool | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -318,7 +329,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           scim_config: Configuration for provisioning to this application via SCIM. This is currently
               in closed beta.
@@ -359,8 +371,8 @@ class ApplicationsResource(SyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -375,7 +387,9 @@ class ApplicationsResource(SyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.BrowserSSHApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.BrowserSSHApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.BrowserSSHApplicationPolicy] | Omit = omit,
@@ -446,7 +460,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -456,7 +478,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -523,8 +546,8 @@ class ApplicationsResource(SyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -539,7 +562,9 @@ class ApplicationsResource(SyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.BrowserVNCApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.BrowserVNCApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.BrowserVNCApplicationPolicy] | Omit = omit,
@@ -610,7 +635,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -620,7 +653,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -686,8 +720,8 @@ class ApplicationsResource(SyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_logo_url: str | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -744,7 +778,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -767,8 +802,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -809,7 +844,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -830,8 +866,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -872,7 +908,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -893,8 +930,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -942,7 +979,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -962,8 +1000,8 @@ class ApplicationsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         app_launcher_visible: bool | Omit = omit,
         domain: str | Omit = omit,
         logo_url: str | Omit = omit,
@@ -996,7 +1034,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           tags: The tags you want assigned to an application. Tags are used to filter
               applications in the App Launcher dashboard.
@@ -1019,8 +1058,8 @@ class ApplicationsResource(SyncAPIResource):
         *,
         target_criteria: Iterable[application_create_params.InfrastructureApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         name: str | Omit = omit,
         policies: Iterable[application_create_params.InfrastructureApplicationPolicy] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -1059,10 +1098,10 @@ class ApplicationsResource(SyncAPIResource):
         self,
         *,
         domain: str,
-        target_criteria: Iterable[application_create_params.BrowserRdpApplicationTargetCriterion],
+        target_criteria: Iterable[application_create_params.BrowserRDPApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -1073,17 +1112,19 @@ class ApplicationsResource(SyncAPIResource):
         custom_deny_url: str | Omit = omit,
         custom_non_identity_deny_url: str | Omit = omit,
         custom_pages: SequenceNotStr[str] | Omit = omit,
-        destinations: Iterable[application_create_params.BrowserRdpApplicationDestination] | Omit = omit,
+        destinations: Iterable[application_create_params.BrowserRDPApplicationDestination] | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.BrowserRDPApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.BrowserRDPApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
-        policies: SequenceNotStr[application_create_params.BrowserRdpApplicationPolicy] | Omit = omit,
+        policies: SequenceNotStr[application_create_params.BrowserRDPApplicationPolicy] | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
-        scim_config: application_create_params.BrowserRdpApplicationSCIMConfig | Omit = omit,
+        scim_config: application_create_params.BrowserRDPApplicationSCIMConfig | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
         session_duration: str | Omit = omit,
@@ -1148,7 +1189,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -1158,7 +1207,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -1204,6 +1254,234 @@ class ApplicationsResource(SyncAPIResource):
         """
         ...
 
+    @overload
+    def create(
+        self,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_create_params.McpServerApplicationDestination] | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_create_params.McpServerApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_create_params.McpServerApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_create_params.McpServerApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationCreateResponse]:
+        """
+        Adds a new application to Access.
+
+        Args:
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    def create(
+        self,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_create_params.McpServerPortalApplicationDestination] | Omit = omit,
+        domain: str | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_create_params.McpServerPortalApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_create_params.McpServerPortalApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_create_params.McpServerPortalApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationCreateResponse]:
+        """
+        Adds a new application to Access.
+
+        Args:
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          domain: The primary hostname and path secured by Access. This domain will be displayed
+              if the app is visible in the App Launcher.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
     def create(
         self,
         *,
@@ -1226,8 +1504,8 @@ class ApplicationsResource(SyncAPIResource):
             "proxy_endpoint",
         ]
         | Omit = omit,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -1241,12 +1519,26 @@ class ApplicationsResource(SyncAPIResource):
         destinations: Iterable[application_create_params.SelfHostedApplicationDestination]
         | Iterable[application_create_params.BrowserSSHApplicationDestination]
         | Iterable[application_create_params.BrowserVNCApplicationDestination]
-        | Iterable[application_create_params.BrowserRdpApplicationDestination]
+        | Iterable[application_create_params.BrowserRDPApplicationDestination]
+        | Iterable[application_create_params.McpServerApplicationDestination]
+        | Iterable[application_create_params.McpServerPortalApplicationDestination]
         | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.SelfHostedApplicationMfaConfig
+        | application_create_params.BrowserSSHApplicationMfaConfig
+        | application_create_params.BrowserVNCApplicationMfaConfig
+        | application_create_params.BrowserRDPApplicationMfaConfig
+        | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.SelfHostedApplicationOAuthConfiguration
+        | application_create_params.BrowserSSHApplicationOAuthConfiguration
+        | application_create_params.BrowserVNCApplicationOAuthConfiguration
+        | application_create_params.BrowserRDPApplicationOAuthConfiguration
+        | application_create_params.McpServerApplicationOAuthConfiguration
+        | application_create_params.McpServerPortalApplicationOAuthConfiguration
+        | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.SelfHostedApplicationPolicy]
@@ -1259,7 +1551,9 @@ class ApplicationsResource(SyncAPIResource):
         | SequenceNotStr[application_create_params.GatewayIdentityProxyEndpointApplicationPolicy]
         | SequenceNotStr[application_create_params.BookmarkApplicationPolicy]
         | Iterable[application_create_params.InfrastructureApplicationPolicy]
-        | SequenceNotStr[application_create_params.BrowserRdpApplicationPolicy]
+        | SequenceNotStr[application_create_params.BrowserRDPApplicationPolicy]
+        | SequenceNotStr[application_create_params.McpServerApplicationPolicy]
+        | SequenceNotStr[application_create_params.McpServerPortalApplicationPolicy]
         | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
@@ -1267,7 +1561,9 @@ class ApplicationsResource(SyncAPIResource):
         | application_create_params.SaaSApplicationSCIMConfig
         | application_create_params.BrowserSSHApplicationSCIMConfig
         | application_create_params.BrowserVNCApplicationSCIMConfig
-        | application_create_params.BrowserRdpApplicationSCIMConfig
+        | application_create_params.BrowserRDPApplicationSCIMConfig
+        | application_create_params.McpServerApplicationSCIMConfig
+        | application_create_params.McpServerPortalApplicationSCIMConfig
         | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
@@ -1283,7 +1579,7 @@ class ApplicationsResource(SyncAPIResource):
         landing_page_design: application_create_params.AppLauncherApplicationLandingPageDesign | Omit = omit,
         skip_app_launcher_login_page: bool | Omit = omit,
         target_criteria: Iterable[application_create_params.InfrastructureApplicationTargetCriterion]
-        | Iterable[application_create_params.BrowserRdpApplicationTargetCriterion]
+        | Iterable[application_create_params.BrowserRDPApplicationTargetCriterion]
         | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -1292,6 +1588,10 @@ class ApplicationsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[ApplicationCreateResponse]:
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -1307,7 +1607,11 @@ class ApplicationsResource(SyncAPIResource):
         return cast(
             Optional[ApplicationCreateResponse],
             self._post(
-                f"/{account_or_zone}/{account_or_zone_id}/access/apps",
+                path_template(
+                    "/{account_or_zone}/{account_or_zone_id}/access/apps",
+                    account_or_zone=account_or_zone,
+                    account_or_zone_id=account_or_zone_id,
+                ),
                 body=maybe_transform(
                     {
                         "domain": domain,
@@ -1326,7 +1630,9 @@ class ApplicationsResource(SyncAPIResource):
                         "enable_binding_cookie": enable_binding_cookie,
                         "http_only_cookie_attribute": http_only_cookie_attribute,
                         "logo_url": logo_url,
+                        "mfa_config": mfa_config,
                         "name": name,
+                        "oauth_configuration": oauth_configuration,
                         "options_preflight_bypass": options_preflight_bypass,
                         "path_cookie_attribute": path_cookie_attribute,
                         "policies": policies,
@@ -1370,8 +1676,8 @@ class ApplicationsResource(SyncAPIResource):
         *,
         domain: str,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -1386,7 +1692,9 @@ class ApplicationsResource(SyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.SelfHostedApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.SelfHostedApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.SelfHostedApplicationPolicy] | Omit = omit,
@@ -1459,7 +1767,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -1469,7 +1785,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -1520,8 +1837,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_visible: bool | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -1566,7 +1883,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           scim_config: Configuration for provisioning to this application via SCIM. This is currently
               in closed beta.
@@ -1608,8 +1926,8 @@ class ApplicationsResource(SyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -1624,7 +1942,9 @@ class ApplicationsResource(SyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.BrowserSSHApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.BrowserSSHApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.BrowserSSHApplicationPolicy] | Omit = omit,
@@ -1697,7 +2017,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -1707,7 +2035,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -1775,8 +2104,8 @@ class ApplicationsResource(SyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -1791,7 +2120,9 @@ class ApplicationsResource(SyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.BrowserVNCApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.BrowserVNCApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.BrowserVNCApplicationPolicy] | Omit = omit,
@@ -1864,7 +2195,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -1874,7 +2213,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -1941,8 +2281,8 @@ class ApplicationsResource(SyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_logo_url: str | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -2001,7 +2341,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -2025,8 +2366,8 @@ class ApplicationsResource(SyncAPIResource):
         app_id: AppID,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -2069,7 +2410,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -2091,8 +2433,8 @@ class ApplicationsResource(SyncAPIResource):
         app_id: AppID,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -2135,7 +2477,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -2157,8 +2500,8 @@ class ApplicationsResource(SyncAPIResource):
         app_id: AppID,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -2208,7 +2551,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -2229,8 +2573,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         app_launcher_visible: bool | Omit = omit,
         domain: str | Omit = omit,
         logo_url: str | Omit = omit,
@@ -2265,7 +2609,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           tags: The tags you want assigned to an application. Tags are used to filter
               applications in the App Launcher dashboard.
@@ -2289,8 +2634,8 @@ class ApplicationsResource(SyncAPIResource):
         *,
         target_criteria: Iterable[application_update_params.InfrastructureApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         name: str | Omit = omit,
         policies: Iterable[application_update_params.InfrastructureApplicationPolicy] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -2332,10 +2677,10 @@ class ApplicationsResource(SyncAPIResource):
         app_id: AppID,
         *,
         domain: str,
-        target_criteria: Iterable[application_update_params.BrowserRdpApplicationTargetCriterion],
+        target_criteria: Iterable[application_update_params.BrowserRDPApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -2346,17 +2691,19 @@ class ApplicationsResource(SyncAPIResource):
         custom_deny_url: str | Omit = omit,
         custom_non_identity_deny_url: str | Omit = omit,
         custom_pages: SequenceNotStr[str] | Omit = omit,
-        destinations: Iterable[application_update_params.BrowserRdpApplicationDestination] | Omit = omit,
+        destinations: Iterable[application_update_params.BrowserRDPApplicationDestination] | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.BrowserRDPApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.BrowserRDPApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
-        policies: SequenceNotStr[application_update_params.BrowserRdpApplicationPolicy] | Omit = omit,
+        policies: SequenceNotStr[application_update_params.BrowserRDPApplicationPolicy] | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
-        scim_config: application_update_params.BrowserRdpApplicationSCIMConfig | Omit = omit,
+        scim_config: application_update_params.BrowserRDPApplicationSCIMConfig | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
         session_duration: str | Omit = omit,
@@ -2423,7 +2770,15 @@ class ApplicationsResource(SyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -2433,7 +2788,8 @@ class ApplicationsResource(SyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -2479,6 +2835,240 @@ class ApplicationsResource(SyncAPIResource):
         """
         ...
 
+    @overload
+    def update(
+        self,
+        app_id: AppID,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_update_params.McpServerApplicationDestination] | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_update_params.McpServerApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_update_params.McpServerApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_update_params.McpServerApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationUpdateResponse]:
+        """
+        Updates an Access application.
+
+        Args:
+          app_id: Identifier.
+
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    def update(
+        self,
+        app_id: AppID,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_update_params.McpServerPortalApplicationDestination] | Omit = omit,
+        domain: str | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_update_params.McpServerPortalApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_update_params.McpServerPortalApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_update_params.McpServerPortalApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationUpdateResponse]:
+        """
+        Updates an Access application.
+
+        Args:
+          app_id: Identifier.
+
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          domain: The primary hostname and path secured by Access. This domain will be displayed
+              if the app is visible in the App Launcher.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
     def update(
         self,
         app_id: AppID,
@@ -2502,8 +3092,8 @@ class ApplicationsResource(SyncAPIResource):
             "proxy_endpoint",
         ]
         | Omit = omit,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -2517,12 +3107,26 @@ class ApplicationsResource(SyncAPIResource):
         destinations: Iterable[application_update_params.SelfHostedApplicationDestination]
         | Iterable[application_update_params.BrowserSSHApplicationDestination]
         | Iterable[application_update_params.BrowserVNCApplicationDestination]
-        | Iterable[application_update_params.BrowserRdpApplicationDestination]
+        | Iterable[application_update_params.BrowserRDPApplicationDestination]
+        | Iterable[application_update_params.McpServerApplicationDestination]
+        | Iterable[application_update_params.McpServerPortalApplicationDestination]
         | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.SelfHostedApplicationMfaConfig
+        | application_update_params.BrowserSSHApplicationMfaConfig
+        | application_update_params.BrowserVNCApplicationMfaConfig
+        | application_update_params.BrowserRDPApplicationMfaConfig
+        | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.SelfHostedApplicationOAuthConfiguration
+        | application_update_params.BrowserSSHApplicationOAuthConfiguration
+        | application_update_params.BrowserVNCApplicationOAuthConfiguration
+        | application_update_params.BrowserRDPApplicationOAuthConfiguration
+        | application_update_params.McpServerApplicationOAuthConfiguration
+        | application_update_params.McpServerPortalApplicationOAuthConfiguration
+        | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.SelfHostedApplicationPolicy]
@@ -2535,7 +3139,9 @@ class ApplicationsResource(SyncAPIResource):
         | SequenceNotStr[application_update_params.GatewayIdentityProxyEndpointApplicationPolicy]
         | SequenceNotStr[application_update_params.BookmarkApplicationPolicy]
         | Iterable[application_update_params.InfrastructureApplicationPolicy]
-        | SequenceNotStr[application_update_params.BrowserRdpApplicationPolicy]
+        | SequenceNotStr[application_update_params.BrowserRDPApplicationPolicy]
+        | SequenceNotStr[application_update_params.McpServerApplicationPolicy]
+        | SequenceNotStr[application_update_params.McpServerPortalApplicationPolicy]
         | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
@@ -2543,7 +3149,9 @@ class ApplicationsResource(SyncAPIResource):
         | application_update_params.SaaSApplicationSCIMConfig
         | application_update_params.BrowserSSHApplicationSCIMConfig
         | application_update_params.BrowserVNCApplicationSCIMConfig
-        | application_update_params.BrowserRdpApplicationSCIMConfig
+        | application_update_params.BrowserRDPApplicationSCIMConfig
+        | application_update_params.McpServerApplicationSCIMConfig
+        | application_update_params.McpServerPortalApplicationSCIMConfig
         | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
@@ -2559,7 +3167,7 @@ class ApplicationsResource(SyncAPIResource):
         landing_page_design: application_update_params.AppLauncherApplicationLandingPageDesign | Omit = omit,
         skip_app_launcher_login_page: bool | Omit = omit,
         target_criteria: Iterable[application_update_params.InfrastructureApplicationTargetCriterion]
-        | Iterable[application_update_params.BrowserRdpApplicationTargetCriterion]
+        | Iterable[application_update_params.BrowserRDPApplicationTargetCriterion]
         | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -2570,6 +3178,10 @@ class ApplicationsResource(SyncAPIResource):
     ) -> Optional[ApplicationUpdateResponse]:
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -2585,7 +3197,12 @@ class ApplicationsResource(SyncAPIResource):
         return cast(
             Optional[ApplicationUpdateResponse],
             self._put(
-                f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                path_template(
+                    "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                    app_id=app_id,
+                    account_or_zone=account_or_zone,
+                    account_or_zone_id=account_or_zone_id,
+                ),
                 body=maybe_transform(
                     {
                         "domain": domain,
@@ -2604,7 +3221,9 @@ class ApplicationsResource(SyncAPIResource):
                         "enable_binding_cookie": enable_binding_cookie,
                         "http_only_cookie_attribute": http_only_cookie_attribute,
                         "logo_url": logo_url,
+                        "mfa_config": mfa_config,
                         "name": name,
+                        "oauth_configuration": oauth_configuration,
                         "options_preflight_bypass": options_preflight_bypass,
                         "path_cookie_attribute": path_cookie_attribute,
                         "policies": policies,
@@ -2644,8 +3263,8 @@ class ApplicationsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         aud: str | Omit = omit,
         domain: str | Omit = omit,
         exact: bool | Omit = omit,
@@ -2693,6 +3312,10 @@ class ApplicationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -2706,7 +3329,11 @@ class ApplicationsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            f"/{account_or_zone}/{account_or_zone_id}/access/apps",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/apps",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             page=SyncV4PagePaginationArray[ApplicationListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -2734,8 +3361,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -2763,6 +3390,10 @@ class ApplicationsResource(SyncAPIResource):
         """
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -2776,7 +3407,12 @@ class ApplicationsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._delete(
-            f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                app_id=app_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -2791,8 +3427,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -2820,6 +3456,10 @@ class ApplicationsResource(SyncAPIResource):
         """
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -2835,7 +3475,12 @@ class ApplicationsResource(SyncAPIResource):
         return cast(
             Optional[ApplicationGetResponse],
             self._get(
-                f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                path_template(
+                    "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                    app_id=app_id,
+                    account_or_zone=account_or_zone,
+                    account_or_zone_id=account_or_zone_id,
+                ),
                 options=make_request_options(
                     extra_headers=extra_headers,
                     extra_query=extra_query,
@@ -2853,8 +3498,8 @@ class ApplicationsResource(SyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -2882,6 +3527,10 @@ class ApplicationsResource(SyncAPIResource):
         """
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -2895,7 +3544,12 @@ class ApplicationsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}/revoke_tokens",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}/revoke_tokens",
+                app_id=app_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -2953,8 +3607,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         *,
         domain: str,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -2969,7 +3623,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.SelfHostedApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.SelfHostedApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.SelfHostedApplicationPolicy] | Omit = omit,
@@ -3040,7 +3696,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -3050,7 +3714,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -3100,8 +3765,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_visible: bool | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -3144,7 +3809,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           scim_config: Configuration for provisioning to this application via SCIM. This is currently
               in closed beta.
@@ -3185,8 +3851,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -3201,7 +3867,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.BrowserSSHApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.BrowserSSHApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.BrowserSSHApplicationPolicy] | Omit = omit,
@@ -3272,7 +3940,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -3282,7 +3958,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -3349,8 +4026,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -3365,7 +4042,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.BrowserVNCApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.BrowserVNCApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.BrowserVNCApplicationPolicy] | Omit = omit,
@@ -3436,7 +4115,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -3446,7 +4133,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -3512,8 +4200,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_logo_url: str | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -3570,7 +4258,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -3593,8 +4282,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -3635,7 +4324,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -3656,8 +4346,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -3698,7 +4388,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -3719,8 +4410,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -3768,7 +4459,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -3788,8 +4480,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         app_launcher_visible: bool | Omit = omit,
         domain: str | Omit = omit,
         logo_url: str | Omit = omit,
@@ -3822,7 +4514,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           tags: The tags you want assigned to an application. Tags are used to filter
               applications in the App Launcher dashboard.
@@ -3845,8 +4538,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         *,
         target_criteria: Iterable[application_create_params.InfrastructureApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         name: str | Omit = omit,
         policies: Iterable[application_create_params.InfrastructureApplicationPolicy] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -3885,10 +4578,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         *,
         domain: str,
-        target_criteria: Iterable[application_create_params.BrowserRdpApplicationTargetCriterion],
+        target_criteria: Iterable[application_create_params.BrowserRDPApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -3899,17 +4592,19 @@ class AsyncApplicationsResource(AsyncAPIResource):
         custom_deny_url: str | Omit = omit,
         custom_non_identity_deny_url: str | Omit = omit,
         custom_pages: SequenceNotStr[str] | Omit = omit,
-        destinations: Iterable[application_create_params.BrowserRdpApplicationDestination] | Omit = omit,
+        destinations: Iterable[application_create_params.BrowserRDPApplicationDestination] | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.BrowserRDPApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.BrowserRDPApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
-        policies: SequenceNotStr[application_create_params.BrowserRdpApplicationPolicy] | Omit = omit,
+        policies: SequenceNotStr[application_create_params.BrowserRDPApplicationPolicy] | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
-        scim_config: application_create_params.BrowserRdpApplicationSCIMConfig | Omit = omit,
+        scim_config: application_create_params.BrowserRDPApplicationSCIMConfig | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
         session_duration: str | Omit = omit,
@@ -3974,7 +4669,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -3984,7 +4687,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -4030,6 +4734,234 @@ class AsyncApplicationsResource(AsyncAPIResource):
         """
         ...
 
+    @overload
+    async def create(
+        self,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_create_params.McpServerApplicationDestination] | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_create_params.McpServerApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_create_params.McpServerApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_create_params.McpServerApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationCreateResponse]:
+        """
+        Adds a new application to Access.
+
+        Args:
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    async def create(
+        self,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_create_params.McpServerPortalApplicationDestination] | Omit = omit,
+        domain: str | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_create_params.McpServerPortalApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_create_params.McpServerPortalApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_create_params.McpServerPortalApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationCreateResponse]:
+        """
+        Adds a new application to Access.
+
+        Args:
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          domain: The primary hostname and path secured by Access. This domain will be displayed
+              if the app is visible in the App Launcher.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
     async def create(
         self,
         *,
@@ -4052,8 +4984,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "proxy_endpoint",
         ]
         | Omit = omit,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -4067,12 +4999,26 @@ class AsyncApplicationsResource(AsyncAPIResource):
         destinations: Iterable[application_create_params.SelfHostedApplicationDestination]
         | Iterable[application_create_params.BrowserSSHApplicationDestination]
         | Iterable[application_create_params.BrowserVNCApplicationDestination]
-        | Iterable[application_create_params.BrowserRdpApplicationDestination]
+        | Iterable[application_create_params.BrowserRDPApplicationDestination]
+        | Iterable[application_create_params.McpServerApplicationDestination]
+        | Iterable[application_create_params.McpServerPortalApplicationDestination]
         | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_create_params.SelfHostedApplicationMfaConfig
+        | application_create_params.BrowserSSHApplicationMfaConfig
+        | application_create_params.BrowserVNCApplicationMfaConfig
+        | application_create_params.BrowserRDPApplicationMfaConfig
+        | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_create_params.SelfHostedApplicationOAuthConfiguration
+        | application_create_params.BrowserSSHApplicationOAuthConfiguration
+        | application_create_params.BrowserVNCApplicationOAuthConfiguration
+        | application_create_params.BrowserRDPApplicationOAuthConfiguration
+        | application_create_params.McpServerApplicationOAuthConfiguration
+        | application_create_params.McpServerPortalApplicationOAuthConfiguration
+        | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_create_params.SelfHostedApplicationPolicy]
@@ -4085,7 +5031,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         | SequenceNotStr[application_create_params.GatewayIdentityProxyEndpointApplicationPolicy]
         | SequenceNotStr[application_create_params.BookmarkApplicationPolicy]
         | Iterable[application_create_params.InfrastructureApplicationPolicy]
-        | SequenceNotStr[application_create_params.BrowserRdpApplicationPolicy]
+        | SequenceNotStr[application_create_params.BrowserRDPApplicationPolicy]
+        | SequenceNotStr[application_create_params.McpServerApplicationPolicy]
+        | SequenceNotStr[application_create_params.McpServerPortalApplicationPolicy]
         | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
@@ -4093,7 +5041,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         | application_create_params.SaaSApplicationSCIMConfig
         | application_create_params.BrowserSSHApplicationSCIMConfig
         | application_create_params.BrowserVNCApplicationSCIMConfig
-        | application_create_params.BrowserRdpApplicationSCIMConfig
+        | application_create_params.BrowserRDPApplicationSCIMConfig
+        | application_create_params.McpServerApplicationSCIMConfig
+        | application_create_params.McpServerPortalApplicationSCIMConfig
         | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
@@ -4109,7 +5059,7 @@ class AsyncApplicationsResource(AsyncAPIResource):
         landing_page_design: application_create_params.AppLauncherApplicationLandingPageDesign | Omit = omit,
         skip_app_launcher_login_page: bool | Omit = omit,
         target_criteria: Iterable[application_create_params.InfrastructureApplicationTargetCriterion]
-        | Iterable[application_create_params.BrowserRdpApplicationTargetCriterion]
+        | Iterable[application_create_params.BrowserRDPApplicationTargetCriterion]
         | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -4118,6 +5068,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[ApplicationCreateResponse]:
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -4133,7 +5087,11 @@ class AsyncApplicationsResource(AsyncAPIResource):
         return cast(
             Optional[ApplicationCreateResponse],
             await self._post(
-                f"/{account_or_zone}/{account_or_zone_id}/access/apps",
+                path_template(
+                    "/{account_or_zone}/{account_or_zone_id}/access/apps",
+                    account_or_zone=account_or_zone,
+                    account_or_zone_id=account_or_zone_id,
+                ),
                 body=await async_maybe_transform(
                     {
                         "domain": domain,
@@ -4152,7 +5110,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
                         "enable_binding_cookie": enable_binding_cookie,
                         "http_only_cookie_attribute": http_only_cookie_attribute,
                         "logo_url": logo_url,
+                        "mfa_config": mfa_config,
                         "name": name,
+                        "oauth_configuration": oauth_configuration,
                         "options_preflight_bypass": options_preflight_bypass,
                         "path_cookie_attribute": path_cookie_attribute,
                         "policies": policies,
@@ -4196,8 +5156,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         *,
         domain: str,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -4212,7 +5172,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.SelfHostedApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.SelfHostedApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.SelfHostedApplicationPolicy] | Omit = omit,
@@ -4285,7 +5247,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -4295,7 +5265,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -4346,8 +5317,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_visible: bool | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -4392,7 +5363,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           scim_config: Configuration for provisioning to this application via SCIM. This is currently
               in closed beta.
@@ -4434,8 +5406,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -4450,7 +5422,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.BrowserSSHApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.BrowserSSHApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.BrowserSSHApplicationPolicy] | Omit = omit,
@@ -4523,7 +5497,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -4533,7 +5515,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -4601,8 +5584,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -4617,7 +5600,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.BrowserVNCApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.BrowserVNCApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.BrowserVNCApplicationPolicy] | Omit = omit,
@@ -4690,7 +5675,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -4700,7 +5693,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -4767,8 +5761,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "mcp_portal",
             "proxy_endpoint",
         ],
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         app_launcher_logo_url: str | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
@@ -4827,7 +5821,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -4851,8 +5846,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         app_id: AppID,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -4895,7 +5890,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -4917,8 +5913,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         app_id: AppID,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -4961,7 +5957,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -4983,8 +5980,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         app_id: AppID,
         *,
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
         auto_redirect_to_identity: bool | Omit = omit,
         custom_deny_url: str | Omit = omit,
@@ -5034,7 +6031,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           session_duration: The amount of time that tokens issued for this application will be valid. Must
               be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
@@ -5055,8 +6053,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         app_launcher_visible: bool | Omit = omit,
         domain: str | Omit = omit,
         logo_url: str | Omit = omit,
@@ -5091,7 +6089,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           tags: The tags you want assigned to an application. Tags are used to filter
               applications in the App Launcher dashboard.
@@ -5115,8 +6114,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         *,
         target_criteria: Iterable[application_update_params.InfrastructureApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         name: str | Omit = omit,
         policies: Iterable[application_update_params.InfrastructureApplicationPolicy] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -5158,10 +6157,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
         app_id: AppID,
         *,
         domain: str,
-        target_criteria: Iterable[application_update_params.BrowserRdpApplicationTargetCriterion],
+        target_criteria: Iterable[application_update_params.BrowserRDPApplicationTargetCriterion],
         type: ApplicationType,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -5172,17 +6171,19 @@ class AsyncApplicationsResource(AsyncAPIResource):
         custom_deny_url: str | Omit = omit,
         custom_non_identity_deny_url: str | Omit = omit,
         custom_pages: SequenceNotStr[str] | Omit = omit,
-        destinations: Iterable[application_update_params.BrowserRdpApplicationDestination] | Omit = omit,
+        destinations: Iterable[application_update_params.BrowserRDPApplicationDestination] | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.BrowserRDPApplicationMfaConfig | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.BrowserRDPApplicationOAuthConfiguration | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
-        policies: SequenceNotStr[application_update_params.BrowserRdpApplicationPolicy] | Omit = omit,
+        policies: SequenceNotStr[application_update_params.BrowserRDPApplicationPolicy] | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
-        scim_config: application_update_params.BrowserRdpApplicationSCIMConfig | Omit = omit,
+        scim_config: application_update_params.BrowserRDPApplicationSCIMConfig | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
         session_duration: str | Omit = omit,
@@ -5249,7 +6250,15 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           logo_url: The image URL for the logo shown in the App Launcher dashboard.
 
+          mfa_config: Configures multi-factor authentication (MFA) settings.
+
           name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
 
           options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
               directly to the origin. Cannot turn on if cors_headers is set.
@@ -5259,7 +6268,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           policies: The policies that Access applies to the application, in ascending order of
               precedence. Items can reference existing policies or create new policies
-              exclusive to the application.
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
 
           read_service_tokens_from_header: Allows matching Access Service Tokens passed HTTP in a single header with this
               name. This works as an alternative to the (CF-Access-Client-Id,
@@ -5305,6 +6315,240 @@ class AsyncApplicationsResource(AsyncAPIResource):
         """
         ...
 
+    @overload
+    async def update(
+        self,
+        app_id: AppID,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_update_params.McpServerApplicationDestination] | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_update_params.McpServerApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_update_params.McpServerApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_update_params.McpServerApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationUpdateResponse]:
+        """
+        Updates an Access application.
+
+        Args:
+          app_id: Identifier.
+
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
+    @overload
+    async def update(
+        self,
+        app_id: AppID,
+        *,
+        type: ApplicationType,
+        account_id: str | None = None,
+        zone_id: str | None = None,
+        allow_authenticate_via_warp: bool | Omit = omit,
+        allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
+        auto_redirect_to_identity: bool | Omit = omit,
+        custom_deny_message: str | Omit = omit,
+        custom_deny_url: str | Omit = omit,
+        custom_non_identity_deny_url: str | Omit = omit,
+        custom_pages: SequenceNotStr[str] | Omit = omit,
+        destinations: Iterable[application_update_params.McpServerPortalApplicationDestination] | Omit = omit,
+        domain: str | Omit = omit,
+        http_only_cookie_attribute: bool | Omit = omit,
+        logo_url: str | Omit = omit,
+        name: str | Omit = omit,
+        oauth_configuration: application_update_params.McpServerPortalApplicationOAuthConfiguration | Omit = omit,
+        options_preflight_bypass: bool | Omit = omit,
+        policies: SequenceNotStr[application_update_params.McpServerPortalApplicationPolicy] | Omit = omit,
+        same_site_cookie_attribute: str | Omit = omit,
+        scim_config: application_update_params.McpServerPortalApplicationSCIMConfig | Omit = omit,
+        session_duration: str | Omit = omit,
+        tags: SequenceNotStr[str] | Omit = omit,
+        # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
+        # The extra values given here take precedence over values defined on the client or passed to this method.
+        extra_headers: Headers | None = None,
+        extra_query: Query | None = None,
+        extra_body: Body | None = None,
+        timeout: float | httpx.Timeout | None | NotGiven = not_given,
+    ) -> Optional[ApplicationUpdateResponse]:
+        """
+        Updates an Access application.
+
+        Args:
+          app_id: Identifier.
+
+          type: The application type.
+
+          account_id: The Account ID to use for this endpoint. Mutually exclusive with the Zone ID.
+
+          zone_id: The Zone ID to use for this endpoint. Mutually exclusive with the Account ID.
+
+          allow_authenticate_via_warp: When set to true, users can authenticate to this application using their WARP
+              session. When set to false this application will always require direct IdP
+              authentication. This setting always overrides the organization setting for WARP
+              authentication.
+
+          allowed_idps: The identity providers your users can select when connecting to this
+              application. Defaults to all IdPs configured in your account.
+
+          auto_redirect_to_identity: When set to `true`, users skip the identity provider selection step during
+              login. You must specify only one identity provider in allowed_idps.
+
+          custom_deny_message: The custom error message shown to a user when they are denied access to the
+              application.
+
+          custom_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing identity-based rules.
+
+          custom_non_identity_deny_url: The custom URL a user is redirected to when they are denied access to the
+              application when failing non-identity rules.
+
+          custom_pages: The custom pages that will be displayed when applicable for this application
+
+          destinations: List of destinations secured by Access. This supersedes `self_hosted_domains` to
+              allow for more flexibility in defining different types of domains. If
+              `destinations` are provided, then `self_hosted_domains` will be ignored.
+
+          domain: The primary hostname and path secured by Access. This domain will be displayed
+              if the app is visible in the App Launcher.
+
+          http_only_cookie_attribute: Enables the HttpOnly cookie attribute, which increases security against XSS
+              attacks.
+
+          logo_url: The image URL for the logo shown in the App Launcher dashboard.
+
+          name: The name of the application.
+
+          oauth_configuration: **Beta:** Optional configuration for managing an OAuth authorization flow
+              controlled by Access. When set, Access will act as the OAuth authorization
+              server for this application. Only compatible with OAuth clients that support
+              [RFC 8707](https://datatracker.ietf.org/doc/html/rfc8707) (Resource Indicators
+              for OAuth 2.0). This feature is currently in beta.
+
+          options_preflight_bypass: Allows options preflight requests to bypass Access authentication and go
+              directly to the origin. Cannot turn on if cors_headers is set.
+
+          policies: The policies that Access applies to the application, in ascending order of
+              precedence. Items can reference existing policies or create new policies
+              exclusive to the application. Reusable and inline policies are mutually
+              exclusive.
+
+          same_site_cookie_attribute: Sets the SameSite cookie setting, which provides increased security against CSRF
+              attacks.
+
+          scim_config: Configuration for provisioning to this application via SCIM. This is currently
+              in closed beta.
+
+          session_duration: The amount of time that tokens issued for this application will be valid. Must
+              be in the format `300ms` or `2h45m`. Valid time units are: ns, us (or µs), ms,
+              s, m, h. Note: unsupported for infrastructure type applications.
+
+          tags: The tags you want assigned to an application. Tags are used to filter
+              applications in the App Launcher dashboard.
+
+          extra_headers: Send extra headers
+
+          extra_query: Add additional query parameters to the request
+
+          extra_body: Add additional JSON properties to the request
+
+          timeout: Override the client-level default timeout for this request, in seconds
+        """
+        ...
+
     async def update(
         self,
         app_id: AppID,
@@ -5328,8 +6572,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
             "proxy_endpoint",
         ]
         | Omit = omit,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         allow_authenticate_via_warp: bool | Omit = omit,
         allow_iframe: bool | Omit = omit,
         allowed_idps: SequenceNotStr[AllowedIdPs] | Omit = omit,
@@ -5343,12 +6587,26 @@ class AsyncApplicationsResource(AsyncAPIResource):
         destinations: Iterable[application_update_params.SelfHostedApplicationDestination]
         | Iterable[application_update_params.BrowserSSHApplicationDestination]
         | Iterable[application_update_params.BrowserVNCApplicationDestination]
-        | Iterable[application_update_params.BrowserRdpApplicationDestination]
+        | Iterable[application_update_params.BrowserRDPApplicationDestination]
+        | Iterable[application_update_params.McpServerApplicationDestination]
+        | Iterable[application_update_params.McpServerPortalApplicationDestination]
         | Omit = omit,
         enable_binding_cookie: bool | Omit = omit,
         http_only_cookie_attribute: bool | Omit = omit,
         logo_url: str | Omit = omit,
+        mfa_config: application_update_params.SelfHostedApplicationMfaConfig
+        | application_update_params.BrowserSSHApplicationMfaConfig
+        | application_update_params.BrowserVNCApplicationMfaConfig
+        | application_update_params.BrowserRDPApplicationMfaConfig
+        | Omit = omit,
         name: str | Omit = omit,
+        oauth_configuration: application_update_params.SelfHostedApplicationOAuthConfiguration
+        | application_update_params.BrowserSSHApplicationOAuthConfiguration
+        | application_update_params.BrowserVNCApplicationOAuthConfiguration
+        | application_update_params.BrowserRDPApplicationOAuthConfiguration
+        | application_update_params.McpServerApplicationOAuthConfiguration
+        | application_update_params.McpServerPortalApplicationOAuthConfiguration
+        | Omit = omit,
         options_preflight_bypass: bool | Omit = omit,
         path_cookie_attribute: bool | Omit = omit,
         policies: SequenceNotStr[application_update_params.SelfHostedApplicationPolicy]
@@ -5361,7 +6619,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         | SequenceNotStr[application_update_params.GatewayIdentityProxyEndpointApplicationPolicy]
         | SequenceNotStr[application_update_params.BookmarkApplicationPolicy]
         | Iterable[application_update_params.InfrastructureApplicationPolicy]
-        | SequenceNotStr[application_update_params.BrowserRdpApplicationPolicy]
+        | SequenceNotStr[application_update_params.BrowserRDPApplicationPolicy]
+        | SequenceNotStr[application_update_params.McpServerApplicationPolicy]
+        | SequenceNotStr[application_update_params.McpServerPortalApplicationPolicy]
         | Omit = omit,
         read_service_tokens_from_header: str | Omit = omit,
         same_site_cookie_attribute: str | Omit = omit,
@@ -5369,7 +6629,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
         | application_update_params.SaaSApplicationSCIMConfig
         | application_update_params.BrowserSSHApplicationSCIMConfig
         | application_update_params.BrowserVNCApplicationSCIMConfig
-        | application_update_params.BrowserRdpApplicationSCIMConfig
+        | application_update_params.BrowserRDPApplicationSCIMConfig
+        | application_update_params.McpServerApplicationSCIMConfig
+        | application_update_params.McpServerPortalApplicationSCIMConfig
         | Omit = omit,
         self_hosted_domains: SequenceNotStr[SelfHostedDomains] | Omit = omit,
         service_auth_401_redirect: bool | Omit = omit,
@@ -5385,7 +6647,7 @@ class AsyncApplicationsResource(AsyncAPIResource):
         landing_page_design: application_update_params.AppLauncherApplicationLandingPageDesign | Omit = omit,
         skip_app_launcher_login_page: bool | Omit = omit,
         target_criteria: Iterable[application_update_params.InfrastructureApplicationTargetCriterion]
-        | Iterable[application_update_params.BrowserRdpApplicationTargetCriterion]
+        | Iterable[application_update_params.BrowserRDPApplicationTargetCriterion]
         | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -5396,6 +6658,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
     ) -> Optional[ApplicationUpdateResponse]:
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -5411,7 +6677,12 @@ class AsyncApplicationsResource(AsyncAPIResource):
         return cast(
             Optional[ApplicationUpdateResponse],
             await self._put(
-                f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                path_template(
+                    "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                    app_id=app_id,
+                    account_or_zone=account_or_zone,
+                    account_or_zone_id=account_or_zone_id,
+                ),
                 body=await async_maybe_transform(
                     {
                         "domain": domain,
@@ -5430,7 +6701,9 @@ class AsyncApplicationsResource(AsyncAPIResource):
                         "enable_binding_cookie": enable_binding_cookie,
                         "http_only_cookie_attribute": http_only_cookie_attribute,
                         "logo_url": logo_url,
+                        "mfa_config": mfa_config,
                         "name": name,
+                        "oauth_configuration": oauth_configuration,
                         "options_preflight_bypass": options_preflight_bypass,
                         "path_cookie_attribute": path_cookie_attribute,
                         "policies": policies,
@@ -5470,8 +6743,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         aud: str | Omit = omit,
         domain: str | Omit = omit,
         exact: bool | Omit = omit,
@@ -5519,6 +6792,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -5532,7 +6809,11 @@ class AsyncApplicationsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            f"/{account_or_zone}/{account_or_zone_id}/access/apps",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/apps",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             page=AsyncV4PagePaginationArray[ApplicationListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -5560,8 +6841,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -5589,6 +6870,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
         """
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -5602,7 +6887,12 @@ class AsyncApplicationsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._delete(
-            f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                app_id=app_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -5617,8 +6907,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -5646,6 +6936,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
         """
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -5661,7 +6955,12 @@ class AsyncApplicationsResource(AsyncAPIResource):
         return cast(
             Optional[ApplicationGetResponse],
             await self._get(
-                f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                path_template(
+                    "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}",
+                    app_id=app_id,
+                    account_or_zone=account_or_zone,
+                    account_or_zone_id=account_or_zone_id,
+                ),
                 options=make_request_options(
                     extra_headers=extra_headers,
                     extra_query=extra_query,
@@ -5679,8 +6978,8 @@ class AsyncApplicationsResource(AsyncAPIResource):
         self,
         app_id: AppID,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -5708,6 +7007,10 @@ class AsyncApplicationsResource(AsyncAPIResource):
         """
         if not app_id:
             raise ValueError(f"Expected a non-empty value for `app_id` but received {app_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -5721,7 +7024,12 @@ class AsyncApplicationsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}/revoke_tokens",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/access/apps/{app_id}/revoke_tokens",
+                app_id=app_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

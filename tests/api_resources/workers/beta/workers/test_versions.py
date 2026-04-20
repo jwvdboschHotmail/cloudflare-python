@@ -43,7 +43,7 @@ class TestVersions:
                 "config": {
                     "html_handling": "auto-trailing-slash",
                     "not_found_handling": "404-page",
-                    "run_worker_first": ["string"],
+                    "run_worker_first": True,
                 },
                 "jwt": "jwt",
             },
@@ -56,7 +56,11 @@ class TestVersions:
             ],
             compatibility_date="2021-01-01",
             compatibility_flags=["nodejs_compat"],
-            limits={"cpu_ms": 50},
+            containers=[{"class_name": "MyDurableObject"}],
+            limits={
+                "cpu_ms": 50,
+                "subrequests": 1000,
+            },
             main_module="index.js",
             migrations={
                 "deleted_classes": ["string"],
@@ -346,7 +350,7 @@ class TestAsyncVersions:
                 "config": {
                     "html_handling": "auto-trailing-slash",
                     "not_found_handling": "404-page",
-                    "run_worker_first": ["string"],
+                    "run_worker_first": True,
                 },
                 "jwt": "jwt",
             },
@@ -359,7 +363,11 @@ class TestAsyncVersions:
             ],
             compatibility_date="2021-01-01",
             compatibility_flags=["nodejs_compat"],
-            limits={"cpu_ms": 50},
+            containers=[{"class_name": "MyDurableObject"}],
+            limits={
+                "cpu_ms": 50,
+                "subrequests": 1000,
+            },
             main_module="index.js",
             migrations={
                 "deleted_classes": ["string"],

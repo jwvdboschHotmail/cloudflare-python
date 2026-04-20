@@ -52,7 +52,18 @@ class TestPolicies:
                 },
             ],
             approval_required=True,
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             precedence=0,
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,
@@ -139,7 +150,18 @@ class TestPolicies:
                 },
             ],
             approval_required=True,
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             precedence=0,
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,
@@ -473,7 +495,18 @@ class TestAsyncPolicies:
                 },
             ],
             approval_required=True,
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             precedence=0,
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,
@@ -560,7 +593,18 @@ class TestAsyncPolicies:
                 },
             ],
             approval_required=True,
+            connection_rules={
+                "rdp": {
+                    "allowed_clipboard_local_to_remote_formats": ["text"],
+                    "allowed_clipboard_remote_to_local_formats": ["text"],
+                }
+            },
             isolation_required=False,
+            mfa_config={
+                "allowed_authenticators": ["totp", "biometrics", "security_key"],
+                "mfa_disabled": False,
+                "session_duration": "24h",
+            },
             precedence=0,
             purpose_justification_prompt="Please enter a justification for entering this protected domain.",
             purpose_justification_required=True,

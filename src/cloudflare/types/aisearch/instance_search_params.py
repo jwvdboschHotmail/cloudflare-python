@@ -2,40 +2,41 @@
 
 from __future__ import annotations
 
-from typing import Dict, Union, Iterable, Optional
-from typing_extensions import Literal, Required, Annotated, TypeAlias, TypedDict
+from typing import Dict, Iterable, Optional
+from typing_extensions import Literal, Required, Annotated, TypedDict
 
 from ..._utils import PropertyInfo
 
 __all__ = [
     "InstanceSearchParams",
-    "Message",
     "AISearchOptions",
+    "AISearchOptionsCache",
     "AISearchOptionsQueryRewrite",
     "AISearchOptionsReranking",
     "AISearchOptionsRetrieval",
-    "AISearchOptionsRetrievalFilters",
-    "AISearchOptionsRetrievalFiltersUnionMember0",
-    "AISearchOptionsRetrievalFiltersUnionMember1",
-    "AISearchOptionsRetrievalFiltersUnionMember1Filter",
+    "AISearchOptionsRetrievalBoostBy",
+    "Message",
 ]
 
 
 class InstanceSearchParams(TypedDict, total=False):
-    account_id: Required[str]
-
-    messages: Required[Iterable[Message]]
+    account_id: str
 
     aisearch_options: Annotated[AISearchOptions, PropertyInfo(alias="ai_search_options")]
 
+    messages: Iterable[Message]
 
-class MessageTyped(TypedDict, total=False):
-    content: Required[Optional[str]]
+    query: str
+    """A simple text query string.
 
-    role: Required[Literal["system", "developer", "user", "assistant", "tool"]]
+    Alternative to 'messages' — provide either this or 'messages', not both.
+    """
 
 
-Message: TypeAlias = Union[MessageTyped, Dict[str, object]]
+class AISearchOptionsCache(TypedDict, total=False):
+    cache_threshold: Literal["super_strict_match", "close_enough", "flexible_friend", "anything_goes"]
+
+    enabled: bool
 
 
 class AISearchOptionsQueryRewrite(TypedDict, total=False):
@@ -43,12 +44,16 @@ class AISearchOptionsQueryRewrite(TypedDict, total=False):
 
     model: Literal[
         "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+        "@cf/zai-org/glm-4.7-flash",
         "@cf/meta/llama-3.1-8b-instruct-fast",
         "@cf/meta/llama-3.1-8b-instruct-fp8",
         "@cf/meta/llama-4-scout-17b-16e-instruct",
         "@cf/qwen/qwen3-30b-a3b-fp8",
         "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
         "@cf/moonshotai/kimi-k2-instruct",
+        "@cf/google/gemma-3-12b-it",
+        "@cf/google/gemma-4-26b-a4b-it",
+        "@cf/moonshotai/kimi-k2.5",
         "anthropic/claude-3-7-sonnet",
         "anthropic/claude-sonnet-4",
         "anthropic/claude-opus-4",
@@ -81,37 +86,47 @@ class AISearchOptionsReranking(TypedDict, total=False):
     model: Literal["@cf/baai/bge-reranker-base", ""]
 
 
-class AISearchOptionsRetrievalFiltersUnionMember0(TypedDict, total=False):
-    key: Required[str]
+class AISearchOptionsRetrievalBoostBy(TypedDict, total=False):
+    field: Required[str]
+    """Metadata field name to boost by.
 
-    type: Required[Literal["eq", "ne", "gt", "gte", "lt", "lte"]]
+    Use 'timestamp' for document freshness, or any custom_metadata field. Numeric
+    and datetime fields support asc/desc directions; text/boolean fields support
+    exists/not_exists.
+    """
 
-    value: Required[Union[str, float, bool]]
+    direction: Literal["asc", "desc", "exists", "not_exists"]
+    """Boost direction.
 
-
-class AISearchOptionsRetrievalFiltersUnionMember1Filter(TypedDict, total=False):
-    key: Required[str]
-
-    type: Required[Literal["eq", "ne", "gt", "gte", "lt", "lte"]]
-
-    value: Required[Union[str, float, bool]]
-
-
-class AISearchOptionsRetrievalFiltersUnionMember1(TypedDict, total=False):
-    filters: Required[Iterable[AISearchOptionsRetrievalFiltersUnionMember1Filter]]
-
-    type: Required[Literal["and", "or"]]
-
-
-AISearchOptionsRetrievalFilters: TypeAlias = Union[
-    AISearchOptionsRetrievalFiltersUnionMember0, AISearchOptionsRetrievalFiltersUnionMember1
-]
+    'desc' = higher values rank higher (e.g. newer timestamps). 'asc' = lower values
+    rank higher. 'exists' = boost chunks that have the field. 'not_exists' = boost
+    chunks that lack the field. Optional ��� defaults to 'asc' for numeric/datetime
+    fields, 'exists' for text/boolean fields.
+    """
 
 
 class AISearchOptionsRetrieval(TypedDict, total=False):
+    boost_by: Iterable[AISearchOptionsRetrievalBoostBy]
+    """Metadata fields to boost search results by.
+
+    Overrides the instance-level boost_by config. Direction defaults to 'asc' for
+    numeric/datetime fields, 'exists' for text/boolean fields. Fields must match
+    'timestamp' or a defined custom_metadata field.
+    """
+
     context_expansion: int
 
-    filters: AISearchOptionsRetrievalFilters
+    filters: Dict[str, object]
+
+    fusion_method: Literal["max", "rrf"]
+
+    keyword_match_mode: Literal["and", "or"]
+    """Controls which documents are candidates for BM25 scoring.
+
+    'and' restricts candidates to documents containing all query terms; 'or'
+    includes any document containing at least one term, ranked by BM25 relevance.
+    Defaults to 'and'.
+    """
 
     match_threshold: float
 
@@ -119,10 +134,20 @@ class AISearchOptionsRetrieval(TypedDict, total=False):
 
     retrieval_type: Literal["vector", "keyword", "hybrid"]
 
+    return_on_failure: bool
+
 
 class AISearchOptions(TypedDict, total=False):
+    cache: AISearchOptionsCache
+
     query_rewrite: AISearchOptionsQueryRewrite
 
     reranking: AISearchOptionsReranking
 
     retrieval: AISearchOptionsRetrieval
+
+
+class Message(TypedDict, total=False, extra_items=object):  # type: ignore[call-arg]
+    content: Required[Optional[str]]
+
+    role: Required[Literal["system", "developer", "user", "assistant", "tool"]]

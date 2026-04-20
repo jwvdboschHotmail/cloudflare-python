@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -58,7 +58,7 @@ class OperationsResource(SyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         mitigation_action: Optional[Literal["log", "block", "none"]],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -68,7 +68,7 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationUpdateResponse:
         """
-        Update per-operation schema validation setting
+        Fully updates schema validation settings for a specific API operation.
 
         Args:
           zone_id: Identifier.
@@ -92,12 +92,18 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return self._put(
-            f"/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+                zone_id=zone_id,
+                operation_id=operation_id,
+            ),
             body=maybe_transform(
                 {"mitigation_action": mitigation_action}, operation_update_params.OperationUpdateParams
             ),
@@ -114,7 +120,7 @@ class OperationsResource(SyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -125,7 +131,7 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncV4PagePaginationArray[OperationListResponse]:
         """
-        List per-operation schema validation settings
+        Lists all per-operation schema validation settings configured for the zone.
 
         Args:
           zone_id: Identifier.
@@ -142,10 +148,12 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/schema_validation/settings/operations",
+            path_template("/zones/{zone_id}/schema_validation/settings/operations", zone_id=zone_id),
             page=SyncV4PagePaginationArray[OperationListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -167,7 +175,7 @@ class OperationsResource(SyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -176,7 +184,8 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationDeleteResponse:
         """
-        Delete per-operation schema validation setting
+        Removes custom schema validation settings for a specific API operation,
+        reverting to zone-level defaults.
 
         Args:
           zone_id: Identifier.
@@ -191,12 +200,18 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return self._delete(
-            f"/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+                zone_id=zone_id,
+                operation_id=operation_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -210,7 +225,7 @@ class OperationsResource(SyncAPIResource):
     def bulk_edit(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         body: Dict[str, operation_bulk_edit_params.Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -220,7 +235,8 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationBulkEditResponse:
         """
-        Bulk edit per-operation schema validation settings
+        Updates schema validation settings for multiple API operations in a single
+        request. Efficient for applying consistent validation rules across endpoints.
 
         Args:
           zone_id: Identifier.
@@ -233,10 +249,12 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._patch(
-            f"/zones/{zone_id}/schema_validation/settings/operations",
+            path_template("/zones/{zone_id}/schema_validation/settings/operations", zone_id=zone_id),
             body=maybe_transform(body, operation_bulk_edit_params.OperationBulkEditParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -252,7 +270,7 @@ class OperationsResource(SyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -261,7 +279,8 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationGetResponse:
         """
-        Get per-operation schema validation setting
+        Retrieves the schema validation settings configured for a specific API
+        operation.
 
         Args:
           zone_id: Identifier.
@@ -276,12 +295,18 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return self._get(
-            f"/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+                zone_id=zone_id,
+                operation_id=operation_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -317,7 +342,7 @@ class AsyncOperationsResource(AsyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         mitigation_action: Optional[Literal["log", "block", "none"]],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -327,7 +352,7 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationUpdateResponse:
         """
-        Update per-operation schema validation setting
+        Fully updates schema validation settings for a specific API operation.
 
         Args:
           zone_id: Identifier.
@@ -351,12 +376,18 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return await self._put(
-            f"/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+                zone_id=zone_id,
+                operation_id=operation_id,
+            ),
             body=await async_maybe_transform(
                 {"mitigation_action": mitigation_action}, operation_update_params.OperationUpdateParams
             ),
@@ -373,7 +404,7 @@ class AsyncOperationsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -384,7 +415,7 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[OperationListResponse, AsyncV4PagePaginationArray[OperationListResponse]]:
         """
-        List per-operation schema validation settings
+        Lists all per-operation schema validation settings configured for the zone.
 
         Args:
           zone_id: Identifier.
@@ -401,10 +432,12 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/schema_validation/settings/operations",
+            path_template("/zones/{zone_id}/schema_validation/settings/operations", zone_id=zone_id),
             page=AsyncV4PagePaginationArray[OperationListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -426,7 +459,7 @@ class AsyncOperationsResource(AsyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -435,7 +468,8 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationDeleteResponse:
         """
-        Delete per-operation schema validation setting
+        Removes custom schema validation settings for a specific API operation,
+        reverting to zone-level defaults.
 
         Args:
           zone_id: Identifier.
@@ -450,12 +484,18 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return await self._delete(
-            f"/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+                zone_id=zone_id,
+                operation_id=operation_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -469,7 +509,7 @@ class AsyncOperationsResource(AsyncAPIResource):
     async def bulk_edit(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         body: Dict[str, operation_bulk_edit_params.Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -479,7 +519,8 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationBulkEditResponse:
         """
-        Bulk edit per-operation schema validation settings
+        Updates schema validation settings for multiple API operations in a single
+        request. Efficient for applying consistent validation rules across endpoints.
 
         Args:
           zone_id: Identifier.
@@ -492,10 +533,12 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._patch(
-            f"/zones/{zone_id}/schema_validation/settings/operations",
+            path_template("/zones/{zone_id}/schema_validation/settings/operations", zone_id=zone_id),
             body=await async_maybe_transform(body, operation_bulk_edit_params.OperationBulkEditParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -511,7 +554,7 @@ class AsyncOperationsResource(AsyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -520,7 +563,8 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationGetResponse:
         """
-        Get per-operation schema validation setting
+        Retrieves the schema validation settings configured for a specific API
+        operation.
 
         Args:
           zone_id: Identifier.
@@ -535,12 +579,18 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return await self._get(
-            f"/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/schema_validation/settings/operations/{operation_id}",
+                zone_id=zone_id,
+                operation_id=operation_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

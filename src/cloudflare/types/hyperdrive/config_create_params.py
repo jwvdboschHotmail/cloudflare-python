@@ -10,6 +10,7 @@ __all__ = [
     "Origin",
     "OriginPublicDatabase",
     "OriginAccessProtectedDatabaseBehindCloudflareTunnel",
+    "OriginDatabaseReachableThroughAWorkersVPC",
     "Caching",
     "CachingHyperdriveHyperdriveCachingCommon",
     "CachingHyperdriveHyperdriveCachingEnabled",
@@ -18,7 +19,7 @@ __all__ = [
 
 
 class ConfigCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Define configurations using a unique string identifier."""
 
     name: Required[str]
@@ -32,11 +33,19 @@ class ConfigCreateParams(TypedDict, total=False):
     caching: Caching
 
     mtls: MTLS
+    """mTLS configuration for the origin connection.
+
+    Cannot be used with VPC Service origins; TLS must be managed on the VPC Service.
+    """
 
     origin_connection_limit: int
     """
     The (soft) maximum number of connections the Hyperdrive is allowed to make to
     the origin database.
+
+    Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+    specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+    if you need a higher limit.
     """
 
 
@@ -98,7 +107,33 @@ class OriginAccessProtectedDatabaseBehindCloudflareTunnel(TypedDict, total=False
     """Set the user of your origin database."""
 
 
-Origin: TypeAlias = Union[OriginPublicDatabase, OriginAccessProtectedDatabaseBehindCloudflareTunnel]
+class OriginDatabaseReachableThroughAWorkersVPC(TypedDict, total=False):
+    database: Required[str]
+    """Set the name of your origin database."""
+
+    password: Required[str]
+    """Set the password needed to access your origin database.
+
+    The API never returns this write-only value.
+    """
+
+    scheme: Required[Literal["postgres", "postgresql", "mysql"]]
+    """Specifies the URL scheme used to connect to your origin database."""
+
+    service_id: Required[str]
+    """The identifier of the Workers VPC Service to connect through.
+
+    Hyperdrive will egress through the specified VPC Service to reach the origin
+    database.
+    """
+
+    user: Required[str]
+    """Set the user of your origin database."""
+
+
+Origin: TypeAlias = Union[
+    OriginPublicDatabase, OriginAccessProtectedDatabaseBehindCloudflareTunnel, OriginDatabaseReachableThroughAWorkersVPC
+]
 
 
 class CachingHyperdriveHyperdriveCachingCommon(TypedDict, total=False):
@@ -127,6 +162,11 @@ Caching: TypeAlias = Union[CachingHyperdriveHyperdriveCachingCommon, CachingHype
 
 
 class MTLS(TypedDict, total=False):
+    """mTLS configuration for the origin connection.
+
+    Cannot be used with VPC Service origins; TLS must be managed on the VPC Service.
+    """
+
     ca_certificate_id: str
     """Define CA certificate ID obtained after uploading CA cert."""
 

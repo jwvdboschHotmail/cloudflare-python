@@ -8,10 +8,10 @@ __all__ = ["JobLogsParams"]
 
 
 class JobLogsParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     id: Required[str]
-    """Use your AI Search ID."""
+    """AI Search instance ID. Lowercase alphanumeric, hyphens, and underscores."""
 
     page: int
 

@@ -70,8 +70,8 @@ class OutputOptions(BaseModel):
     `sample_interval` of the data.
     """
 
-    timestamp_format: Optional[Literal["unixnano", "unix", "rfc3339"]] = None
+    timestamp_format: Optional[Literal["unixnano", "unix", "rfc3339", "rfc3339ms", "rfc3339ns"]] = None
     """
-    String to specify the format for timestamps, such as `unixnano`, `unix`, or
-    `rfc3339`.
+    String to specify the format for timestamps, such as `unixnano`, `unix`,
+    `rfc3339`, `rfc3339ms` or `rfc3339ns`.
     """

@@ -32,7 +32,7 @@ __all__ = [
 
 
 class Variant0(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account ID."""
 
     elements: Required[Iterable[Variant0Element]]
@@ -194,6 +194,7 @@ class Variant0Authenticate(TypedDict, total=False):
 
 class Variant0Cookie(TypedDict, total=False):
     name: Required[str]
+    """Cookie name."""
 
     value: Required[str]
 
@@ -272,7 +273,7 @@ class Variant0WaitForSelector(TypedDict, total=False):
 
 
 class Variant1(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account ID."""
 
     elements: Required[Iterable[Variant1Element]]
@@ -431,6 +432,7 @@ class Variant1Authenticate(TypedDict, total=False):
 
 class Variant1Cookie(TypedDict, total=False):
     name: Required[str]
+    """Cookie name."""
 
     value: Required[str]
 

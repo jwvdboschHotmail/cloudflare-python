@@ -9,7 +9,7 @@ __all__ = ["AIGatewayCreateParams"]
 
 
 class AIGatewayCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     id: Required[str]
     """gateway id"""
@@ -24,11 +24,7 @@ class AIGatewayCreateParams(TypedDict, total=False):
 
     rate_limiting_limit: Required[Optional[int]]
 
-    rate_limiting_technique: Required[Literal["fixed", "sliding"]]
-
     authentication: bool
-
-    is_default: bool
 
     log_management: Optional[int]
 
@@ -37,5 +33,22 @@ class AIGatewayCreateParams(TypedDict, total=False):
     logpush: bool
 
     logpush_public_key: Optional[str]
+
+    rate_limiting_technique: Optional[Literal["fixed", "sliding"]]
+
+    retry_backoff: Optional[Literal["constant", "linear", "exponential"]]
+    """Backoff strategy for retry delays"""
+
+    retry_delay: Optional[int]
+    """Delay between retry attempts in milliseconds (0-5000)"""
+
+    retry_max_attempts: Optional[int]
+    """Maximum number of retry attempts for failed requests (1-5)"""
+
+    workers_ai_billing_mode: Literal["postpaid"]
+    """Controls how Workers AI inference calls routed through this gateway are billed.
+
+    Only 'postpaid' is currently supported.
+    """
 
     zdr: bool

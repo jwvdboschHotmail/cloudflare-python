@@ -7,7 +7,7 @@ from typing import Type, Iterable, cast
 import httpx
 
 from ......_types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ......_utils import maybe_transform, async_maybe_transform
+from ......_utils import path_template, maybe_transform, async_maybe_transform
 from ......_compat import cached_property
 from ......_resource import SyncAPIResource, AsyncAPIResource
 from ......_response import (
@@ -52,10 +52,11 @@ class PortalsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         id: str,
         hostname: str,
         name: str,
+        allow_code_mode: bool | Omit = omit,
         description: str | Omit = omit,
         secure_web_gateway: bool | Omit = omit,
         servers: Iterable[portal_create_params.Server] | Omit = omit,
@@ -67,10 +68,12 @@ class PortalsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> PortalCreateResponse:
         """
-        Create a new MCP Portal
+        Creates a new MCP portal for managing AI tool access through Cloudflare Access.
 
         Args:
           id: portal id
+
+          allow_code_mode: Allow remote code execution in Dynamic Workers (beta)
 
           secure_web_gateway: Route outbound MCP traffic through Zero Trust Secure Web Gateway
 
@@ -82,15 +85,18 @@ class PortalsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals", account_id=account_id),
             body=maybe_transform(
                 {
                     "id": id,
                     "hostname": hostname,
                     "name": name,
+                    "allow_code_mode": allow_code_mode,
                     "description": description,
                     "secure_web_gateway": secure_web_gateway,
                     "servers": servers,
@@ -111,7 +117,8 @@ class PortalsResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        allow_code_mode: bool | Omit = omit,
         description: str | Omit = omit,
         hostname: str | Omit = omit,
         name: str | Omit = omit,
@@ -125,10 +132,12 @@ class PortalsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> PortalUpdateResponse:
         """
-        Update a MCP Portal
+        Updates an MCP portal configuration.
 
         Args:
           id: portal id
+
+          allow_code_mode: Allow remote code execution in Dynamic Workers (beta)
 
           secure_web_gateway: Route outbound MCP traffic through Zero Trust Secure Web Gateway
 
@@ -140,14 +149,17 @@ class PortalsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._put(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals/{id}",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals/{id}", account_id=account_id, id=id),
             body=maybe_transform(
                 {
+                    "allow_code_mode": allow_code_mode,
                     "description": description,
                     "hostname": hostname,
                     "name": name,
@@ -169,7 +181,7 @@ class PortalsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         search: str | Omit = omit,
@@ -181,7 +193,7 @@ class PortalsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncV4PagePaginationArray[PortalListResponse]:
         """
-        List MCP Portals
+        Lists all MCP portals configured for the account.
 
         Args:
           search: Search by id, name, hostname
@@ -194,10 +206,12 @@ class PortalsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals", account_id=account_id),
             page=SyncV4PagePaginationArray[PortalListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -220,7 +234,7 @@ class PortalsResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -229,7 +243,7 @@ class PortalsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> PortalDeleteResponse:
         """
-        Delete a MCP Portal
+        Deletes an MCP portal from the account.
 
         Args:
           id: portal id
@@ -242,12 +256,14 @@ class PortalsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._delete(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals/{id}",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -262,7 +278,7 @@ class PortalsResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -284,12 +300,14 @@ class PortalsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._get(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals/{id}",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -324,10 +342,11 @@ class AsyncPortalsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         id: str,
         hostname: str,
         name: str,
+        allow_code_mode: bool | Omit = omit,
         description: str | Omit = omit,
         secure_web_gateway: bool | Omit = omit,
         servers: Iterable[portal_create_params.Server] | Omit = omit,
@@ -339,10 +358,12 @@ class AsyncPortalsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> PortalCreateResponse:
         """
-        Create a new MCP Portal
+        Creates a new MCP portal for managing AI tool access through Cloudflare Access.
 
         Args:
           id: portal id
+
+          allow_code_mode: Allow remote code execution in Dynamic Workers (beta)
 
           secure_web_gateway: Route outbound MCP traffic through Zero Trust Secure Web Gateway
 
@@ -354,15 +375,18 @@ class AsyncPortalsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "id": id,
                     "hostname": hostname,
                     "name": name,
+                    "allow_code_mode": allow_code_mode,
                     "description": description,
                     "secure_web_gateway": secure_web_gateway,
                     "servers": servers,
@@ -383,7 +407,8 @@ class AsyncPortalsResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        allow_code_mode: bool | Omit = omit,
         description: str | Omit = omit,
         hostname: str | Omit = omit,
         name: str | Omit = omit,
@@ -397,10 +422,12 @@ class AsyncPortalsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> PortalUpdateResponse:
         """
-        Update a MCP Portal
+        Updates an MCP portal configuration.
 
         Args:
           id: portal id
+
+          allow_code_mode: Allow remote code execution in Dynamic Workers (beta)
 
           secure_web_gateway: Route outbound MCP traffic through Zero Trust Secure Web Gateway
 
@@ -412,14 +439,17 @@ class AsyncPortalsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._put(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals/{id}",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals/{id}", account_id=account_id, id=id),
             body=await async_maybe_transform(
                 {
+                    "allow_code_mode": allow_code_mode,
                     "description": description,
                     "hostname": hostname,
                     "name": name,
@@ -441,7 +471,7 @@ class AsyncPortalsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         search: str | Omit = omit,
@@ -453,7 +483,7 @@ class AsyncPortalsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[PortalListResponse, AsyncV4PagePaginationArray[PortalListResponse]]:
         """
-        List MCP Portals
+        Lists all MCP portals configured for the account.
 
         Args:
           search: Search by id, name, hostname
@@ -466,10 +496,12 @@ class AsyncPortalsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals", account_id=account_id),
             page=AsyncV4PagePaginationArray[PortalListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -492,7 +524,7 @@ class AsyncPortalsResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -501,7 +533,7 @@ class AsyncPortalsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> PortalDeleteResponse:
         """
-        Delete a MCP Portal
+        Deletes an MCP portal from the account.
 
         Args:
           id: portal id
@@ -514,12 +546,14 @@ class AsyncPortalsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals/{id}",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -534,7 +568,7 @@ class AsyncPortalsResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -556,12 +590,14 @@ class AsyncPortalsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._get(
-            f"/accounts/{account_id}/access/ai-controls/mcp/portals/{id}",
+            path_template("/accounts/{account_id}/access/ai-controls/mcp/portals/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

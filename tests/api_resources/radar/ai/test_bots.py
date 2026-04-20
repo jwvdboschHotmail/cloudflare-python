@@ -34,6 +34,7 @@ class TestBots:
         bot = client.radar.ai.bots.summary_v2(
             dimension="USER_AGENT",
             asn=["string"],
+            content_type=["HTML"],
             continent=["string"],
             crawl_purpose=["string"],
             date_end=[parse_datetime("2019-12-27T18:11:19.117Z")],
@@ -44,6 +45,9 @@ class TestBots:
             limit_per_group=10,
             location=["string"],
             name=["main_series"],
+            response_status=["string"],
+            response_status_category=["INFORMATIONAL"],
+            user_agent=["string"],
             vertical=["string"],
         )
         assert_matches_type(BotSummaryV2Response, bot, path=["response"])
@@ -82,6 +86,7 @@ class TestBots:
         bot = client.radar.ai.bots.timeseries(
             agg_interval="1h",
             asn=["string"],
+            content_type=["HTML"],
             continent=["string"],
             crawl_purpose=["string"],
             date_end=[parse_datetime("2019-12-27T18:11:19.117Z")],
@@ -92,6 +97,8 @@ class TestBots:
             limit_per_group=10,
             location=["string"],
             name=["main_series"],
+            response_status=["string"],
+            response_status_category=["INFORMATIONAL"],
             user_agent=["string"],
             vertical=["string"],
         )
@@ -130,6 +137,7 @@ class TestBots:
             dimension="USER_AGENT",
             agg_interval="1h",
             asn=["string"],
+            content_type=["HTML"],
             continent=["string"],
             crawl_purpose=["string"],
             date_end=[parse_datetime("2019-12-27T18:11:19.117Z")],
@@ -140,7 +148,10 @@ class TestBots:
             limit_per_group=10,
             location=["string"],
             name=["main_series"],
-            normalization="MIN0_MAX",
+            normalization="PERCENTAGE",
+            response_status=["string"],
+            response_status_category=["INFORMATIONAL"],
+            user_agent=["string"],
             vertical=["string"],
         )
         assert_matches_type(BotTimeseriesGroupsResponse, bot, path=["response"])
@@ -187,6 +198,7 @@ class TestAsyncBots:
         bot = await async_client.radar.ai.bots.summary_v2(
             dimension="USER_AGENT",
             asn=["string"],
+            content_type=["HTML"],
             continent=["string"],
             crawl_purpose=["string"],
             date_end=[parse_datetime("2019-12-27T18:11:19.117Z")],
@@ -197,6 +209,9 @@ class TestAsyncBots:
             limit_per_group=10,
             location=["string"],
             name=["main_series"],
+            response_status=["string"],
+            response_status_category=["INFORMATIONAL"],
+            user_agent=["string"],
             vertical=["string"],
         )
         assert_matches_type(BotSummaryV2Response, bot, path=["response"])
@@ -235,6 +250,7 @@ class TestAsyncBots:
         bot = await async_client.radar.ai.bots.timeseries(
             agg_interval="1h",
             asn=["string"],
+            content_type=["HTML"],
             continent=["string"],
             crawl_purpose=["string"],
             date_end=[parse_datetime("2019-12-27T18:11:19.117Z")],
@@ -245,6 +261,8 @@ class TestAsyncBots:
             limit_per_group=10,
             location=["string"],
             name=["main_series"],
+            response_status=["string"],
+            response_status_category=["INFORMATIONAL"],
             user_agent=["string"],
             vertical=["string"],
         )
@@ -283,6 +301,7 @@ class TestAsyncBots:
             dimension="USER_AGENT",
             agg_interval="1h",
             asn=["string"],
+            content_type=["HTML"],
             continent=["string"],
             crawl_purpose=["string"],
             date_end=[parse_datetime("2019-12-27T18:11:19.117Z")],
@@ -293,7 +312,10 @@ class TestAsyncBots:
             limit_per_group=10,
             location=["string"],
             name=["main_series"],
-            normalization="MIN0_MAX",
+            normalization="PERCENTAGE",
+            response_status=["string"],
+            response_status_category=["INFORMATIONAL"],
+            user_agent=["string"],
             vertical=["string"],
         )
         assert_matches_type(BotTimeseriesGroupsResponse, bot, path=["response"])

@@ -7,8 +7,16 @@ from typing_extensions import Literal
 
 import httpx
 
+from .labels import (
+    LabelsResource,
+    AsyncLabelsResource,
+    LabelsResourceWithRawResponse,
+    AsyncLabelsResourceWithRawResponse,
+    LabelsResourceWithStreamingResponse,
+    AsyncLabelsResourceWithStreamingResponse,
+)
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -46,6 +54,10 @@ __all__ = ["OperationsResource", "AsyncOperationsResource"]
 
 class OperationsResource(SyncAPIResource):
     @cached_property
+    def labels(self) -> LabelsResource:
+        return LabelsResource(self._client)
+
+    @cached_property
     def schema_validation(self) -> SchemaValidationResource:
         return SchemaValidationResource(self._client)
 
@@ -71,7 +83,7 @@ class OperationsResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         endpoint: str,
         host: str,
         method: Literal["GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "CONNECT", "PATCH", "TRACE"],
@@ -110,10 +122,12 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            f"/zones/{zone_id}/api_gateway/operations/item",
+            path_template("/zones/{zone_id}/api_gateway/operations/item", zone_id=zone_id),
             body=maybe_transform(
                 {
                     "endpoint": endpoint,
@@ -135,7 +149,7 @@ class OperationsResource(SyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         direction: Literal["asc", "desc"] | Omit = omit,
         endpoint: str | Omit = omit,
         feature: List[Literal["thresholds", "parameter_schemas", "schema_info"]] | Omit = omit,
@@ -152,7 +166,8 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncV4PagePaginationArray[OperationListResponse]:
         """
-        Retrieve information about all operations on a zone
+        Lists all API operations tracked by API Shield for a zone with pagination.
+        Returns operation details including method, path, and feature configurations.
 
         Args:
           zone_id: Identifier.
@@ -184,10 +199,12 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/api_gateway/operations",
+            path_template("/zones/{zone_id}/api_gateway/operations", zone_id=zone_id),
             page=SyncV4PagePaginationArray[OperationListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -215,7 +232,7 @@ class OperationsResource(SyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -223,8 +240,10 @@ class OperationsResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationDeleteResponse:
-        """
-        Delete an operation
+        """Removes a single API operation from API Shield endpoint management.
+
+        The
+        operation will no longer be tracked or protected by API Shield rules.
 
         Args:
           zone_id: Identifier.
@@ -239,12 +258,16 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return self._delete(
-            f"/zones/{zone_id}/api_gateway/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/api_gateway/operations/{operation_id}", zone_id=zone_id, operation_id=operation_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -254,7 +277,7 @@ class OperationsResource(SyncAPIResource):
     def bulk_create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         body: Iterable[operation_bulk_create_params.Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -282,10 +305,12 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/api_gateway/operations",
+            path_template("/zones/{zone_id}/api_gateway/operations", zone_id=zone_id),
             page=SyncSinglePage[OperationBulkCreateResponse],
             body=maybe_transform(body, Iterable[operation_bulk_create_params.Body]),
             options=make_request_options(
@@ -298,7 +323,7 @@ class OperationsResource(SyncAPIResource):
     def bulk_delete(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -307,7 +332,8 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationBulkDeleteResponse:
         """
-        Delete multiple operations
+        Bulk removes multiple API operations from API Shield endpoint management in a
+        single request. Efficient for cleaning up unused endpoints.
 
         Args:
           zone_id: Identifier.
@@ -320,10 +346,12 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._delete(
-            f"/zones/{zone_id}/api_gateway/operations",
+            path_template("/zones/{zone_id}/api_gateway/operations", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -334,7 +362,7 @@ class OperationsResource(SyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         feature: List[Literal["thresholds", "parameter_schemas", "schema_info"]] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -344,7 +372,8 @@ class OperationsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationGetResponse:
         """
-        Retrieve information about an operation
+        Gets detailed information about a specific API operation in API Shield,
+        including its schema validation settings and traffic statistics.
 
         Args:
           zone_id: Identifier.
@@ -363,12 +392,16 @@ class OperationsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return self._get(
-            f"/zones/{zone_id}/api_gateway/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/api_gateway/operations/{operation_id}", zone_id=zone_id, operation_id=operation_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -382,6 +415,10 @@ class OperationsResource(SyncAPIResource):
 
 
 class AsyncOperationsResource(AsyncAPIResource):
+    @cached_property
+    def labels(self) -> AsyncLabelsResource:
+        return AsyncLabelsResource(self._client)
+
     @cached_property
     def schema_validation(self) -> AsyncSchemaValidationResource:
         return AsyncSchemaValidationResource(self._client)
@@ -408,7 +445,7 @@ class AsyncOperationsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         endpoint: str,
         host: str,
         method: Literal["GET", "POST", "HEAD", "OPTIONS", "PUT", "DELETE", "CONNECT", "PATCH", "TRACE"],
@@ -447,10 +484,12 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            f"/zones/{zone_id}/api_gateway/operations/item",
+            path_template("/zones/{zone_id}/api_gateway/operations/item", zone_id=zone_id),
             body=await async_maybe_transform(
                 {
                     "endpoint": endpoint,
@@ -472,7 +511,7 @@ class AsyncOperationsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         direction: Literal["asc", "desc"] | Omit = omit,
         endpoint: str | Omit = omit,
         feature: List[Literal["thresholds", "parameter_schemas", "schema_info"]] | Omit = omit,
@@ -489,7 +528,8 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[OperationListResponse, AsyncV4PagePaginationArray[OperationListResponse]]:
         """
-        Retrieve information about all operations on a zone
+        Lists all API operations tracked by API Shield for a zone with pagination.
+        Returns operation details including method, path, and feature configurations.
 
         Args:
           zone_id: Identifier.
@@ -521,10 +561,12 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/api_gateway/operations",
+            path_template("/zones/{zone_id}/api_gateway/operations", zone_id=zone_id),
             page=AsyncV4PagePaginationArray[OperationListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -552,7 +594,7 @@ class AsyncOperationsResource(AsyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -560,8 +602,10 @@ class AsyncOperationsResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationDeleteResponse:
-        """
-        Delete an operation
+        """Removes a single API operation from API Shield endpoint management.
+
+        The
+        operation will no longer be tracked or protected by API Shield rules.
 
         Args:
           zone_id: Identifier.
@@ -576,12 +620,16 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return await self._delete(
-            f"/zones/{zone_id}/api_gateway/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/api_gateway/operations/{operation_id}", zone_id=zone_id, operation_id=operation_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -591,7 +639,7 @@ class AsyncOperationsResource(AsyncAPIResource):
     def bulk_create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         body: Iterable[operation_bulk_create_params.Body],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -619,10 +667,12 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/api_gateway/operations",
+            path_template("/zones/{zone_id}/api_gateway/operations", zone_id=zone_id),
             page=AsyncSinglePage[OperationBulkCreateResponse],
             body=maybe_transform(body, Iterable[operation_bulk_create_params.Body]),
             options=make_request_options(
@@ -635,7 +685,7 @@ class AsyncOperationsResource(AsyncAPIResource):
     async def bulk_delete(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -644,7 +694,8 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationBulkDeleteResponse:
         """
-        Delete multiple operations
+        Bulk removes multiple API operations from API Shield endpoint management in a
+        single request. Efficient for cleaning up unused endpoints.
 
         Args:
           zone_id: Identifier.
@@ -657,10 +708,12 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._delete(
-            f"/zones/{zone_id}/api_gateway/operations",
+            path_template("/zones/{zone_id}/api_gateway/operations", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -671,7 +724,7 @@ class AsyncOperationsResource(AsyncAPIResource):
         self,
         operation_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         feature: List[Literal["thresholds", "parameter_schemas", "schema_info"]] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -681,7 +734,8 @@ class AsyncOperationsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> OperationGetResponse:
         """
-        Retrieve information about an operation
+        Gets detailed information about a specific API operation in API Shield,
+        including its schema validation settings and traffic statistics.
 
         Args:
           zone_id: Identifier.
@@ -700,12 +754,16 @@ class AsyncOperationsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not operation_id:
             raise ValueError(f"Expected a non-empty value for `operation_id` but received {operation_id!r}")
         return await self._get(
-            f"/zones/{zone_id}/api_gateway/operations/{operation_id}",
+            path_template(
+                "/zones/{zone_id}/api_gateway/operations/{operation_id}", zone_id=zone_id, operation_id=operation_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -742,6 +800,10 @@ class OperationsResourceWithRawResponse:
         )
 
     @cached_property
+    def labels(self) -> LabelsResourceWithRawResponse:
+        return LabelsResourceWithRawResponse(self._operations.labels)
+
+    @cached_property
     def schema_validation(self) -> SchemaValidationResourceWithRawResponse:
         return SchemaValidationResourceWithRawResponse(self._operations.schema_validation)
 
@@ -768,6 +830,10 @@ class AsyncOperationsResourceWithRawResponse:
         self.get = async_to_raw_response_wrapper(
             operations.get,
         )
+
+    @cached_property
+    def labels(self) -> AsyncLabelsResourceWithRawResponse:
+        return AsyncLabelsResourceWithRawResponse(self._operations.labels)
 
     @cached_property
     def schema_validation(self) -> AsyncSchemaValidationResourceWithRawResponse:
@@ -798,6 +864,10 @@ class OperationsResourceWithStreamingResponse:
         )
 
     @cached_property
+    def labels(self) -> LabelsResourceWithStreamingResponse:
+        return LabelsResourceWithStreamingResponse(self._operations.labels)
+
+    @cached_property
     def schema_validation(self) -> SchemaValidationResourceWithStreamingResponse:
         return SchemaValidationResourceWithStreamingResponse(self._operations.schema_validation)
 
@@ -824,6 +894,10 @@ class AsyncOperationsResourceWithStreamingResponse:
         self.get = async_to_streamed_response_wrapper(
             operations.get,
         )
+
+    @cached_property
+    def labels(self) -> AsyncLabelsResourceWithStreamingResponse:
+        return AsyncLabelsResourceWithStreamingResponse(self._operations.labels)
 
     @cached_property
     def schema_validation(self) -> AsyncSchemaValidationResourceWithStreamingResponse:

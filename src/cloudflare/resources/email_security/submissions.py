@@ -9,7 +9,7 @@ from typing_extensions import Literal
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform
+from ..._utils import path_template, maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -49,7 +49,8 @@ class SubmissionsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        customer_status: Literal["escalated", "reviewed", "unreviewed"] | Omit = omit,
         end: Union[str, datetime] | Omit = omit,
         original_disposition: Literal["MALICIOUS", "SUSPICIOUS", "SPOOF", "SPAM", "BULK", "NONE"] | Omit = omit,
         outcome_disposition: Literal["MALICIOUS", "SUSPICIOUS", "SPOOF", "SPAM", "BULK", "NONE"] | Omit = omit,
@@ -74,13 +75,14 @@ class SubmissionsResource(SyncAPIResource):
         Args:
           account_id: Account Identifier
 
-          end: The end of the search date range. Defaults to `now`.
+          end: The end of the search date range. Defaults to `now` if not provided.
 
           page: The page number of paginated results.
 
           per_page: The number of results per page.
 
-          start: The beginning of the search date range. Defaults to `now - 30 days`.
+          start: The beginning of the search date range. Defaults to `now - 30 days` if not
+              provided.
 
           extra_headers: Send extra headers
 
@@ -90,10 +92,12 @@ class SubmissionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/submissions",
+            path_template("/accounts/{account_id}/email-security/submissions", account_id=account_id),
             page=SyncV4PagePaginationArray[SubmissionListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -102,6 +106,7 @@ class SubmissionsResource(SyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "customer_status": customer_status,
                         "end": end,
                         "original_disposition": original_disposition,
                         "outcome_disposition": outcome_disposition,
@@ -144,7 +149,8 @@ class AsyncSubmissionsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        customer_status: Literal["escalated", "reviewed", "unreviewed"] | Omit = omit,
         end: Union[str, datetime] | Omit = omit,
         original_disposition: Literal["MALICIOUS", "SUSPICIOUS", "SPOOF", "SPAM", "BULK", "NONE"] | Omit = omit,
         outcome_disposition: Literal["MALICIOUS", "SUSPICIOUS", "SPOOF", "SPAM", "BULK", "NONE"] | Omit = omit,
@@ -169,13 +175,14 @@ class AsyncSubmissionsResource(AsyncAPIResource):
         Args:
           account_id: Account Identifier
 
-          end: The end of the search date range. Defaults to `now`.
+          end: The end of the search date range. Defaults to `now` if not provided.
 
           page: The page number of paginated results.
 
           per_page: The number of results per page.
 
-          start: The beginning of the search date range. Defaults to `now - 30 days`.
+          start: The beginning of the search date range. Defaults to `now - 30 days` if not
+              provided.
 
           extra_headers: Send extra headers
 
@@ -185,10 +192,12 @@ class AsyncSubmissionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/submissions",
+            path_template("/accounts/{account_id}/email-security/submissions", account_id=account_id),
             page=AsyncV4PagePaginationArray[SubmissionListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -197,6 +206,7 @@ class AsyncSubmissionsResource(AsyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "customer_status": customer_status,
                         "end": end,
                         "original_disposition": original_disposition,
                         "outcome_disposition": outcome_disposition,

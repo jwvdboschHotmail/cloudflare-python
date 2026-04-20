@@ -33,7 +33,7 @@ from .priority import (
     AsyncPriorityResourceWithStreamingResponse,
 )
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -91,7 +91,7 @@ class RequestsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         content: str | Omit = omit,
         priority: str | Omit = omit,
         request_type: str | Omit = omit,
@@ -130,10 +130,12 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/cloudforce-one/requests/new",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/new", account_id=account_id),
             body=maybe_transform(
                 {
                     "content": content,
@@ -158,7 +160,7 @@ class RequestsResource(SyncAPIResource):
         self,
         request_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         content: str | Omit = omit,
         priority: str | Omit = omit,
         request_type: str | Omit = omit,
@@ -200,12 +202,18 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not request_id:
             raise ValueError(f"Expected a non-empty value for `request_id` but received {request_id!r}")
         return self._put(
-            f"/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+            path_template(
+                "/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+                account_id=account_id,
+                request_id=request_id,
+            ),
             body=maybe_transform(
                 {
                     "content": content,
@@ -229,7 +237,7 @@ class RequestsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int,
         per_page: int,
         completed_after: Union[str, datetime] | Omit = omit,
@@ -248,7 +256,7 @@ class RequestsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncSinglePage[ListItem]:
         """
-        List Requests
+        Lists Cloudforce One intelligence requests with filtering and pagination.
 
         Args:
           account_id: Identifier.
@@ -281,10 +289,12 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/cloudforce-one/requests",
+            path_template("/accounts/{account_id}/cloudforce-one/requests", account_id=account_id),
             page=SyncSinglePage[ListItem],
             body=maybe_transform(
                 {
@@ -312,7 +322,7 @@ class RequestsResource(SyncAPIResource):
         self,
         request_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -321,7 +331,7 @@ class RequestsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> RequestDeleteResponse:
         """
-        Delete a Request
+        Deletes a Cloudforce One intelligence request and all associated data.
 
         Args:
           account_id: Identifier.
@@ -336,12 +346,18 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not request_id:
             raise ValueError(f"Expected a non-empty value for `request_id` but received {request_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+            path_template(
+                "/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+                account_id=account_id,
+                request_id=request_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -351,7 +367,7 @@ class RequestsResource(SyncAPIResource):
     def constants(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -360,7 +376,8 @@ class RequestsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RequestConstants]:
         """
-        Get Request Priority, Status, and TLP constants
+        Retrieves constant values used in Cloudforce One requests, including valid
+        statuses and types.
 
         Args:
           account_id: Identifier.
@@ -373,10 +390,12 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get(
-            f"/accounts/{account_id}/cloudforce-one/requests/constants",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/constants", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -391,7 +410,7 @@ class RequestsResource(SyncAPIResource):
         self,
         request_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -400,7 +419,7 @@ class RequestsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[Item]:
         """
-        Get a Request
+        Retrieves details for a specific Cloudforce One intelligence request.
 
         Args:
           account_id: Identifier.
@@ -415,12 +434,18 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not request_id:
             raise ValueError(f"Expected a non-empty value for `request_id` but received {request_id!r}")
         return self._get(
-            f"/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+            path_template(
+                "/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+                account_id=account_id,
+                request_id=request_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -434,7 +459,7 @@ class RequestsResource(SyncAPIResource):
     def quota(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -443,7 +468,7 @@ class RequestsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[Quota]:
         """
-        Get Request Quota
+        Retrieves quota usage for Cloudforce One standard requests.
 
         Args:
           account_id: Identifier.
@@ -456,10 +481,12 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get(
-            f"/accounts/{account_id}/cloudforce-one/requests/quota",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/quota", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -473,7 +500,7 @@ class RequestsResource(SyncAPIResource):
     def types(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -482,7 +509,7 @@ class RequestsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncSinglePage[RequestTypesResponse]:
         """
-        Get Request Types
+        Lists available request types for Cloudforce One intelligence requests.
 
         Args:
           account_id: Identifier.
@@ -495,10 +522,12 @@ class RequestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/cloudforce-one/requests/types",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/types", account_id=account_id),
             page=SyncSinglePage[RequestTypesResponse],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -542,7 +571,7 @@ class AsyncRequestsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         content: str | Omit = omit,
         priority: str | Omit = omit,
         request_type: str | Omit = omit,
@@ -581,10 +610,12 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/cloudforce-one/requests/new",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/new", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "content": content,
@@ -609,7 +640,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         self,
         request_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         content: str | Omit = omit,
         priority: str | Omit = omit,
         request_type: str | Omit = omit,
@@ -651,12 +682,18 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not request_id:
             raise ValueError(f"Expected a non-empty value for `request_id` but received {request_id!r}")
         return await self._put(
-            f"/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+            path_template(
+                "/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+                account_id=account_id,
+                request_id=request_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "content": content,
@@ -680,7 +717,7 @@ class AsyncRequestsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int,
         per_page: int,
         completed_after: Union[str, datetime] | Omit = omit,
@@ -699,7 +736,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[ListItem, AsyncSinglePage[ListItem]]:
         """
-        List Requests
+        Lists Cloudforce One intelligence requests with filtering and pagination.
 
         Args:
           account_id: Identifier.
@@ -732,10 +769,12 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/cloudforce-one/requests",
+            path_template("/accounts/{account_id}/cloudforce-one/requests", account_id=account_id),
             page=AsyncSinglePage[ListItem],
             body=maybe_transform(
                 {
@@ -763,7 +802,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         self,
         request_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -772,7 +811,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> RequestDeleteResponse:
         """
-        Delete a Request
+        Deletes a Cloudforce One intelligence request and all associated data.
 
         Args:
           account_id: Identifier.
@@ -787,12 +826,18 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not request_id:
             raise ValueError(f"Expected a non-empty value for `request_id` but received {request_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+            path_template(
+                "/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+                account_id=account_id,
+                request_id=request_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -802,7 +847,7 @@ class AsyncRequestsResource(AsyncAPIResource):
     async def constants(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -811,7 +856,8 @@ class AsyncRequestsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[RequestConstants]:
         """
-        Get Request Priority, Status, and TLP constants
+        Retrieves constant values used in Cloudforce One requests, including valid
+        statuses and types.
 
         Args:
           account_id: Identifier.
@@ -824,10 +870,12 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/cloudforce-one/requests/constants",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/constants", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -842,7 +890,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         self,
         request_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -851,7 +899,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[Item]:
         """
-        Get a Request
+        Retrieves details for a specific Cloudforce One intelligence request.
 
         Args:
           account_id: Identifier.
@@ -866,12 +914,18 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not request_id:
             raise ValueError(f"Expected a non-empty value for `request_id` but received {request_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+            path_template(
+                "/accounts/{account_id}/cloudforce-one/requests/{request_id}",
+                account_id=account_id,
+                request_id=request_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -885,7 +939,7 @@ class AsyncRequestsResource(AsyncAPIResource):
     async def quota(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -894,7 +948,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[Quota]:
         """
-        Get Request Quota
+        Retrieves quota usage for Cloudforce One standard requests.
 
         Args:
           account_id: Identifier.
@@ -907,10 +961,12 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/cloudforce-one/requests/quota",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/quota", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -924,7 +980,7 @@ class AsyncRequestsResource(AsyncAPIResource):
     def types(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -933,7 +989,7 @@ class AsyncRequestsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[RequestTypesResponse, AsyncSinglePage[RequestTypesResponse]]:
         """
-        Get Request Types
+        Lists available request types for Cloudforce One intelligence requests.
 
         Args:
           account_id: Identifier.
@@ -946,10 +1002,12 @@ class AsyncRequestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/cloudforce-one/requests/types",
+            path_template("/accounts/{account_id}/cloudforce-one/requests/types", account_id=account_id),
             page=AsyncSinglePage[RequestTypesResponse],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout

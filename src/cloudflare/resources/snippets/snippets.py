@@ -23,7 +23,7 @@ from .content import (
     AsyncContentResourceWithStreamingResponse,
 )
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -38,7 +38,6 @@ from ..._base_client import AsyncPaginator, make_request_options
 from ...types.snippets import snippet_list_params, snippet_update_params
 from ...types.snippets.snippet_get_response import SnippetGetResponse
 from ...types.snippets.snippet_list_response import SnippetListResponse
-from ...types.snippets.snippet_delete_response import SnippetDeleteResponse
 from ...types.snippets.snippet_update_response import SnippetUpdateResponse
 
 __all__ = ["SnippetsResource", "AsyncSnippetsResource"]
@@ -76,7 +75,7 @@ class SnippetsResource(SyncAPIResource):
         self,
         snippet_name: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         metadata: snippet_update_params.Metadata,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -89,11 +88,11 @@ class SnippetsResource(SyncAPIResource):
         Creates or updates a snippet belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          snippet_name: The identifying name of the snippet.
+          snippet_name: Identify the snippet.
 
-          metadata: Metadata about the snippet.
+          metadata: Provide metadata about the snippet.
 
           extra_headers: Send extra headers
 
@@ -103,6 +102,8 @@ class SnippetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not snippet_name:
@@ -112,7 +113,7 @@ class SnippetsResource(SyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return self._put(
-            f"/zones/{zone_id}/snippets/{snippet_name}",
+            path_template("/zones/{zone_id}/snippets/{snippet_name}", zone_id=zone_id, snippet_name=snippet_name),
             body=maybe_transform({"metadata": metadata}, snippet_update_params.SnippetUpdateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -128,7 +129,7 @@ class SnippetsResource(SyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -142,11 +143,11 @@ class SnippetsResource(SyncAPIResource):
         Fetches all snippets belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          page: The current page number.
+          page: Specifies the current page number.
 
-          per_page: The number of results to return per page.
+          per_page: Specifies how many results to return per page.
 
           extra_headers: Send extra headers
 
@@ -156,10 +157,12 @@ class SnippetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/snippets",
+            path_template("/zones/{zone_id}/snippets", zone_id=zone_id),
             page=SyncV4PagePaginationArray[SnippetListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -181,21 +184,21 @@ class SnippetsResource(SyncAPIResource):
         self,
         snippet_name: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> str:
+    ) -> object:
         """
         Deletes a snippet belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          snippet_name: The identifying name of the snippet.
+          snippet_name: Identify the snippet.
 
           extra_headers: Send extra headers
 
@@ -205,27 +208,29 @@ class SnippetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not snippet_name:
             raise ValueError(f"Expected a non-empty value for `snippet_name` but received {snippet_name!r}")
         return self._delete(
-            f"/zones/{zone_id}/snippets/{snippet_name}",
+            path_template("/zones/{zone_id}/snippets/{snippet_name}", zone_id=zone_id, snippet_name=snippet_name),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[SnippetDeleteResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[object]]._unwrapper,
             ),
-            cast_to=cast(Type[str], ResultWrapper[str]),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     def get(
         self,
         snippet_name: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -237,9 +242,9 @@ class SnippetsResource(SyncAPIResource):
         Fetches a snippet belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          snippet_name: The identifying name of the snippet.
+          snippet_name: Identify the snippet.
 
           extra_headers: Send extra headers
 
@@ -249,12 +254,14 @@ class SnippetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not snippet_name:
             raise ValueError(f"Expected a non-empty value for `snippet_name` but received {snippet_name!r}")
         return self._get(
-            f"/zones/{zone_id}/snippets/{snippet_name}",
+            path_template("/zones/{zone_id}/snippets/{snippet_name}", zone_id=zone_id, snippet_name=snippet_name),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -298,7 +305,7 @@ class AsyncSnippetsResource(AsyncAPIResource):
         self,
         snippet_name: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         metadata: snippet_update_params.Metadata,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -311,11 +318,11 @@ class AsyncSnippetsResource(AsyncAPIResource):
         Creates or updates a snippet belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          snippet_name: The identifying name of the snippet.
+          snippet_name: Identify the snippet.
 
-          metadata: Metadata about the snippet.
+          metadata: Provide metadata about the snippet.
 
           extra_headers: Send extra headers
 
@@ -325,6 +332,8 @@ class AsyncSnippetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not snippet_name:
@@ -334,7 +343,7 @@ class AsyncSnippetsResource(AsyncAPIResource):
         # multipart/form-data; boundary=---abc--
         extra_headers = {"Content-Type": "multipart/form-data", **(extra_headers or {})}
         return await self._put(
-            f"/zones/{zone_id}/snippets/{snippet_name}",
+            path_template("/zones/{zone_id}/snippets/{snippet_name}", zone_id=zone_id, snippet_name=snippet_name),
             body=await async_maybe_transform({"metadata": metadata}, snippet_update_params.SnippetUpdateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -350,7 +359,7 @@ class AsyncSnippetsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -364,11 +373,11 @@ class AsyncSnippetsResource(AsyncAPIResource):
         Fetches all snippets belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          page: The current page number.
+          page: Specifies the current page number.
 
-          per_page: The number of results to return per page.
+          per_page: Specifies how many results to return per page.
 
           extra_headers: Send extra headers
 
@@ -378,10 +387,12 @@ class AsyncSnippetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/snippets",
+            path_template("/zones/{zone_id}/snippets", zone_id=zone_id),
             page=AsyncV4PagePaginationArray[SnippetListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -403,21 +414,21 @@ class AsyncSnippetsResource(AsyncAPIResource):
         self,
         snippet_name: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> str:
+    ) -> object:
         """
         Deletes a snippet belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          snippet_name: The identifying name of the snippet.
+          snippet_name: Identify the snippet.
 
           extra_headers: Send extra headers
 
@@ -427,27 +438,29 @@ class AsyncSnippetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not snippet_name:
             raise ValueError(f"Expected a non-empty value for `snippet_name` but received {snippet_name!r}")
         return await self._delete(
-            f"/zones/{zone_id}/snippets/{snippet_name}",
+            path_template("/zones/{zone_id}/snippets/{snippet_name}", zone_id=zone_id, snippet_name=snippet_name),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[SnippetDeleteResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[object]]._unwrapper,
             ),
-            cast_to=cast(Type[str], ResultWrapper[str]),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     async def get(
         self,
         snippet_name: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -459,9 +472,9 @@ class AsyncSnippetsResource(AsyncAPIResource):
         Fetches a snippet belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          snippet_name: The identifying name of the snippet.
+          snippet_name: Identify the snippet.
 
           extra_headers: Send extra headers
 
@@ -471,12 +484,14 @@ class AsyncSnippetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not snippet_name:
             raise ValueError(f"Expected a non-empty value for `snippet_name` but received {snippet_name!r}")
         return await self._get(
-            f"/zones/{zone_id}/snippets/{snippet_name}",
+            path_template("/zones/{zone_id}/snippets/{snippet_name}", zone_id=zone_id, snippet_name=snippet_name),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

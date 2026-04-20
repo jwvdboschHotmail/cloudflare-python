@@ -24,7 +24,7 @@ from .plans import (
     AsyncPlansResourceWithStreamingResponse,
 )
 from ..._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from .settings import (
     SettingsResource,
     AsyncSettingsResource,
@@ -51,6 +51,14 @@ from ..._response import (
 )
 from ..._wrappers import ResultWrapper
 from ...pagination import SyncV4PagePaginationArray, AsyncV4PagePaginationArray
+from .environments import (
+    EnvironmentsResource,
+    AsyncEnvironmentsResource,
+    EnvironmentsResourceWithRawResponse,
+    AsyncEnvironmentsResourceWithRawResponse,
+    EnvironmentsResourceWithStreamingResponse,
+    AsyncEnvironmentsResourceWithStreamingResponse,
+)
 from ...types.zones import zone_edit_params, zone_list_params, zone_create_params
 from .subscriptions import (
     SubscriptionsResource,
@@ -92,6 +100,10 @@ class ZonesResource(SyncAPIResource):
     @cached_property
     def settings(self) -> SettingsResource:
         return SettingsResource(self._client)
+
+    @cached_property
+    def environments(self) -> EnvironmentsResource:
+        return EnvironmentsResource(self._client)
 
     @cached_property
     def custom_nameservers(self) -> CustomNameserversResource:
@@ -145,11 +157,15 @@ class ZonesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[Zone]:
-        """
-        Create Zone
+        """Create Zone
 
         Args:
           name: The domain name.
+
+        Per
+              [RFC 1035](https://datatracker.ietf.org/doc/html/rfc1035#section-2.3.4) the
+              overall zone name can be up to 253 characters, with each segment ("label") not
+              exceeding 63 characters.
 
           type: A full zone implies that DNS is hosted with Cloudflare. A partial zone is
               typically a partner-hosted zone or a CNAME setup.
@@ -266,7 +282,7 @@ class ZonesResource(SyncAPIResource):
     def delete(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -288,10 +304,12 @@ class ZonesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._delete(
-            f"/zones/{zone_id}",
+            path_template("/zones/{zone_id}", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -305,7 +323,7 @@ class ZonesResource(SyncAPIResource):
     def edit(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         paused: bool | Omit = omit,
         type: Literal["full", "partial", "secondary", "internal"] | Omit = omit,
         vanity_name_servers: SequenceNotStr[str] | Omit = omit,
@@ -342,10 +360,12 @@ class ZonesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._patch(
-            f"/zones/{zone_id}",
+            path_template("/zones/{zone_id}", zone_id=zone_id),
             body=maybe_transform(
                 {
                     "paused": paused,
@@ -367,7 +387,7 @@ class ZonesResource(SyncAPIResource):
     def get(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -389,10 +409,12 @@ class ZonesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get(
-            f"/zones/{zone_id}",
+            path_template("/zones/{zone_id}", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -412,6 +434,10 @@ class AsyncZonesResource(AsyncAPIResource):
     @cached_property
     def settings(self) -> AsyncSettingsResource:
         return AsyncSettingsResource(self._client)
+
+    @cached_property
+    def environments(self) -> AsyncEnvironmentsResource:
+        return AsyncEnvironmentsResource(self._client)
 
     @cached_property
     def custom_nameservers(self) -> AsyncCustomNameserversResource:
@@ -465,11 +491,15 @@ class AsyncZonesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[Zone]:
-        """
-        Create Zone
+        """Create Zone
 
         Args:
           name: The domain name.
+
+        Per
+              [RFC 1035](https://datatracker.ietf.org/doc/html/rfc1035#section-2.3.4) the
+              overall zone name can be up to 253 characters, with each segment ("label") not
+              exceeding 63 characters.
 
           type: A full zone implies that DNS is hosted with Cloudflare. A partial zone is
               typically a partner-hosted zone or a CNAME setup.
@@ -586,7 +616,7 @@ class AsyncZonesResource(AsyncAPIResource):
     async def delete(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -608,10 +638,12 @@ class AsyncZonesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._delete(
-            f"/zones/{zone_id}",
+            path_template("/zones/{zone_id}", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -625,7 +657,7 @@ class AsyncZonesResource(AsyncAPIResource):
     async def edit(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         paused: bool | Omit = omit,
         type: Literal["full", "partial", "secondary", "internal"] | Omit = omit,
         vanity_name_servers: SequenceNotStr[str] | Omit = omit,
@@ -662,10 +694,12 @@ class AsyncZonesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._patch(
-            f"/zones/{zone_id}",
+            path_template("/zones/{zone_id}", zone_id=zone_id),
             body=await async_maybe_transform(
                 {
                     "paused": paused,
@@ -687,7 +721,7 @@ class AsyncZonesResource(AsyncAPIResource):
     async def get(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -709,10 +743,12 @@ class AsyncZonesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._get(
-            f"/zones/{zone_id}",
+            path_template("/zones/{zone_id}", zone_id=zone_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -751,6 +787,10 @@ class ZonesResourceWithRawResponse:
     @cached_property
     def settings(self) -> SettingsResourceWithRawResponse:
         return SettingsResourceWithRawResponse(self._zones.settings)
+
+    @cached_property
+    def environments(self) -> EnvironmentsResourceWithRawResponse:
+        return EnvironmentsResourceWithRawResponse(self._zones.environments)
 
     @cached_property
     def custom_nameservers(self) -> CustomNameserversResourceWithRawResponse:
@@ -802,6 +842,10 @@ class AsyncZonesResourceWithRawResponse:
         return AsyncSettingsResourceWithRawResponse(self._zones.settings)
 
     @cached_property
+    def environments(self) -> AsyncEnvironmentsResourceWithRawResponse:
+        return AsyncEnvironmentsResourceWithRawResponse(self._zones.environments)
+
+    @cached_property
     def custom_nameservers(self) -> AsyncCustomNameserversResourceWithRawResponse:
         return AsyncCustomNameserversResourceWithRawResponse(self._zones.custom_nameservers)
 
@@ -851,6 +895,10 @@ class ZonesResourceWithStreamingResponse:
         return SettingsResourceWithStreamingResponse(self._zones.settings)
 
     @cached_property
+    def environments(self) -> EnvironmentsResourceWithStreamingResponse:
+        return EnvironmentsResourceWithStreamingResponse(self._zones.environments)
+
+    @cached_property
     def custom_nameservers(self) -> CustomNameserversResourceWithStreamingResponse:
         return CustomNameserversResourceWithStreamingResponse(self._zones.custom_nameservers)
 
@@ -898,6 +946,10 @@ class AsyncZonesResourceWithStreamingResponse:
     @cached_property
     def settings(self) -> AsyncSettingsResourceWithStreamingResponse:
         return AsyncSettingsResourceWithStreamingResponse(self._zones.settings)
+
+    @cached_property
+    def environments(self) -> AsyncEnvironmentsResourceWithStreamingResponse:
+        return AsyncEnvironmentsResourceWithStreamingResponse(self._zones.environments)
 
     @cached_property
     def custom_nameservers(self) -> AsyncCustomNameserversResourceWithStreamingResponse:

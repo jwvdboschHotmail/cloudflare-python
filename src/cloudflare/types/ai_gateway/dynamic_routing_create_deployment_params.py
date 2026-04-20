@@ -8,10 +8,8 @@ __all__ = ["DynamicRoutingCreateDeploymentParams"]
 
 
 class DynamicRoutingCreateDeploymentParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     gateway_id: Required[str]
-
-    comment: Required[str]
 
     version_id: Required[str]

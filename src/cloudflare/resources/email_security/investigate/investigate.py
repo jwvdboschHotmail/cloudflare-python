@@ -49,7 +49,7 @@ from .release import (
     AsyncReleaseResourceWithStreamingResponse,
 )
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from .detections import (
     DetectionsResource,
@@ -77,7 +77,7 @@ from ...._response import (
 from ...._wrappers import ResultWrapper
 from ....pagination import SyncV4PagePaginationArray, AsyncV4PagePaginationArray
 from ...._base_client import AsyncPaginator, make_request_options
-from ....types.email_security import investigate_list_params
+from ....types.email_security import investigate_get_params, investigate_list_params
 from ....types.email_security.investigate_get_response import InvestigateGetResponse
 from ....types.email_security.investigate_list_response import InvestigateListResponse
 
@@ -135,15 +135,16 @@ class InvestigateResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         action_log: bool | Omit = omit,
         alert_id: str | Omit = omit,
         cursor: str | Omit = omit,
         detections_only: bool | Omit = omit,
         domain: str | Omit = omit,
         end: Union[str, datetime] | Omit = omit,
+        exact_subject: str | Omit = omit,
         final_disposition: Literal["MALICIOUS", "SUSPICIOUS", "SPOOF", "SPAM", "BULK", "NONE"] | Omit = omit,
-        message_action: Literal["PREVIEW", "QUARANTINE_RELEASED", "MOVED"] | Omit = omit,
+        message_action: Literal["PREVIEW", "QUARANTINE_RELEASED", "MOVED", "SUBMITTED"] | Omit = omit,
         message_id: str | Omit = omit,
         metric: str | Omit = omit,
         page: Optional[int] | Omit = omit,
@@ -153,6 +154,7 @@ class InvestigateResource(SyncAPIResource):
         sender: str | Omit = omit,
         start: Union[str, datetime] | Omit = omit,
         subject: str | Omit = omit,
+        submissions: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -173,9 +175,12 @@ class InvestigateResource(SyncAPIResource):
 
           detections_only: Determines if the search results will include detections or not.
 
-          domain: The sender domains the search filters by.
+          domain: Filter by a domain found in the email: sender domain, recipient domain, or a
+              domain in a link.
 
-          end: The end of the search date range. Defaults to `now`.
+          end: The end of the search date range. Defaults to `now` if not provided.
+
+          exact_subject: Search for messages with an exact subject match.
 
           final_disposition: The dispositions the search filters by.
 
@@ -210,7 +215,17 @@ class InvestigateResource(SyncAPIResource):
               - x_originating_ip
               - Subject
 
-          start: The beginning of the search date range. Defaults to `now - 30 days`.
+          recipient: Filter by recipient. Matches either an email address or a domain.
+
+          sender: Filter by sender. Matches either an email address or a domain.
+
+          start: The beginning of the search date range. Defaults to `now - 30 days` if not
+              provided.
+
+          subject: Search for messages containing individual keywords in any order within the
+              subject.
+
+          submissions: Search for submissions instead of original messages
 
           extra_headers: Send extra headers
 
@@ -220,10 +235,12 @@ class InvestigateResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/investigate",
+            path_template("/accounts/{account_id}/email-security/investigate", account_id=account_id),
             page=SyncV4PagePaginationArray[InvestigateListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -238,6 +255,7 @@ class InvestigateResource(SyncAPIResource):
                         "detections_only": detections_only,
                         "domain": domain,
                         "end": end,
+                        "exact_subject": exact_subject,
                         "final_disposition": final_disposition,
                         "message_action": message_action,
                         "message_id": message_id,
@@ -249,6 +267,7 @@ class InvestigateResource(SyncAPIResource):
                         "sender": sender,
                         "start": start,
                         "subject": subject,
+                        "submissions": submissions,
                     },
                     investigate_list_params.InvestigateListParams,
                 ),
@@ -260,7 +279,8 @@ class InvestigateResource(SyncAPIResource):
         self,
         postfix_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        submission: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -269,12 +289,16 @@ class InvestigateResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InvestigateGetResponse:
         """
-        Get message details
+        Retrieves detailed information about a specific email message, including
+        headers, metadata, and security scan results.
 
         Args:
           account_id: Account Identifier
 
           postfix_id: The identifier of the message.
+
+          submission: When true, search the submissions datastore only. When false or omitted, search
+              the regular datastore only.
 
           extra_headers: Send extra headers
 
@@ -284,17 +308,24 @@ class InvestigateResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not postfix_id:
             raise ValueError(f"Expected a non-empty value for `postfix_id` but received {postfix_id!r}")
         return self._get(
-            f"/accounts/{account_id}/email-security/investigate/{postfix_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/investigate/{postfix_id}",
+                account_id=account_id,
+                postfix_id=postfix_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
+                query=maybe_transform({"submission": submission}, investigate_get_params.InvestigateGetParams),
                 post_parser=ResultWrapper[InvestigateGetResponse]._unwrapper,
             ),
             cast_to=cast(Type[InvestigateGetResponse], ResultWrapper[InvestigateGetResponse]),
@@ -352,15 +383,16 @@ class AsyncInvestigateResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         action_log: bool | Omit = omit,
         alert_id: str | Omit = omit,
         cursor: str | Omit = omit,
         detections_only: bool | Omit = omit,
         domain: str | Omit = omit,
         end: Union[str, datetime] | Omit = omit,
+        exact_subject: str | Omit = omit,
         final_disposition: Literal["MALICIOUS", "SUSPICIOUS", "SPOOF", "SPAM", "BULK", "NONE"] | Omit = omit,
-        message_action: Literal["PREVIEW", "QUARANTINE_RELEASED", "MOVED"] | Omit = omit,
+        message_action: Literal["PREVIEW", "QUARANTINE_RELEASED", "MOVED", "SUBMITTED"] | Omit = omit,
         message_id: str | Omit = omit,
         metric: str | Omit = omit,
         page: Optional[int] | Omit = omit,
@@ -370,6 +402,7 @@ class AsyncInvestigateResource(AsyncAPIResource):
         sender: str | Omit = omit,
         start: Union[str, datetime] | Omit = omit,
         subject: str | Omit = omit,
+        submissions: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -390,9 +423,12 @@ class AsyncInvestigateResource(AsyncAPIResource):
 
           detections_only: Determines if the search results will include detections or not.
 
-          domain: The sender domains the search filters by.
+          domain: Filter by a domain found in the email: sender domain, recipient domain, or a
+              domain in a link.
 
-          end: The end of the search date range. Defaults to `now`.
+          end: The end of the search date range. Defaults to `now` if not provided.
+
+          exact_subject: Search for messages with an exact subject match.
 
           final_disposition: The dispositions the search filters by.
 
@@ -427,7 +463,17 @@ class AsyncInvestigateResource(AsyncAPIResource):
               - x_originating_ip
               - Subject
 
-          start: The beginning of the search date range. Defaults to `now - 30 days`.
+          recipient: Filter by recipient. Matches either an email address or a domain.
+
+          sender: Filter by sender. Matches either an email address or a domain.
+
+          start: The beginning of the search date range. Defaults to `now - 30 days` if not
+              provided.
+
+          subject: Search for messages containing individual keywords in any order within the
+              subject.
+
+          submissions: Search for submissions instead of original messages
 
           extra_headers: Send extra headers
 
@@ -437,10 +483,12 @@ class AsyncInvestigateResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/investigate",
+            path_template("/accounts/{account_id}/email-security/investigate", account_id=account_id),
             page=AsyncV4PagePaginationArray[InvestigateListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -455,6 +503,7 @@ class AsyncInvestigateResource(AsyncAPIResource):
                         "detections_only": detections_only,
                         "domain": domain,
                         "end": end,
+                        "exact_subject": exact_subject,
                         "final_disposition": final_disposition,
                         "message_action": message_action,
                         "message_id": message_id,
@@ -466,6 +515,7 @@ class AsyncInvestigateResource(AsyncAPIResource):
                         "sender": sender,
                         "start": start,
                         "subject": subject,
+                        "submissions": submissions,
                     },
                     investigate_list_params.InvestigateListParams,
                 ),
@@ -477,7 +527,8 @@ class AsyncInvestigateResource(AsyncAPIResource):
         self,
         postfix_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        submission: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -486,12 +537,16 @@ class AsyncInvestigateResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InvestigateGetResponse:
         """
-        Get message details
+        Retrieves detailed information about a specific email message, including
+        headers, metadata, and security scan results.
 
         Args:
           account_id: Account Identifier
 
           postfix_id: The identifier of the message.
+
+          submission: When true, search the submissions datastore only. When false or omitted, search
+              the regular datastore only.
 
           extra_headers: Send extra headers
 
@@ -501,17 +556,26 @@ class AsyncInvestigateResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not postfix_id:
             raise ValueError(f"Expected a non-empty value for `postfix_id` but received {postfix_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/email-security/investigate/{postfix_id}",
+            path_template(
+                "/accounts/{account_id}/email-security/investigate/{postfix_id}",
+                account_id=account_id,
+                postfix_id=postfix_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
+                query=await async_maybe_transform(
+                    {"submission": submission}, investigate_get_params.InvestigateGetParams
+                ),
                 post_parser=ResultWrapper[InvestigateGetResponse]._unwrapper,
             ),
             cast_to=cast(Type[InvestigateGetResponse], ResultWrapper[InvestigateGetResponse]),

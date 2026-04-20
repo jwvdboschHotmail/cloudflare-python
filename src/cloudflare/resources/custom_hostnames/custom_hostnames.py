@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -81,7 +81,7 @@ class CustomHostnamesResource(SyncAPIResource):
     def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         hostname: str,
         custom_metadata: Dict[str, str] | Omit = omit,
         ssl: custom_hostname_create_params.SSL | Omit = omit,
@@ -122,10 +122,12 @@ class CustomHostnamesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._post(
-            f"/zones/{zone_id}/custom_hostnames",
+            path_template("/zones/{zone_id}/custom_hostnames", zone_id=zone_id),
             body=maybe_transform(
                 {
                     "hostname": hostname,
@@ -147,14 +149,60 @@ class CustomHostnamesResource(SyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         id: str | Omit = omit,
+        certificate_authority: Literal["google", "lets_encrypt", "ssl_com"] | Omit = omit,
+        custom_origin_server: str | Omit = omit,
         direction: Literal["asc", "desc"] | Omit = omit,
-        hostname: str | Omit = omit,
+        hostname: custom_hostname_list_params.Hostname | Omit = omit,
+        hostname_status: Literal[
+            "active",
+            "pending",
+            "active_redeploying",
+            "moved",
+            "pending_deletion",
+            "deleted",
+            "pending_blocked",
+            "pending_migration",
+            "pending_provisioned",
+            "test_pending",
+            "test_active",
+            "test_active_apex",
+            "test_blocked",
+            "test_failed",
+            "provisioned",
+            "blocked",
+        ]
+        | Omit = omit,
         order: Literal["ssl", "ssl_status"] | Omit = omit,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
         ssl: Literal[0, 1] | Omit = omit,
+        ssl_status: Literal[
+            "initializing",
+            "pending_validation",
+            "deleted",
+            "pending_issuance",
+            "pending_deployment",
+            "pending_deletion",
+            "pending_expiration",
+            "expired",
+            "active",
+            "initializing_timed_out",
+            "validation_timed_out",
+            "issuance_timed_out",
+            "deployment_timed_out",
+            "deletion_timed_out",
+            "pending_cleanup",
+            "staging_deployment",
+            "staging_active",
+            "deactivating",
+            "inactive",
+            "backup_issued",
+            "holding_deployment",
+        ]
+        | Omit = omit,
+        wildcard: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -172,10 +220,13 @@ class CustomHostnamesResource(SyncAPIResource):
               initial custom_hostname creation. This parameter cannot be used with the
               'hostname' parameter.
 
+          certificate_authority: Filter by the certificate authority that issued the SSL certificate.
+
+          custom_origin_server: Filter by custom origin server name.
+
           direction: Direction to order hostnames.
 
-          hostname: Fully qualified domain name to match against. This parameter cannot be used with
-              the 'id' parameter.
+          hostname_status: Filter by the hostname's activation status.
 
           order: Field to order hostnames by.
 
@@ -185,6 +236,10 @@ class CustomHostnamesResource(SyncAPIResource):
 
           ssl: Whether to filter hostnames based on if they have SSL enabled.
 
+          ssl_status: Filter by SSL certificate status.
+
+          wildcard: Filter by whether the custom hostname is a wildcard hostname.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -193,10 +248,12 @@ class CustomHostnamesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/custom_hostnames",
+            path_template("/zones/{zone_id}/custom_hostnames", zone_id=zone_id),
             page=SyncV4PagePaginationArray[CustomHostnameListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -206,12 +263,17 @@ class CustomHostnamesResource(SyncAPIResource):
                 query=maybe_transform(
                     {
                         "id": id,
+                        "certificate_authority": certificate_authority,
+                        "custom_origin_server": custom_origin_server,
                         "direction": direction,
                         "hostname": hostname,
+                        "hostname_status": hostname_status,
                         "order": order,
                         "page": page,
                         "per_page": per_page,
                         "ssl": ssl,
+                        "ssl_status": ssl_status,
+                        "wildcard": wildcard,
                     },
                     custom_hostname_list_params.CustomHostnameListParams,
                 ),
@@ -223,7 +285,7 @@ class CustomHostnamesResource(SyncAPIResource):
         self,
         custom_hostname_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -232,7 +294,8 @@ class CustomHostnamesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> CustomHostnameDeleteResponse:
         """
-        Delete Custom Hostname (and any issued SSL certificates)
+        Permanently deletes a custom hostname and revokes any SSL certificates that were
+        issued for it. This action cannot be undone.
 
         Args:
           zone_id: Identifier.
@@ -247,12 +310,18 @@ class CustomHostnamesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_hostname_id:
             raise ValueError(f"Expected a non-empty value for `custom_hostname_id` but received {custom_hostname_id!r}")
         return self._delete(
-            f"/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+            path_template(
+                "/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+                zone_id=zone_id,
+                custom_hostname_id=custom_hostname_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -263,7 +332,7 @@ class CustomHostnamesResource(SyncAPIResource):
         self,
         custom_hostname_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         custom_metadata: Dict[str, str] | Omit = omit,
         custom_origin_server: str | Omit = omit,
         custom_origin_sni: str | Omit = omit,
@@ -312,12 +381,18 @@ class CustomHostnamesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_hostname_id:
             raise ValueError(f"Expected a non-empty value for `custom_hostname_id` but received {custom_hostname_id!r}")
         return self._patch(
-            f"/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+            path_template(
+                "/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+                zone_id=zone_id,
+                custom_hostname_id=custom_hostname_id,
+            ),
             body=maybe_transform(
                 {
                     "custom_metadata": custom_metadata,
@@ -341,7 +416,7 @@ class CustomHostnamesResource(SyncAPIResource):
         self,
         custom_hostname_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -350,7 +425,8 @@ class CustomHostnamesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[CustomHostnameGetResponse]:
         """
-        Custom Hostname Details
+        Retrieves detailed information about a specific custom hostname, including SSL
+        certificate status, ownership verification, and origin configuration.
 
         Args:
           zone_id: Identifier.
@@ -365,12 +441,18 @@ class CustomHostnamesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_hostname_id:
             raise ValueError(f"Expected a non-empty value for `custom_hostname_id` but received {custom_hostname_id!r}")
         return self._get(
-            f"/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+            path_template(
+                "/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+                zone_id=zone_id,
+                custom_hostname_id=custom_hostname_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -413,7 +495,7 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         hostname: str,
         custom_metadata: Dict[str, str] | Omit = omit,
         ssl: custom_hostname_create_params.SSL | Omit = omit,
@@ -454,10 +536,12 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return await self._post(
-            f"/zones/{zone_id}/custom_hostnames",
+            path_template("/zones/{zone_id}/custom_hostnames", zone_id=zone_id),
             body=await async_maybe_transform(
                 {
                     "hostname": hostname,
@@ -479,14 +563,60 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         id: str | Omit = omit,
+        certificate_authority: Literal["google", "lets_encrypt", "ssl_com"] | Omit = omit,
+        custom_origin_server: str | Omit = omit,
         direction: Literal["asc", "desc"] | Omit = omit,
-        hostname: str | Omit = omit,
+        hostname: custom_hostname_list_params.Hostname | Omit = omit,
+        hostname_status: Literal[
+            "active",
+            "pending",
+            "active_redeploying",
+            "moved",
+            "pending_deletion",
+            "deleted",
+            "pending_blocked",
+            "pending_migration",
+            "pending_provisioned",
+            "test_pending",
+            "test_active",
+            "test_active_apex",
+            "test_blocked",
+            "test_failed",
+            "provisioned",
+            "blocked",
+        ]
+        | Omit = omit,
         order: Literal["ssl", "ssl_status"] | Omit = omit,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
         ssl: Literal[0, 1] | Omit = omit,
+        ssl_status: Literal[
+            "initializing",
+            "pending_validation",
+            "deleted",
+            "pending_issuance",
+            "pending_deployment",
+            "pending_deletion",
+            "pending_expiration",
+            "expired",
+            "active",
+            "initializing_timed_out",
+            "validation_timed_out",
+            "issuance_timed_out",
+            "deployment_timed_out",
+            "deletion_timed_out",
+            "pending_cleanup",
+            "staging_deployment",
+            "staging_active",
+            "deactivating",
+            "inactive",
+            "backup_issued",
+            "holding_deployment",
+        ]
+        | Omit = omit,
+        wildcard: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -504,10 +634,13 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
               initial custom_hostname creation. This parameter cannot be used with the
               'hostname' parameter.
 
+          certificate_authority: Filter by the certificate authority that issued the SSL certificate.
+
+          custom_origin_server: Filter by custom origin server name.
+
           direction: Direction to order hostnames.
 
-          hostname: Fully qualified domain name to match against. This parameter cannot be used with
-              the 'id' parameter.
+          hostname_status: Filter by the hostname's activation status.
 
           order: Field to order hostnames by.
 
@@ -517,6 +650,10 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
 
           ssl: Whether to filter hostnames based on if they have SSL enabled.
 
+          ssl_status: Filter by SSL certificate status.
+
+          wildcard: Filter by whether the custom hostname is a wildcard hostname.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -525,10 +662,12 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         return self._get_api_list(
-            f"/zones/{zone_id}/custom_hostnames",
+            path_template("/zones/{zone_id}/custom_hostnames", zone_id=zone_id),
             page=AsyncV4PagePaginationArray[CustomHostnameListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -538,12 +677,17 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
                 query=maybe_transform(
                     {
                         "id": id,
+                        "certificate_authority": certificate_authority,
+                        "custom_origin_server": custom_origin_server,
                         "direction": direction,
                         "hostname": hostname,
+                        "hostname_status": hostname_status,
                         "order": order,
                         "page": page,
                         "per_page": per_page,
                         "ssl": ssl,
+                        "ssl_status": ssl_status,
+                        "wildcard": wildcard,
                     },
                     custom_hostname_list_params.CustomHostnameListParams,
                 ),
@@ -555,7 +699,7 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
         self,
         custom_hostname_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -564,7 +708,8 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> CustomHostnameDeleteResponse:
         """
-        Delete Custom Hostname (and any issued SSL certificates)
+        Permanently deletes a custom hostname and revokes any SSL certificates that were
+        issued for it. This action cannot be undone.
 
         Args:
           zone_id: Identifier.
@@ -579,12 +724,18 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_hostname_id:
             raise ValueError(f"Expected a non-empty value for `custom_hostname_id` but received {custom_hostname_id!r}")
         return await self._delete(
-            f"/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+            path_template(
+                "/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+                zone_id=zone_id,
+                custom_hostname_id=custom_hostname_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -595,7 +746,7 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
         self,
         custom_hostname_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         custom_metadata: Dict[str, str] | Omit = omit,
         custom_origin_server: str | Omit = omit,
         custom_origin_sni: str | Omit = omit,
@@ -644,12 +795,18 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_hostname_id:
             raise ValueError(f"Expected a non-empty value for `custom_hostname_id` but received {custom_hostname_id!r}")
         return await self._patch(
-            f"/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+            path_template(
+                "/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+                zone_id=zone_id,
+                custom_hostname_id=custom_hostname_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "custom_metadata": custom_metadata,
@@ -673,7 +830,7 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
         self,
         custom_hostname_id: str,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -682,7 +839,8 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> Optional[CustomHostnameGetResponse]:
         """
-        Custom Hostname Details
+        Retrieves detailed information about a specific custom hostname, including SSL
+        certificate status, ownership verification, and origin configuration.
 
         Args:
           zone_id: Identifier.
@@ -697,12 +855,18 @@ class AsyncCustomHostnamesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
         if not custom_hostname_id:
             raise ValueError(f"Expected a non-empty value for `custom_hostname_id` but received {custom_hostname_id!r}")
         return await self._get(
-            f"/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+            path_template(
+                "/zones/{zone_id}/custom_hostnames/{custom_hostname_id}",
+                zone_id=zone_id,
+                custom_hostname_id=custom_hostname_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

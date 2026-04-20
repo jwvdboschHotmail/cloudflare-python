@@ -7,7 +7,7 @@ from typing import Type, cast
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from .versions import (
     VersionsResource,
     AsyncVersionsResource,
@@ -76,9 +76,10 @@ class WorkflowsResource(SyncAPIResource):
         self,
         workflow_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         class_name: str,
         script_name: str,
+        limits: workflow_update_params.Limits | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -87,7 +88,7 @@ class WorkflowsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> WorkflowUpdateResponse:
         """
-        Create/modify Workflow
+        Creates a new workflow or updates an existing workflow definition.
 
         Args:
           extra_headers: Send extra headers
@@ -98,16 +99,21 @@ class WorkflowsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not workflow_name:
             raise ValueError(f"Expected a non-empty value for `workflow_name` but received {workflow_name!r}")
         return self._put(
-            f"/accounts/{account_id}/workflows/{workflow_name}",
+            path_template(
+                "/accounts/{account_id}/workflows/{workflow_name}", account_id=account_id, workflow_name=workflow_name
+            ),
             body=maybe_transform(
                 {
                     "class_name": class_name,
                     "script_name": script_name,
+                    "limits": limits,
                 },
                 workflow_update_params.WorkflowUpdateParams,
             ),
@@ -124,7 +130,7 @@ class WorkflowsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
         search: str | Omit = omit,
@@ -136,7 +142,7 @@ class WorkflowsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncV4PagePaginationArray[WorkflowListResponse]:
         """
-        List all Workflows
+        Lists all workflows configured for the account.
 
         Args:
           search: Allows filtering workflows` name.
@@ -149,10 +155,12 @@ class WorkflowsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/workflows",
+            path_template("/accounts/{account_id}/workflows", account_id=account_id),
             page=SyncV4PagePaginationArray[WorkflowListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -175,7 +183,7 @@ class WorkflowsResource(SyncAPIResource):
         self,
         workflow_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -197,12 +205,16 @@ class WorkflowsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not workflow_name:
             raise ValueError(f"Expected a non-empty value for `workflow_name` but received {workflow_name!r}")
         return self._delete(
-            f"/accounts/{account_id}/workflows/{workflow_name}",
+            path_template(
+                "/accounts/{account_id}/workflows/{workflow_name}", account_id=account_id, workflow_name=workflow_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -217,7 +229,7 @@ class WorkflowsResource(SyncAPIResource):
         self,
         workflow_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -226,7 +238,7 @@ class WorkflowsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> WorkflowGetResponse:
         """
-        Get Workflow details
+        Retrieves configuration and metadata for a specific workflow.
 
         Args:
           extra_headers: Send extra headers
@@ -237,12 +249,16 @@ class WorkflowsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not workflow_name:
             raise ValueError(f"Expected a non-empty value for `workflow_name` but received {workflow_name!r}")
         return self._get(
-            f"/accounts/{account_id}/workflows/{workflow_name}",
+            path_template(
+                "/accounts/{account_id}/workflows/{workflow_name}", account_id=account_id, workflow_name=workflow_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -286,9 +302,10 @@ class AsyncWorkflowsResource(AsyncAPIResource):
         self,
         workflow_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         class_name: str,
         script_name: str,
+        limits: workflow_update_params.Limits | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -297,7 +314,7 @@ class AsyncWorkflowsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> WorkflowUpdateResponse:
         """
-        Create/modify Workflow
+        Creates a new workflow or updates an existing workflow definition.
 
         Args:
           extra_headers: Send extra headers
@@ -308,16 +325,21 @@ class AsyncWorkflowsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not workflow_name:
             raise ValueError(f"Expected a non-empty value for `workflow_name` but received {workflow_name!r}")
         return await self._put(
-            f"/accounts/{account_id}/workflows/{workflow_name}",
+            path_template(
+                "/accounts/{account_id}/workflows/{workflow_name}", account_id=account_id, workflow_name=workflow_name
+            ),
             body=await async_maybe_transform(
                 {
                     "class_name": class_name,
                     "script_name": script_name,
+                    "limits": limits,
                 },
                 workflow_update_params.WorkflowUpdateParams,
             ),
@@ -334,7 +356,7 @@ class AsyncWorkflowsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
         search: str | Omit = omit,
@@ -346,7 +368,7 @@ class AsyncWorkflowsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[WorkflowListResponse, AsyncV4PagePaginationArray[WorkflowListResponse]]:
         """
-        List all Workflows
+        Lists all workflows configured for the account.
 
         Args:
           search: Allows filtering workflows` name.
@@ -359,10 +381,12 @@ class AsyncWorkflowsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/workflows",
+            path_template("/accounts/{account_id}/workflows", account_id=account_id),
             page=AsyncV4PagePaginationArray[WorkflowListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -385,7 +409,7 @@ class AsyncWorkflowsResource(AsyncAPIResource):
         self,
         workflow_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -407,12 +431,16 @@ class AsyncWorkflowsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not workflow_name:
             raise ValueError(f"Expected a non-empty value for `workflow_name` but received {workflow_name!r}")
         return await self._delete(
-            f"/accounts/{account_id}/workflows/{workflow_name}",
+            path_template(
+                "/accounts/{account_id}/workflows/{workflow_name}", account_id=account_id, workflow_name=workflow_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -427,7 +455,7 @@ class AsyncWorkflowsResource(AsyncAPIResource):
         self,
         workflow_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -436,7 +464,7 @@ class AsyncWorkflowsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> WorkflowGetResponse:
         """
-        Get Workflow details
+        Retrieves configuration and metadata for a specific workflow.
 
         Args:
           extra_headers: Send extra headers
@@ -447,12 +475,16 @@ class AsyncWorkflowsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not workflow_name:
             raise ValueError(f"Expected a non-empty value for `workflow_name` but received {workflow_name!r}")
         return await self._get(
-            f"/accounts/{account_id}/workflows/{workflow_name}",
+            path_template(
+                "/accounts/{account_id}/workflows/{workflow_name}", account_id=account_id, workflow_name=workflow_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

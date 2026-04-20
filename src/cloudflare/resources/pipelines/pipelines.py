@@ -24,7 +24,7 @@ from .streams import (
     AsyncStreamsResourceWithStreamingResponse,
 )
 from ..._types import Body, Omit, Query, Headers, NoneType, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -88,7 +88,7 @@ class PipelinesResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         destination: pipeline_create_params.Destination,
         name: str,
         source: Iterable[pipeline_create_params.Source],
@@ -117,10 +117,12 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/pipelines",
+            path_template("/accounts/{account_id}/pipelines", account_id=account_id),
             body=maybe_transform(
                 {
                     "destination": destination,
@@ -144,7 +146,7 @@ class PipelinesResource(SyncAPIResource):
         self,
         pipeline_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         destination: pipeline_update_params.Destination,
         name: str,
         source: Iterable[pipeline_update_params.Source],
@@ -175,12 +177,16 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_name:
             raise ValueError(f"Expected a non-empty value for `pipeline_name` but received {pipeline_name!r}")
         return self._put(
-            f"/accounts/{account_id}/pipelines/{pipeline_name}",
+            path_template(
+                "/accounts/{account_id}/pipelines/{pipeline_name}", account_id=account_id, pipeline_name=pipeline_name
+            ),
             body=maybe_transform(
                 {
                     "destination": destination,
@@ -203,7 +209,7 @@ class PipelinesResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: str | Omit = omit,
         per_page: str | Omit = omit,
         search: str | Omit = omit,
@@ -236,10 +242,12 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get(
-            f"/accounts/{account_id}/pipelines",
+            path_template("/accounts/{account_id}/pipelines", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -262,7 +270,7 @@ class PipelinesResource(SyncAPIResource):
         self,
         pipeline_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -288,13 +296,17 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_name:
             raise ValueError(f"Expected a non-empty value for `pipeline_name` but received {pipeline_name!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return self._delete(
-            f"/accounts/{account_id}/pipelines/{pipeline_name}",
+            path_template(
+                "/accounts/{account_id}/pipelines/{pipeline_name}", account_id=account_id, pipeline_name=pipeline_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -304,7 +316,7 @@ class PipelinesResource(SyncAPIResource):
     def create_v1(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         sql: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -332,10 +344,12 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/pipelines/v1/pipelines",
+            path_template("/accounts/{account_id}/pipelines/v1/pipelines", account_id=account_id),
             body=maybe_transform(
                 {
                     "name": name,
@@ -357,14 +371,14 @@ class PipelinesResource(SyncAPIResource):
         self,
         pipeline_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> None:
+    ) -> object:
         """
         Delete Pipeline in Account.
 
@@ -381,17 +395,26 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_id:
             raise ValueError(f"Expected a non-empty value for `pipeline_id` but received {pipeline_id!r}")
-        extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return self._delete(
-            f"/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            path_template(
+                "/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
+                account_id=account_id,
+                pipeline_id=pipeline_id,
             ),
-            cast_to=NoneType,
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
+            ),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     @typing_extensions.deprecated("Use get_v1 instead. This endpoint will be removed in the future.")
@@ -399,7 +422,7 @@ class PipelinesResource(SyncAPIResource):
         self,
         pipeline_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -425,12 +448,16 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_name:
             raise ValueError(f"Expected a non-empty value for `pipeline_name` but received {pipeline_name!r}")
         return self._get(
-            f"/accounts/{account_id}/pipelines/{pipeline_name}",
+            path_template(
+                "/accounts/{account_id}/pipelines/{pipeline_name}", account_id=account_id, pipeline_name=pipeline_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -445,7 +472,7 @@ class PipelinesResource(SyncAPIResource):
         self,
         pipeline_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -469,12 +496,18 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_id:
             raise ValueError(f"Expected a non-empty value for `pipeline_id` but received {pipeline_id!r}")
         return self._get(
-            f"/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
+            path_template(
+                "/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
+                account_id=account_id,
+                pipeline_id=pipeline_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -488,7 +521,7 @@ class PipelinesResource(SyncAPIResource):
     def list_v1(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -512,10 +545,12 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/pipelines/v1/pipelines",
+            path_template("/accounts/{account_id}/pipelines/v1/pipelines", account_id=account_id),
             page=SyncV4PagePaginationArray[PipelineListV1Response],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -536,7 +571,7 @@ class PipelinesResource(SyncAPIResource):
     def validate_sql(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         sql: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -561,10 +596,12 @@ class PipelinesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/pipelines/v1/validate_sql",
+            path_template("/accounts/{account_id}/pipelines/v1/validate_sql", account_id=account_id),
             body=maybe_transform({"sql": sql}, pipeline_validate_sql_params.PipelineValidateSqlParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -609,7 +646,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         destination: pipeline_create_params.Destination,
         name: str,
         source: Iterable[pipeline_create_params.Source],
@@ -638,10 +675,12 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/pipelines",
+            path_template("/accounts/{account_id}/pipelines", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "destination": destination,
@@ -665,7 +704,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
         self,
         pipeline_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         destination: pipeline_update_params.Destination,
         name: str,
         source: Iterable[pipeline_update_params.Source],
@@ -696,12 +735,16 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_name:
             raise ValueError(f"Expected a non-empty value for `pipeline_name` but received {pipeline_name!r}")
         return await self._put(
-            f"/accounts/{account_id}/pipelines/{pipeline_name}",
+            path_template(
+                "/accounts/{account_id}/pipelines/{pipeline_name}", account_id=account_id, pipeline_name=pipeline_name
+            ),
             body=await async_maybe_transform(
                 {
                     "destination": destination,
@@ -724,7 +767,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
     async def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: str | Omit = omit,
         per_page: str | Omit = omit,
         search: str | Omit = omit,
@@ -757,10 +800,12 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/pipelines",
+            path_template("/accounts/{account_id}/pipelines", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -783,7 +828,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
         self,
         pipeline_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -809,13 +854,17 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_name:
             raise ValueError(f"Expected a non-empty value for `pipeline_name` but received {pipeline_name!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return await self._delete(
-            f"/accounts/{account_id}/pipelines/{pipeline_name}",
+            path_template(
+                "/accounts/{account_id}/pipelines/{pipeline_name}", account_id=account_id, pipeline_name=pipeline_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -825,7 +874,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
     async def create_v1(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         sql: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -853,10 +902,12 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/pipelines/v1/pipelines",
+            path_template("/accounts/{account_id}/pipelines/v1/pipelines", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "name": name,
@@ -878,14 +929,14 @@ class AsyncPipelinesResource(AsyncAPIResource):
         self,
         pipeline_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> None:
+    ) -> object:
         """
         Delete Pipeline in Account.
 
@@ -902,17 +953,26 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_id:
             raise ValueError(f"Expected a non-empty value for `pipeline_id` but received {pipeline_id!r}")
-        extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return await self._delete(
-            f"/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
-            options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+            path_template(
+                "/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
+                account_id=account_id,
+                pipeline_id=pipeline_id,
             ),
-            cast_to=NoneType,
+            options=make_request_options(
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
+            ),
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     @typing_extensions.deprecated("Use get_v1 instead. This endpoint will be removed in the future.")
@@ -920,7 +980,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
         self,
         pipeline_name: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -946,12 +1006,16 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_name:
             raise ValueError(f"Expected a non-empty value for `pipeline_name` but received {pipeline_name!r}")
         return await self._get(
-            f"/accounts/{account_id}/pipelines/{pipeline_name}",
+            path_template(
+                "/accounts/{account_id}/pipelines/{pipeline_name}", account_id=account_id, pipeline_name=pipeline_name
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -966,7 +1030,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
         self,
         pipeline_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -990,12 +1054,18 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not pipeline_id:
             raise ValueError(f"Expected a non-empty value for `pipeline_id` but received {pipeline_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
+            path_template(
+                "/accounts/{account_id}/pipelines/v1/pipelines/{pipeline_id}",
+                account_id=account_id,
+                pipeline_id=pipeline_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -1009,7 +1079,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
     def list_v1(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -1033,10 +1103,12 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/pipelines/v1/pipelines",
+            path_template("/accounts/{account_id}/pipelines/v1/pipelines", account_id=account_id),
             page=AsyncV4PagePaginationArray[PipelineListV1Response],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -1057,7 +1129,7 @@ class AsyncPipelinesResource(AsyncAPIResource):
     async def validate_sql(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         sql: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -1082,10 +1154,12 @@ class AsyncPipelinesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/pipelines/v1/validate_sql",
+            path_template("/accounts/{account_id}/pipelines/v1/validate_sql", account_id=account_id),
             body=await async_maybe_transform({"sql": sql}, pipeline_validate_sql_params.PipelineValidateSqlParams),
             options=make_request_options(
                 extra_headers=extra_headers,

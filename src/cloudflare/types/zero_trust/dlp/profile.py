@@ -23,6 +23,16 @@ __all__ = [
     "CustomProfileEntryExactDataEntry",
     "CustomProfileEntryDocumentFingerprintEntry",
     "CustomProfileEntryWordListEntry",
+    "CustomProfileSensitivityLevel",
+    "CustomProfileSharedEntry",
+    "CustomProfileSharedEntryCustomEntry",
+    "CustomProfileSharedEntryPredefinedEntry",
+    "CustomProfileSharedEntryPredefinedEntryConfidence",
+    "CustomProfileSharedEntryPredefinedEntryVariant",
+    "CustomProfileSharedEntryIntegrationEntry",
+    "CustomProfileSharedEntryExactDataEntry",
+    "CustomProfileSharedEntryDocumentFingerprintEntry",
+    "CustomProfileSharedEntryWordListEntry",
     "PredefinedProfile",
     "PredefinedProfileEntry",
     "PredefinedProfileEntryCustomEntry",
@@ -43,6 +53,15 @@ __all__ = [
     "IntegrationProfileEntryExactDataEntry",
     "IntegrationProfileEntryDocumentFingerprintEntry",
     "IntegrationProfileEntryWordListEntry",
+    "IntegrationProfileSharedEntry",
+    "IntegrationProfileSharedEntryCustomEntry",
+    "IntegrationProfileSharedEntryPredefinedEntry",
+    "IntegrationProfileSharedEntryPredefinedEntryConfidence",
+    "IntegrationProfileSharedEntryPredefinedEntryVariant",
+    "IntegrationProfileSharedEntryIntegrationEntry",
+    "IntegrationProfileSharedEntryExactDataEntry",
+    "IntegrationProfileSharedEntryDocumentFingerprintEntry",
+    "IntegrationProfileSharedEntryWordListEntry",
 ]
 
 
@@ -60,6 +79,8 @@ class CustomProfileEntryCustomEntry(BaseModel):
     type: Literal["custom"]
 
     updated_at: datetime
+
+    description: Optional[str] = None
 
     profile_id: Optional[str] = None
 
@@ -179,6 +200,151 @@ CustomProfileEntry: TypeAlias = Union[
 ]
 
 
+class CustomProfileSensitivityLevel(BaseModel):
+    """
+    A reference pairing a sensitivity group with a specific level within that group.
+    """
+
+    group_id: str
+
+    level_id: str
+
+
+class CustomProfileSharedEntryCustomEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    pattern: Pattern
+
+    type: Literal["custom"]
+
+    updated_at: datetime
+
+    description: Optional[str] = None
+
+    profile_id: Optional[str] = None
+
+
+class CustomProfileSharedEntryPredefinedEntryConfidence(BaseModel):
+    ai_context_available: bool
+    """Indicates whether this entry has AI remote service validation."""
+
+    available: bool
+    """
+    Indicates whether this entry has any form of validation that is not an AI remote
+    service.
+    """
+
+
+class CustomProfileSharedEntryPredefinedEntryVariant(BaseModel):
+    topic_type: Literal["Intent", "Content"]
+
+    type: Literal["PromptTopic"]
+
+    description: Optional[str] = None
+
+
+class CustomProfileSharedEntryPredefinedEntry(BaseModel):
+    id: str
+
+    confidence: CustomProfileSharedEntryPredefinedEntryConfidence
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["predefined"]
+
+    profile_id: Optional[str] = None
+
+    variant: Optional[CustomProfileSharedEntryPredefinedEntryVariant] = None
+
+
+class CustomProfileSharedEntryIntegrationEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["integration"]
+
+    updated_at: datetime
+
+    profile_id: Optional[str] = None
+
+
+class CustomProfileSharedEntryExactDataEntry(BaseModel):
+    id: str
+
+    case_sensitive: bool
+    """
+    Only applies to custom word lists. Determines if the words should be matched in
+    a case-sensitive manner Cannot be set to false if secret is true
+    """
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    secret: bool
+
+    type: Literal["exact_data"]
+
+    updated_at: datetime
+
+
+class CustomProfileSharedEntryDocumentFingerprintEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["document_fingerprint"]
+
+    updated_at: datetime
+
+
+class CustomProfileSharedEntryWordListEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["word_list"]
+
+    updated_at: datetime
+
+    word_list: object
+
+    profile_id: Optional[str] = None
+
+
+CustomProfileSharedEntry: TypeAlias = Union[
+    CustomProfileSharedEntryCustomEntry,
+    CustomProfileSharedEntryPredefinedEntry,
+    CustomProfileSharedEntryIntegrationEntry,
+    CustomProfileSharedEntryExactDataEntry,
+    CustomProfileSharedEntryDocumentFingerprintEntry,
+    CustomProfileSharedEntryWordListEntry,
+]
+
+
 class CustomProfile(BaseModel):
     id: str
     """The id of the profile (uuid)."""
@@ -209,10 +375,21 @@ class CustomProfile(BaseModel):
     keywords.
     """
 
+    data_classes: Optional[List[str]] = None
+    """Data classes associated with this profile."""
+
+    data_tags: Optional[List[str]] = None
+    """Data tags associated with this profile."""
+
     description: Optional[str] = None
     """The description of the profile."""
 
     entries: Optional[List[CustomProfileEntry]] = None
+
+    sensitivity_levels: Optional[List[CustomProfileSensitivityLevel]] = None
+    """Sensitivity levels associated with this profile."""
+
+    shared_entries: Optional[List[CustomProfileSharedEntry]] = None
 
 
 class PredefinedProfileEntryCustomEntry(BaseModel):
@@ -229,6 +406,8 @@ class PredefinedProfileEntryCustomEntry(BaseModel):
     type: Literal["custom"]
 
     updated_at: datetime
+
+    description: Optional[str] = None
 
     profile_id: Optional[str] = None
 
@@ -392,6 +571,8 @@ class IntegrationProfileEntryCustomEntry(BaseModel):
 
     updated_at: datetime
 
+    description: Optional[str] = None
+
     profile_id: Optional[str] = None
 
 
@@ -510,6 +691,141 @@ IntegrationProfileEntry: TypeAlias = Union[
 ]
 
 
+class IntegrationProfileSharedEntryCustomEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    pattern: Pattern
+
+    type: Literal["custom"]
+
+    updated_at: datetime
+
+    description: Optional[str] = None
+
+    profile_id: Optional[str] = None
+
+
+class IntegrationProfileSharedEntryPredefinedEntryConfidence(BaseModel):
+    ai_context_available: bool
+    """Indicates whether this entry has AI remote service validation."""
+
+    available: bool
+    """
+    Indicates whether this entry has any form of validation that is not an AI remote
+    service.
+    """
+
+
+class IntegrationProfileSharedEntryPredefinedEntryVariant(BaseModel):
+    topic_type: Literal["Intent", "Content"]
+
+    type: Literal["PromptTopic"]
+
+    description: Optional[str] = None
+
+
+class IntegrationProfileSharedEntryPredefinedEntry(BaseModel):
+    id: str
+
+    confidence: IntegrationProfileSharedEntryPredefinedEntryConfidence
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["predefined"]
+
+    profile_id: Optional[str] = None
+
+    variant: Optional[IntegrationProfileSharedEntryPredefinedEntryVariant] = None
+
+
+class IntegrationProfileSharedEntryIntegrationEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["integration"]
+
+    updated_at: datetime
+
+    profile_id: Optional[str] = None
+
+
+class IntegrationProfileSharedEntryExactDataEntry(BaseModel):
+    id: str
+
+    case_sensitive: bool
+    """
+    Only applies to custom word lists. Determines if the words should be matched in
+    a case-sensitive manner Cannot be set to false if secret is true
+    """
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    secret: bool
+
+    type: Literal["exact_data"]
+
+    updated_at: datetime
+
+
+class IntegrationProfileSharedEntryDocumentFingerprintEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["document_fingerprint"]
+
+    updated_at: datetime
+
+
+class IntegrationProfileSharedEntryWordListEntry(BaseModel):
+    id: str
+
+    created_at: datetime
+
+    enabled: bool
+
+    name: str
+
+    type: Literal["word_list"]
+
+    updated_at: datetime
+
+    word_list: object
+
+    profile_id: Optional[str] = None
+
+
+IntegrationProfileSharedEntry: TypeAlias = Union[
+    IntegrationProfileSharedEntryCustomEntry,
+    IntegrationProfileSharedEntryPredefinedEntry,
+    IntegrationProfileSharedEntryIntegrationEntry,
+    IntegrationProfileSharedEntryExactDataEntry,
+    IntegrationProfileSharedEntryDocumentFingerprintEntry,
+    IntegrationProfileSharedEntryWordListEntry,
+]
+
+
 class IntegrationProfile(BaseModel):
     id: str
 
@@ -518,6 +834,8 @@ class IntegrationProfile(BaseModel):
     entries: List[IntegrationProfileEntry]
 
     name: str
+
+    shared_entries: List[IntegrationProfileSharedEntry]
 
     type: Literal["integration"]
 
@@ -540,6 +858,7 @@ if PYDANTIC_V2:
     CustomProfileEntryIntegrationEntry.model_rebuild()
     CustomProfileEntryExactDataEntry.model_rebuild()
     CustomProfileEntryWordListEntry.model_rebuild()
+    CustomProfileSharedEntryCustomEntry.model_rebuild()
     PredefinedProfile.model_rebuild()
     PredefinedProfileEntryCustomEntry.model_rebuild()
     PredefinedProfileEntryPredefinedEntry.model_rebuild()
@@ -554,6 +873,7 @@ if PYDANTIC_V2:
     IntegrationProfileEntryIntegrationEntry.model_rebuild()
     IntegrationProfileEntryExactDataEntry.model_rebuild()
     IntegrationProfileEntryWordListEntry.model_rebuild()
+    IntegrationProfileSharedEntryCustomEntry.model_rebuild()
 else:
     CustomProfile.update_forward_refs()  # type: ignore
     CustomProfileEntryCustomEntry.update_forward_refs()  # type: ignore
@@ -562,6 +882,7 @@ else:
     CustomProfileEntryIntegrationEntry.update_forward_refs()  # type: ignore
     CustomProfileEntryExactDataEntry.update_forward_refs()  # type: ignore
     CustomProfileEntryWordListEntry.update_forward_refs()  # type: ignore
+    CustomProfileSharedEntryCustomEntry.update_forward_refs()  # type: ignore
     PredefinedProfile.update_forward_refs()  # type: ignore
     PredefinedProfileEntryCustomEntry.update_forward_refs()  # type: ignore
     PredefinedProfileEntryPredefinedEntry.update_forward_refs()  # type: ignore
@@ -576,3 +897,4 @@ else:
     IntegrationProfileEntryIntegrationEntry.update_forward_refs()  # type: ignore
     IntegrationProfileEntryExactDataEntry.update_forward_refs()  # type: ignore
     IntegrationProfileEntryWordListEntry.update_forward_refs()  # type: ignore
+    IntegrationProfileSharedEntryCustomEntry.update_forward_refs()  # type: ignore

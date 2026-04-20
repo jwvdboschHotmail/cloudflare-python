@@ -2,14 +2,20 @@
 
 from __future__ import annotations
 
-from typing_extensions import Literal, Required, TypedDict
+from typing_extensions import Literal, TypedDict
 
 __all__ = ["ScheduleCreateParams"]
 
 
 class ScheduleCreateParams(TypedDict, total=False):
-    zone_id: Required[str]
+    zone_id: str
     """Identifier."""
+
+    frequency: Literal["DAILY", "WEEKLY"]
+    """The frequency of the scheduled test.
+
+    Defaults to WEEKLY for free plans, DAILY for paid plans.
+    """
 
     region: Literal[
         "asia-east1",

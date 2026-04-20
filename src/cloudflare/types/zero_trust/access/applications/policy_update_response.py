@@ -2,13 +2,57 @@
 
 from typing import List, Optional
 from datetime import datetime
+from typing_extensions import Literal
 
 from ..decision import Decision
 from ....._models import BaseModel
 from .access_rule import AccessRule
 from ..approval_group import ApprovalGroup
 
-__all__ = ["PolicyUpdateResponse"]
+__all__ = ["PolicyUpdateResponse", "ConnectionRules", "ConnectionRulesRDP", "MfaConfig"]
+
+
+class ConnectionRulesRDP(BaseModel):
+    """The RDP-specific rules that define clipboard behavior for RDP connections."""
+
+    allowed_clipboard_local_to_remote_formats: Optional[List[Literal["text"]]] = None
+    """
+    Clipboard formats allowed when copying from local machine to remote RDP session.
+    """
+
+    allowed_clipboard_remote_to_local_formats: Optional[List[Literal["text"]]] = None
+    """
+    Clipboard formats allowed when copying from remote RDP session to local machine.
+    """
+
+
+class ConnectionRules(BaseModel):
+    """
+    The rules that define how users may connect to targets secured by your application.
+    """
+
+    rdp: Optional[ConnectionRulesRDP] = None
+    """The RDP-specific rules that define clipboard behavior for RDP connections."""
+
+
+class MfaConfig(BaseModel):
+    """Configures multi-factor authentication (MFA) settings."""
+
+    allowed_authenticators: Optional[List[Literal["totp", "biometrics", "security_key"]]] = None
+    """Lists the MFA methods that users can authenticate with."""
+
+    mfa_disabled: Optional[bool] = None
+    """Indicates whether to disable MFA for this resource.
+
+    This option is available at the application and policy level.
+    """
+
+    session_duration: Optional[str] = None
+    """Defines the duration of an MFA session.
+
+    Must be in minutes (m) or hours (h). Minimum: 0m. Maximum: 720h (30 days).
+    Examples:`5m` or `24h`.
+    """
 
 
 class PolicyUpdateResponse(BaseModel):
@@ -22,6 +66,12 @@ class PolicyUpdateResponse(BaseModel):
     """
     Requires the user to request access from an administrator at the start of each
     session.
+    """
+
+    connection_rules: Optional[ConnectionRules] = None
+    """
+    The rules that define how users may connect to targets secured by your
+    application.
     """
 
     created_at: Optional[datetime] = None
@@ -50,6 +100,9 @@ class PolicyUpdateResponse(BaseModel):
     this policy. 'Client Web Isolation' must be on for the account in order to use
     this feature.
     """
+
+    mfa_config: Optional[MfaConfig] = None
+    """Configures multi-factor authentication (MFA) settings."""
 
     name: Optional[str] = None
     """The name of the Access policy."""

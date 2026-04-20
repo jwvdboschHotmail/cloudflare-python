@@ -7,7 +7,7 @@ from typing import Type, cast
 import httpx
 
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import is_given, maybe_transform, strip_not_given, async_maybe_transform
+from ..._utils import is_given, path_template, maybe_transform, strip_not_given, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -52,7 +52,7 @@ class CfInterconnectsResource(SyncAPIResource):
         self,
         cf_interconnect_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         automatic_return_routing: bool | Omit = omit,
         description: str | Omit = omit,
         gre: cf_interconnect_update_params.GRE | Omit = omit,
@@ -60,6 +60,7 @@ class CfInterconnectsResource(SyncAPIResource):
         interface_address: str | Omit = omit,
         interface_address6: str | Omit = omit,
         mtu: int | Omit = omit,
+        name: str | Omit = omit,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -98,6 +99,8 @@ class CfInterconnectsResource(SyncAPIResource):
           mtu: The Maximum Transmission Unit (MTU) in bytes for the interconnect. The minimum
               value is 576.
 
+          name: The name of the interconnect. The name cannot share a name with other tunnels.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -106,6 +109,8 @@ class CfInterconnectsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not cf_interconnect_id:
@@ -121,7 +126,11 @@ class CfInterconnectsResource(SyncAPIResource):
             **(extra_headers or {}),
         }
         return self._put(
-            f"/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+            path_template(
+                "/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+                account_id=account_id,
+                cf_interconnect_id=cf_interconnect_id,
+            ),
             body=maybe_transform(
                 {
                     "automatic_return_routing": automatic_return_routing,
@@ -131,6 +140,7 @@ class CfInterconnectsResource(SyncAPIResource):
                     "interface_address": interface_address,
                     "interface_address6": interface_address6,
                     "mtu": mtu,
+                    "name": name,
                 },
                 cf_interconnect_update_params.CfInterconnectUpdateParams,
             ),
@@ -147,7 +157,7 @@ class CfInterconnectsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -170,6 +180,8 @@ class CfInterconnectsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         extra_headers = {
@@ -183,7 +195,7 @@ class CfInterconnectsResource(SyncAPIResource):
             **(extra_headers or {}),
         }
         return self._get(
-            f"/accounts/{account_id}/magic/cf_interconnects",
+            path_template("/accounts/{account_id}/magic/cf_interconnects", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -197,7 +209,7 @@ class CfInterconnectsResource(SyncAPIResource):
     def bulk_update(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: object,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -224,6 +236,8 @@ class CfInterconnectsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         extra_headers = {
@@ -237,7 +251,7 @@ class CfInterconnectsResource(SyncAPIResource):
             **(extra_headers or {}),
         }
         return self._put(
-            f"/accounts/{account_id}/magic/cf_interconnects",
+            path_template("/accounts/{account_id}/magic/cf_interconnects", account_id=account_id),
             body=maybe_transform(body, cf_interconnect_bulk_update_params.CfInterconnectBulkUpdateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -253,7 +267,7 @@ class CfInterconnectsResource(SyncAPIResource):
         self,
         cf_interconnect_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -278,6 +292,8 @@ class CfInterconnectsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not cf_interconnect_id:
@@ -293,7 +309,11 @@ class CfInterconnectsResource(SyncAPIResource):
             **(extra_headers or {}),
         }
         return self._get(
-            f"/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+            path_template(
+                "/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+                account_id=account_id,
+                cf_interconnect_id=cf_interconnect_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -329,7 +349,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
         self,
         cf_interconnect_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         automatic_return_routing: bool | Omit = omit,
         description: str | Omit = omit,
         gre: cf_interconnect_update_params.GRE | Omit = omit,
@@ -337,6 +357,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
         interface_address: str | Omit = omit,
         interface_address6: str | Omit = omit,
         mtu: int | Omit = omit,
+        name: str | Omit = omit,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -375,6 +396,8 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
           mtu: The Maximum Transmission Unit (MTU) in bytes for the interconnect. The minimum
               value is 576.
 
+          name: The name of the interconnect. The name cannot share a name with other tunnels.
+
           extra_headers: Send extra headers
 
           extra_query: Add additional query parameters to the request
@@ -383,6 +406,8 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not cf_interconnect_id:
@@ -398,7 +423,11 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
             **(extra_headers or {}),
         }
         return await self._put(
-            f"/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+            path_template(
+                "/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+                account_id=account_id,
+                cf_interconnect_id=cf_interconnect_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "automatic_return_routing": automatic_return_routing,
@@ -408,6 +437,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
                     "interface_address": interface_address,
                     "interface_address6": interface_address6,
                     "mtu": mtu,
+                    "name": name,
                 },
                 cf_interconnect_update_params.CfInterconnectUpdateParams,
             ),
@@ -424,7 +454,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
     async def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -447,6 +477,8 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         extra_headers = {
@@ -460,7 +492,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
             **(extra_headers or {}),
         }
         return await self._get(
-            f"/accounts/{account_id}/magic/cf_interconnects",
+            path_template("/accounts/{account_id}/magic/cf_interconnects", account_id=account_id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -474,7 +506,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
     async def bulk_update(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: object,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -501,6 +533,8 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         extra_headers = {
@@ -514,7 +548,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
             **(extra_headers or {}),
         }
         return await self._put(
-            f"/accounts/{account_id}/magic/cf_interconnects",
+            path_template("/accounts/{account_id}/magic/cf_interconnects", account_id=account_id),
             body=await async_maybe_transform(body, cf_interconnect_bulk_update_params.CfInterconnectBulkUpdateParams),
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -530,7 +564,7 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
         self,
         cf_interconnect_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         x_magic_new_hc_target: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -555,6 +589,8 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not cf_interconnect_id:
@@ -570,7 +606,11 @@ class AsyncCfInterconnectsResource(AsyncAPIResource):
             **(extra_headers or {}),
         }
         return await self._get(
-            f"/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+            path_template(
+                "/accounts/{account_id}/magic/cf_interconnects/{cf_interconnect_id}",
+                account_id=account_id,
+                cf_interconnect_id=cf_interconnect_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

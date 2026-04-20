@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ....._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ....._utils import maybe_transform, async_maybe_transform
+from ....._utils import path_template, maybe_transform, async_maybe_transform
 from ....._compat import cached_property
 from ....._resource import SyncAPIResource, AsyncAPIResource
 from ....._response import (
@@ -51,13 +51,14 @@ class VersionsResource(SyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         deploy: bool | Omit = omit,
         annotations: version_create_params.Annotations | Omit = omit,
         assets: version_create_params.Assets | Omit = omit,
         bindings: Iterable[version_create_params.Binding] | Omit = omit,
         compatibility_date: str | Omit = omit,
         compatibility_flags: SequenceNotStr[str] | Omit = omit,
+        containers: Iterable[version_create_params.Container] | Omit = omit,
         limits: version_create_params.Limits | Omit = omit,
         main_module: str | Omit = omit,
         migrations: version_create_params.Migrations | Omit = omit,
@@ -103,6 +104,9 @@ class VersionsResource(SyncAPIResource):
               enable upcoming features or opt in or out of specific changes not included in a
               `compatibility_date`.
 
+          containers: List of containers attached to a Worker. Containers can only be attached to
+              Durable Object classes of this Worker script.
+
           limits: Resource limits enforced at runtime.
 
           main_module: The name of the main module in the `modules` array (e.g. the name of the module
@@ -136,12 +140,18 @@ class VersionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return self._post(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions",
+                account_id=account_id,
+                worker_id=worker_id,
+            ),
             body=maybe_transform(
                 {
                     "annotations": annotations,
@@ -149,6 +159,7 @@ class VersionsResource(SyncAPIResource):
                     "bindings": bindings,
                     "compatibility_date": compatibility_date,
                     "compatibility_flags": compatibility_flags,
+                    "containers": containers,
                     "limits": limits,
                     "main_module": main_module,
                     "migrations": migrations,
@@ -173,7 +184,7 @@ class VersionsResource(SyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -203,12 +214,18 @@ class VersionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions",
+                account_id=account_id,
+                worker_id=worker_id,
+            ),
             page=SyncV4PagePaginationArray[Version],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -230,7 +247,7 @@ class VersionsResource(SyncAPIResource):
         self,
         version_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         worker_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -247,8 +264,8 @@ class VersionsResource(SyncAPIResource):
 
           worker_id: Identifier for the Worker, which can be ID or name.
 
-          version_id: Identifier for the version, which can be ID or the literal "latest" to operate
-              on the most recently created version.
+          version_id: Identifier for the version, which can be a UUID, a UUID prefix (minimum length
+              8), or the literal "latest" to operate on the most recently created version.
 
           extra_headers: Send extra headers
 
@@ -258,6 +275,8 @@ class VersionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
@@ -265,7 +284,12 @@ class VersionsResource(SyncAPIResource):
         if not version_id:
             raise ValueError(f"Expected a non-empty value for `version_id` but received {version_id!r}")
         return self._delete(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+                account_id=account_id,
+                worker_id=worker_id,
+                version_id=version_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -276,7 +300,7 @@ class VersionsResource(SyncAPIResource):
         self,
         version_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         worker_id: str,
         include: Literal["modules"] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -294,8 +318,8 @@ class VersionsResource(SyncAPIResource):
 
           worker_id: Identifier for the Worker, which can be ID or name.
 
-          version_id: Identifier for the version, which can be ID or the literal "latest" to operate
-              on the most recently created version.
+          version_id: Identifier for the version, which can be a UUID, a UUID prefix (minimum length
+              8), or the literal "latest" to operate on the most recently created version.
 
           include: Whether to include the `modules` property of the version in the response, which
               contains code and sourcemap content and may add several megabytes to the
@@ -309,6 +333,8 @@ class VersionsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
@@ -316,7 +342,12 @@ class VersionsResource(SyncAPIResource):
         if not version_id:
             raise ValueError(f"Expected a non-empty value for `version_id` but received {version_id!r}")
         return self._get(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+                account_id=account_id,
+                worker_id=worker_id,
+                version_id=version_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -353,13 +384,14 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         deploy: bool | Omit = omit,
         annotations: version_create_params.Annotations | Omit = omit,
         assets: version_create_params.Assets | Omit = omit,
         bindings: Iterable[version_create_params.Binding] | Omit = omit,
         compatibility_date: str | Omit = omit,
         compatibility_flags: SequenceNotStr[str] | Omit = omit,
+        containers: Iterable[version_create_params.Container] | Omit = omit,
         limits: version_create_params.Limits | Omit = omit,
         main_module: str | Omit = omit,
         migrations: version_create_params.Migrations | Omit = omit,
@@ -405,6 +437,9 @@ class AsyncVersionsResource(AsyncAPIResource):
               enable upcoming features or opt in or out of specific changes not included in a
               `compatibility_date`.
 
+          containers: List of containers attached to a Worker. Containers can only be attached to
+              Durable Object classes of this Worker script.
+
           limits: Resource limits enforced at runtime.
 
           main_module: The name of the main module in the `modules` array (e.g. the name of the module
@@ -438,12 +473,18 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions",
+                account_id=account_id,
+                worker_id=worker_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "annotations": annotations,
@@ -451,6 +492,7 @@ class AsyncVersionsResource(AsyncAPIResource):
                     "bindings": bindings,
                     "compatibility_date": compatibility_date,
                     "compatibility_flags": compatibility_flags,
+                    "containers": containers,
                     "limits": limits,
                     "main_module": main_module,
                     "migrations": migrations,
@@ -475,7 +517,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         worker_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -505,12 +547,18 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
             raise ValueError(f"Expected a non-empty value for `worker_id` but received {worker_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions",
+                account_id=account_id,
+                worker_id=worker_id,
+            ),
             page=AsyncV4PagePaginationArray[Version],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -532,7 +580,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         version_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         worker_id: str,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -549,8 +597,8 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           worker_id: Identifier for the Worker, which can be ID or name.
 
-          version_id: Identifier for the version, which can be ID or the literal "latest" to operate
-              on the most recently created version.
+          version_id: Identifier for the version, which can be a UUID, a UUID prefix (minimum length
+              8), or the literal "latest" to operate on the most recently created version.
 
           extra_headers: Send extra headers
 
@@ -560,6 +608,8 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
@@ -567,7 +617,12 @@ class AsyncVersionsResource(AsyncAPIResource):
         if not version_id:
             raise ValueError(f"Expected a non-empty value for `version_id` but received {version_id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+                account_id=account_id,
+                worker_id=worker_id,
+                version_id=version_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -578,7 +633,7 @@ class AsyncVersionsResource(AsyncAPIResource):
         self,
         version_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         worker_id: str,
         include: Literal["modules"] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -596,8 +651,8 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           worker_id: Identifier for the Worker, which can be ID or name.
 
-          version_id: Identifier for the version, which can be ID or the literal "latest" to operate
-              on the most recently created version.
+          version_id: Identifier for the version, which can be a UUID, a UUID prefix (minimum length
+              8), or the literal "latest" to operate on the most recently created version.
 
           include: Whether to include the `modules` property of the version in the response, which
               contains code and sourcemap content and may add several megabytes to the
@@ -611,6 +666,8 @@ class AsyncVersionsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not worker_id:
@@ -618,7 +675,12 @@ class AsyncVersionsResource(AsyncAPIResource):
         if not version_id:
             raise ValueError(f"Expected a non-empty value for `version_id` but received {version_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+            path_template(
+                "/accounts/{account_id}/workers/workers/{worker_id}/versions/{version_id}",
+                account_id=account_id,
+                worker_id=worker_id,
+                version_id=version_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

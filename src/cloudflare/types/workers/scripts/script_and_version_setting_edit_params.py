@@ -3,9 +3,10 @@
 from __future__ import annotations
 
 from typing import List, Union, Iterable, Optional
-from typing_extensions import Literal, Required, TypeAlias, TypedDict
+from typing_extensions import Literal, Required, Annotated, TypeAlias, TypedDict
 
 from ...._types import SequenceNotStr
+from ...._utils import PropertyInfo
 from ..migration_step_param import MigrationStepParam
 from .consumer_script_param import ConsumerScriptParam
 from ..single_step_migration_param import SingleStepMigrationParam
@@ -13,8 +14,11 @@ from ..single_step_migration_param import SingleStepMigrationParam
 __all__ = [
     "ScriptAndVersionSettingEditParams",
     "Settings",
+    "SettingsAnnotations",
     "SettingsBinding",
     "SettingsBindingWorkersBindingKindAI",
+    "SettingsBindingWorkersBindingKindAISearch",
+    "SettingsBindingWorkersBindingKindAISearchNamespace",
     "SettingsBindingWorkersBindingKindAnalyticsEngine",
     "SettingsBindingWorkersBindingKindAssets",
     "SettingsBindingWorkersBindingKindBrowser",
@@ -22,6 +26,7 @@ __all__ = [
     "SettingsBindingWorkersBindingKindDataBlob",
     "SettingsBindingWorkersBindingKindDispatchNamespace",
     "SettingsBindingWorkersBindingKindDispatchNamespaceOutbound",
+    "SettingsBindingWorkersBindingKindDispatchNamespaceOutboundParam",
     "SettingsBindingWorkersBindingKindDispatchNamespaceOutboundWorker",
     "SettingsBindingWorkersBindingKindDurableObjectNamespace",
     "SettingsBindingWorkersBindingKindHyperdrive",
@@ -29,6 +34,7 @@ __all__ = [
     "SettingsBindingWorkersBindingKindImages",
     "SettingsBindingWorkersBindingKindJson",
     "SettingsBindingWorkersBindingKindKVNamespace",
+    "SettingsBindingWorkersBindingKindMedia",
     "SettingsBindingWorkersBindingKindMTLSCertificate",
     "SettingsBindingWorkersBindingKindPlainText",
     "SettingsBindingWorkersBindingKindPipelines",
@@ -43,14 +49,18 @@ __all__ = [
     "SettingsBindingWorkersBindingKindVectorize",
     "SettingsBindingWorkersBindingKindVersionMetadata",
     "SettingsBindingWorkersBindingKindSecretsStoreSecret",
+    "SettingsBindingWorkersBindingKindFlagship",
     "SettingsBindingWorkersBindingKindSecretKey",
     "SettingsBindingWorkersBindingKindWorkflow",
     "SettingsBindingWorkersBindingKindWasmModule",
+    "SettingsBindingWorkersBindingKindVPCService",
+    "SettingsBindingWorkersBindingKindVPCNetwork",
     "SettingsLimits",
     "SettingsMigrations",
     "SettingsMigrationsWorkersMultipleStepMigrations",
     "SettingsObservability",
     "SettingsObservabilityLogs",
+    "SettingsObservabilityTraces",
     "SettingsPlacement",
     "SettingsPlacementMode",
     "SettingsPlacementRegion",
@@ -68,10 +78,23 @@ __all__ = [
 
 
 class ScriptAndVersionSettingEditParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Identifier."""
 
     settings: Settings
+
+
+class SettingsAnnotations(TypedDict, total=False):
+    """Annotations for the Worker version.
+
+    Annotations are not inherited across settings updates; omitting this field means the new version will have no annotations.
+    """
+
+    workers_message: Annotated[str, PropertyInfo(alias="workers/message")]
+    """Human-readable message about the version. Truncated to 1000 bytes if longer."""
+
+    workers_tag: Annotated[str, PropertyInfo(alias="workers/tag")]
+    """User-provided identifier for the version. Maximum 100 bytes."""
 
 
 class SettingsBindingWorkersBindingKindAI(TypedDict, total=False):
@@ -79,6 +102,45 @@ class SettingsBindingWorkersBindingKindAI(TypedDict, total=False):
     """A JavaScript variable name for the binding."""
 
     type: Required[Literal["ai"]]
+    """The kind of resource that the binding provides."""
+
+
+class SettingsBindingWorkersBindingKindAISearch(TypedDict, total=False):
+    instance_name: Required[str]
+    """The user-chosen instance name.
+
+    Must exist at deploy time. The worker can search, chat, update, and manage
+    items/jobs on this instance.
+    """
+
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["ai_search"]]
+    """The kind of resource that the binding provides."""
+
+    namespace: str
+    """The namespace the instance belongs to.
+
+    Defaults to "default" if omitted. Customers who don't use namespaces can simply
+    omit this field.
+    """
+
+
+class SettingsBindingWorkersBindingKindAISearchNamespace(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    namespace: Required[str]
+    """The user-chosen namespace name.
+
+    Must exist before deploy -- Wrangler handles auto-creation on deploy failure (R2
+    bucket pattern). The "default" namespace is auto-created by config-api for new
+    accounts. Grants full access (CRUD + search + chat) to all instances within the
+    namespace.
+    """
+
+    type: Required[Literal["ai_search_namespace"]]
     """The kind of resource that the binding provides."""
 
 
@@ -110,7 +172,7 @@ class SettingsBindingWorkersBindingKindBrowser(TypedDict, total=False):
 
 
 class SettingsBindingWorkersBindingKindD1(TypedDict, total=False):
-    id: Required[str]
+    database_id: Required[str]
     """Identifier of the D1 database to bind to."""
 
     name: Required[str]
@@ -118,6 +180,9 @@ class SettingsBindingWorkersBindingKindD1(TypedDict, total=False):
 
     type: Required[Literal["d1"]]
     """The kind of resource that the binding provides."""
+
+    id: str
+    """Identifier of the D1 database to bind to."""
 
 
 class SettingsBindingWorkersBindingKindDataBlob(TypedDict, total=False):
@@ -134,8 +199,16 @@ class SettingsBindingWorkersBindingKindDataBlob(TypedDict, total=False):
     """The kind of resource that the binding provides."""
 
 
+class SettingsBindingWorkersBindingKindDispatchNamespaceOutboundParam(TypedDict, total=False):
+    name: Required[str]
+    """Name of the parameter."""
+
+
 class SettingsBindingWorkersBindingKindDispatchNamespaceOutboundWorker(TypedDict, total=False):
     """Outbound worker."""
+
+    entrypoint: str
+    """Entrypoint to invoke on the outbound worker."""
 
     environment: str
     """Environment of the outbound worker."""
@@ -147,7 +220,7 @@ class SettingsBindingWorkersBindingKindDispatchNamespaceOutboundWorker(TypedDict
 class SettingsBindingWorkersBindingKindDispatchNamespaceOutbound(TypedDict, total=False):
     """Outbound worker."""
 
-    params: SequenceNotStr[str]
+    params: Iterable[SettingsBindingWorkersBindingKindDispatchNamespaceOutboundParam]
     """
     Pass information from the Dispatch Worker to the Outbound Worker through the
     parameters.
@@ -180,6 +253,9 @@ class SettingsBindingWorkersBindingKindDurableObjectNamespace(TypedDict, total=F
 
     class_name: str
     """The exported class name of the Durable Object."""
+
+    dispatch_namespace: str
+    """The dispatch namespace the Durable Object script belongs to."""
 
     environment: str
     """The environment of the script_name to bind to."""
@@ -236,7 +312,7 @@ class SettingsBindingWorkersBindingKindImages(TypedDict, total=False):
 
 
 class SettingsBindingWorkersBindingKindJson(TypedDict, total=False):
-    json: Required[str]
+    json: Required[object]
     """JSON data to use."""
 
     name: Required[str]
@@ -254,6 +330,14 @@ class SettingsBindingWorkersBindingKindKVNamespace(TypedDict, total=False):
     """Namespace identifier tag."""
 
     type: Required[Literal["kv_namespace"]]
+    """The kind of resource that the binding provides."""
+
+
+class SettingsBindingWorkersBindingKindMedia(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["media"]]
     """The kind of resource that the binding provides."""
 
 
@@ -335,7 +419,7 @@ class SettingsBindingWorkersBindingKindR2Bucket(TypedDict, total=False):
     type: Required[Literal["r2_bucket"]]
     """The kind of resource that the binding provides."""
 
-    jurisdiction: Literal["eu", "fedramp"]
+    jurisdiction: Literal["eu", "fedramp", "fedramp-high"]
     """
     The
     [jurisdiction](https://developers.cloudflare.com/r2/reference/data-location/#jurisdictional-restrictions)
@@ -380,6 +464,9 @@ class SettingsBindingWorkersBindingKindService(TypedDict, total=False):
 
     type: Required[Literal["service"]]
     """The kind of resource that the binding provides."""
+
+    entrypoint: str
+    """Entrypoint to invoke on the target Worker."""
 
     environment: str
     """Optional environment if the Worker utilizes one."""
@@ -429,6 +516,17 @@ class SettingsBindingWorkersBindingKindSecretsStoreSecret(TypedDict, total=False
     """ID of the store containing the secret."""
 
     type: Required[Literal["secrets_store_secret"]]
+    """The kind of resource that the binding provides."""
+
+
+class SettingsBindingWorkersBindingKindFlagship(TypedDict, total=False):
+    app_id: Required[str]
+    """ID of the Flagship app to bind to for feature flag evaluation."""
+
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["flagship"]]
     """The kind of resource that the binding provides."""
 
 
@@ -507,8 +605,38 @@ class SettingsBindingWorkersBindingKindWasmModule(TypedDict, total=False):
     """The kind of resource that the binding provides."""
 
 
+class SettingsBindingWorkersBindingKindVPCService(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    service_id: Required[str]
+    """Identifier of the VPC service to bind to."""
+
+    type: Required[Literal["vpc_service"]]
+    """The kind of resource that the binding provides."""
+
+
+class SettingsBindingWorkersBindingKindVPCNetwork(TypedDict, total=False):
+    name: Required[str]
+    """A JavaScript variable name for the binding."""
+
+    type: Required[Literal["vpc_network"]]
+    """The kind of resource that the binding provides."""
+
+    network_id: str
+    """Identifier of the network to bind to.
+
+    Only "cf1:network" is currently supported. Mutually exclusive with tunnel_id.
+    """
+
+    tunnel_id: str
+    """UUID of the Cloudflare Tunnel to bind to. Mutually exclusive with network_id."""
+
+
 SettingsBinding: TypeAlias = Union[
     SettingsBindingWorkersBindingKindAI,
+    SettingsBindingWorkersBindingKindAISearch,
+    SettingsBindingWorkersBindingKindAISearchNamespace,
     SettingsBindingWorkersBindingKindAnalyticsEngine,
     SettingsBindingWorkersBindingKindAssets,
     SettingsBindingWorkersBindingKindBrowser,
@@ -521,6 +649,7 @@ SettingsBinding: TypeAlias = Union[
     SettingsBindingWorkersBindingKindImages,
     SettingsBindingWorkersBindingKindJson,
     SettingsBindingWorkersBindingKindKVNamespace,
+    SettingsBindingWorkersBindingKindMedia,
     SettingsBindingWorkersBindingKindMTLSCertificate,
     SettingsBindingWorkersBindingKindPlainText,
     SettingsBindingWorkersBindingKindPipelines,
@@ -534,9 +663,12 @@ SettingsBinding: TypeAlias = Union[
     SettingsBindingWorkersBindingKindVectorize,
     SettingsBindingWorkersBindingKindVersionMetadata,
     SettingsBindingWorkersBindingKindSecretsStoreSecret,
+    SettingsBindingWorkersBindingKindFlagship,
     SettingsBindingWorkersBindingKindSecretKey,
     SettingsBindingWorkersBindingKindWorkflow,
     SettingsBindingWorkersBindingKindWasmModule,
+    SettingsBindingWorkersBindingKindVPCService,
+    SettingsBindingWorkersBindingKindVPCNetwork,
 ]
 
 
@@ -545,6 +677,9 @@ class SettingsLimits(TypedDict, total=False):
 
     cpu_ms: int
     """The amount of CPU time this Worker can use in milliseconds."""
+
+    subrequests: int
+    """The number of subrequests this Worker can make per request."""
 
 
 class SettingsMigrationsWorkersMultipleStepMigrations(TypedDict, total=False):
@@ -587,6 +722,22 @@ class SettingsObservabilityLogs(TypedDict, total=False):
     """Whether log persistence is enabled for the Worker."""
 
 
+class SettingsObservabilityTraces(TypedDict, total=False):
+    """Trace settings for the Worker."""
+
+    destinations: SequenceNotStr[str]
+    """A list of destinations where traces will be exported to."""
+
+    enabled: bool
+    """Whether traces are enabled for the Worker."""
+
+    head_sampling_rate: Optional[float]
+    """The sampling rate for traces. From 0 to 1 (1 = 100%, 0.1 = 10%). Default is 1."""
+
+    persist: bool
+    """Whether trace persistence is enabled for the Worker."""
+
+
 class SettingsObservability(TypedDict, total=False):
     """Observability settings for the Worker."""
 
@@ -601,6 +752,9 @@ class SettingsObservability(TypedDict, total=False):
 
     logs: Optional[SettingsObservabilityLogs]
     """Log settings for the Worker."""
+
+    traces: Optional[SettingsObservabilityTraces]
+    """Trace settings for the Worker."""
 
 
 class SettingsPlacementMode(TypedDict, total=False):
@@ -693,6 +847,13 @@ SettingsPlacement: TypeAlias = Union[
 
 
 class Settings(TypedDict, total=False):
+    annotations: SettingsAnnotations
+    """Annotations for the Worker version.
+
+    Annotations are not inherited across settings updates; omitting this field means
+    the new version will have no annotations.
+    """
+
     bindings: Iterable[SettingsBinding]
     """List of bindings attached to a Worker.
 

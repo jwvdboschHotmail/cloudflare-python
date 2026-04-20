@@ -3,13 +3,13 @@
 from __future__ import annotations
 
 from typing import Optional
-from typing_extensions import Literal, Required, TypedDict
+from typing_extensions import Literal, TypedDict
 
 __all__ = ["ServiceListParams"]
 
 
 class ServiceListParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account identifier"""
 
     page: int
@@ -18,4 +18,4 @@ class ServiceListParams(TypedDict, total=False):
     per_page: int
     """Max amount of entries returned per page"""
 
-    type: Optional[Literal["http"]]
+    type: Optional[Literal["tcp", "http"]]

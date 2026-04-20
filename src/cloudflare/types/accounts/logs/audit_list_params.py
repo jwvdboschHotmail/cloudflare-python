@@ -37,7 +37,7 @@ __all__ = [
 
 
 class AuditListParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """The unique id that identifies the account."""
 
     before: Required[Annotated[Union[str, date], PropertyInfo(format="iso8601")]]
@@ -354,7 +354,7 @@ class ResourceProduct(_ResourceProductReservedKeywords, total=False):
 _ResourceScopeReservedKeywords = TypedDict(
     "_ResourceScopeReservedKeywords",
     {
-        "not": List[Literal["accounts", "user", "zones"]],
+        "not": List[Literal["accounts", "user", "zones", "memberships"]],
     },
     total=False,
 )

@@ -5,7 +5,7 @@ from __future__ import annotations
 import httpx
 
 from ...._types import Body, Query, Headers, NotGiven, SequenceNotStr, not_given
-from ...._utils import maybe_transform
+from ...._utils import path_template, maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -44,7 +44,7 @@ class ReleaseResource(SyncAPIResource):
     def bulk(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: SequenceNotStr[str],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -54,7 +54,8 @@ class ReleaseResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncSinglePage[ReleaseBulkResponse]:
         """
-        Release messages from quarantine
+        Releases a quarantined email message, allowing it to be delivered to the
+        recipient.
 
         Args:
           account_id: Account Identifier
@@ -69,10 +70,12 @@ class ReleaseResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/investigate/release",
+            path_template("/accounts/{account_id}/email-security/investigate/release", account_id=account_id),
             page=SyncSinglePage[ReleaseBulkResponse],
             body=maybe_transform(body, SequenceNotStr[str]),
             options=make_request_options(
@@ -106,7 +109,7 @@ class AsyncReleaseResource(AsyncAPIResource):
     def bulk(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         body: SequenceNotStr[str],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -116,7 +119,8 @@ class AsyncReleaseResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[ReleaseBulkResponse, AsyncSinglePage[ReleaseBulkResponse]]:
         """
-        Release messages from quarantine
+        Releases a quarantined email message, allowing it to be delivered to the
+        recipient.
 
         Args:
           account_id: Account Identifier
@@ -131,10 +135,12 @@ class AsyncReleaseResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/email-security/investigate/release",
+            path_template("/accounts/{account_id}/email-security/investigate/release", account_id=account_id),
             page=AsyncSinglePage[ReleaseBulkResponse],
             body=maybe_transform(body, SequenceNotStr[str]),
             options=make_request_options(

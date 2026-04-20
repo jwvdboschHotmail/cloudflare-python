@@ -40,9 +40,17 @@ class TestWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -111,9 +119,17 @@ class TestWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -182,6 +198,8 @@ class TestWorkers:
     def test_method_list_with_all_params(self, client: Cloudflare) -> None:
         worker = client.workers.beta.workers.list(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
+            order="asc",
+            order_by="deployed_on",
             page=1,
             per_page=1,
         )
@@ -291,9 +309,17 @@ class TestWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -442,9 +468,17 @@ class TestAsyncWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -513,9 +547,17 @@ class TestAsyncWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={
@@ -584,6 +626,8 @@ class TestAsyncWorkers:
     async def test_method_list_with_all_params(self, async_client: AsyncCloudflare) -> None:
         worker = await async_client.workers.beta.workers.list(
             account_id="023e105f4ecef8ad9ca31a8372d0c353",
+            order="asc",
+            order_by="deployed_on",
             page=1,
             per_page=1,
         )
@@ -693,9 +737,17 @@ class TestAsyncWorkers:
                 "enabled": True,
                 "head_sampling_rate": 1,
                 "logs": {
+                    "destinations": ["string"],
                     "enabled": True,
                     "head_sampling_rate": 1,
                     "invocation_logs": True,
+                    "persist": True,
+                },
+                "traces": {
+                    "destinations": ["string"],
+                    "enabled": True,
+                    "head_sampling_rate": 1,
+                    "persist": True,
                 },
             },
             subdomain={

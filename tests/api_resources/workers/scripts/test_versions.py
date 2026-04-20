@@ -43,7 +43,7 @@ class TestVersions:
                 "annotations": {
                     "workers_alias": "staging",
                     "workers_message": "Fixed worker code.",
-                    "workers_tag": "workers/tag",
+                    "workers_tag": "any-identifier-from-external-system",
                 },
                 "bindings": [
                     {
@@ -57,7 +57,8 @@ class TestVersions:
                 "keep_bindings": ["string"],
                 "usage_model": "standard",
             },
-            files=[b"raw file contents"],
+            bindings_inherit="strict",
+            files=[b"Example data"],
         )
         assert_matches_type(VersionCreateResponse, version, path=["response"])
 
@@ -254,7 +255,7 @@ class TestAsyncVersions:
                 "annotations": {
                     "workers_alias": "staging",
                     "workers_message": "Fixed worker code.",
-                    "workers_tag": "workers/tag",
+                    "workers_tag": "any-identifier-from-external-system",
                 },
                 "bindings": [
                     {
@@ -268,7 +269,8 @@ class TestAsyncVersions:
                 "keep_bindings": ["string"],
                 "usage_model": "standard",
             },
-            files=[b"raw file contents"],
+            bindings_inherit="strict",
+            files=[b"Example data"],
         )
         assert_matches_type(VersionCreateResponse, version, path=["response"])
 

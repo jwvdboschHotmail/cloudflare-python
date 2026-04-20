@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from typing import Union, Iterable
-from typing_extensions import Literal, Required, Annotated, TypedDict
+from typing_extensions import Literal, Annotated, TypedDict
 
 from ..._types import SequenceNotStr
 from ..._utils import PropertyInfo
@@ -12,7 +12,7 @@ __all__ = ["ThreatEventListParams", "Search"]
 
 
 class ThreatEventListParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account ID."""
 
     cursor: str
@@ -49,7 +49,22 @@ class ThreatEventListParams(TypedDict, total=False):
 
 class Search(TypedDict, total=False):
     field: str
+    """Event field to search on.
+
+    Allowed: attacker, attackerCountry, category, createdAt, date, event, indicator,
+    indicatorType, killChain, mitreAttack, tags, targetCountry, targetIndustry, tlp,
+    uuid.
+    """
 
     op: Literal["equals", "not", "gt", "gte", "lt", "lte", "like", "contains", "startsWith", "endsWith", "in", "find"]
+    """Search operator.
+
+    Use 'in' for bulk lookup of up to 100 values at once, e.g. {field:'tags',
+    op:'in', value:['malware','apt']}.
+    """
 
     value: Union[str, float, SequenceNotStr[Union[str, float]]]
+    """Search value.
+
+    String or number for most operators. Array for 'in' operator (max 100 items).
+    """

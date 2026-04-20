@@ -8,8 +8,14 @@ __all__ = ["PreviewCreateParams"]
 
 
 class PreviewCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account Identifier"""
 
     postfix_id: Required[str]
     """The identifier of the message."""
+
+    submission: bool
+    """When true, search the submissions datastore only.
+
+    When false or omitted, search the regular datastore only.
+    """

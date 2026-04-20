@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Type, Iterable, cast
+from typing import Type, Iterable, Optional, cast
 from typing_extensions import Literal
 
 import httpx
@@ -15,16 +15,8 @@ from .jobs import (
     JobsResourceWithStreamingResponse,
     AsyncJobsResourceWithStreamingResponse,
 )
-from .items import (
-    ItemsResource,
-    AsyncItemsResource,
-    ItemsResourceWithRawResponse,
-    AsyncItemsResourceWithRawResponse,
-    ItemsResourceWithStreamingResponse,
-    AsyncItemsResourceWithStreamingResponse,
-)
 from ...._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -57,10 +49,6 @@ __all__ = ["InstancesResource", "AsyncInstancesResource"]
 
 class InstancesResource(SyncAPIResource):
     @cached_property
-    def items(self) -> ItemsResource:
-        return ItemsResource(self._client)
-
-    @cached_property
     def jobs(self) -> JobsResource:
         return JobsResource(self._client)
 
@@ -86,94 +74,117 @@ class InstancesResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         id: str,
-        source: str,
-        type: Literal["r2", "web-crawler"],
-        ai_gateway_id: str | Omit = omit,
-        aisearch_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        ai_gateway_id: Optional[str] | Omit = omit,
+        aisearch_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
+        | Omit = omit,
+        cache: bool | Omit = omit,
+        cache_threshold: Literal["super_strict_match", "close_enough", "flexible_friend", "anything_goes"]
         | Omit = omit,
         chunk: bool | Omit = omit,
         chunk_overlap: int | Omit = omit,
         chunk_size: int | Omit = omit,
         custom_metadata: Iterable[instance_create_params.CustomMetadata] | Omit = omit,
-        embedding_model: Literal[
-            "@cf/qwen/qwen3-embedding-0.6b",
-            "@cf/baai/bge-m3",
-            "@cf/baai/bge-large-en-v1.5",
-            "@cf/google/embeddinggemma-300m",
-            "google-ai-studio/gemini-embedding-001",
-            "openai/text-embedding-3-small",
-            "openai/text-embedding-3-large",
-            "",
+        embedding_model: Optional[
+            Literal[
+                "@cf/qwen/qwen3-embedding-0.6b",
+                "@cf/baai/bge-m3",
+                "@cf/baai/bge-large-en-v1.5",
+                "@cf/google/embeddinggemma-300m",
+                "google-ai-studio/gemini-embedding-001",
+                "google-ai-studio/gemini-embedding-2-preview",
+                "openai/text-embedding-3-small",
+                "openai/text-embedding-3-large",
+                "",
+            ]
         ]
         | Omit = omit,
+        fusion_method: Literal["max", "rrf"] | Omit = omit,
         hybrid_search_enabled: bool | Omit = omit,
+        index_method: instance_create_params.IndexMethod | Omit = omit,
+        indexing_options: Optional[instance_create_params.IndexingOptions] | Omit = omit,
         max_num_results: int | Omit = omit,
         metadata: instance_create_params.Metadata | Omit = omit,
         public_endpoint_params: instance_create_params.PublicEndpointParams | Omit = omit,
         reranking: bool | Omit = omit,
-        reranking_model: Literal["@cf/baai/bge-reranker-base", ""] | Omit = omit,
-        rewrite_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        reranking_model: Optional[Literal["@cf/baai/bge-reranker-base", ""]] | Omit = omit,
+        retrieval_options: Optional[instance_create_params.RetrievalOptions] | Omit = omit,
+        rewrite_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
         rewrite_query: bool | Omit = omit,
         score_threshold: float | Omit = omit,
-        source_params: instance_create_params.SourceParams | Omit = omit,
+        source: Optional[str] | Omit = omit,
+        source_params: Optional[instance_create_params.SourceParams] | Omit = omit,
+        sync_interval: Literal[900, 1800, 3600, 7200, 14400, 21600, 43200, 86400] | Omit = omit,
         token_id: str | Omit = omit,
+        type: Optional[Literal["r2", "web-crawler"]] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -181,11 +192,20 @@ class InstancesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceCreateResponse:
-        """
-        Create new instances.
+        """Create a new instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
+
+          hybrid_search_enabled: Deprecated — use index_method instead.
+
+          index_method: Controls which storage backends are used during indexing. Defaults to
+              vector-only.
+
+          sync_interval: Interval between automatic syncs, in seconds. Allowed values: 900 (15min), 1800
+              (30min), 3600 (1h), 7200 (2h), 14400 (4h), 21600 (6h), 43200 (12h), 86400 (24h).
 
           extra_headers: Send extra headers
 
@@ -195,33 +215,42 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/ai-search/instances",
+            path_template("/accounts/{account_id}/ai-search/instances", account_id=account_id),
             body=maybe_transform(
                 {
                     "id": id,
-                    "source": source,
-                    "type": type,
                     "ai_gateway_id": ai_gateway_id,
                     "aisearch_model": aisearch_model,
+                    "cache": cache,
+                    "cache_threshold": cache_threshold,
                     "chunk": chunk,
                     "chunk_overlap": chunk_overlap,
                     "chunk_size": chunk_size,
                     "custom_metadata": custom_metadata,
                     "embedding_model": embedding_model,
+                    "fusion_method": fusion_method,
                     "hybrid_search_enabled": hybrid_search_enabled,
+                    "index_method": index_method,
+                    "indexing_options": indexing_options,
                     "max_num_results": max_num_results,
                     "metadata": metadata,
                     "public_endpoint_params": public_endpoint_params,
                     "reranking": reranking,
                     "reranking_model": reranking_model,
+                    "retrieval_options": retrieval_options,
                     "rewrite_model": rewrite_model,
                     "rewrite_query": rewrite_query,
                     "score_threshold": score_threshold,
+                    "source": source,
                     "source_params": source_params,
+                    "sync_interval": sync_interval,
                     "token_id": token_id,
+                    "type": type,
                 },
                 instance_create_params.InstanceCreateParams,
             ),
@@ -239,35 +268,41 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
-        ai_gateway_id: str | Omit = omit,
-        aisearch_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        account_id: str | None = None,
+        ai_gateway_id: Optional[str] | Omit = omit,
+        aisearch_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
         cache: bool | Omit = omit,
@@ -277,89 +312,108 @@ class InstancesResource(SyncAPIResource):
         chunk_overlap: int | Omit = omit,
         chunk_size: int | Omit = omit,
         custom_metadata: Iterable[instance_update_params.CustomMetadata] | Omit = omit,
-        embedding_model: Literal[
-            "@cf/qwen/qwen3-embedding-0.6b",
-            "@cf/baai/bge-m3",
-            "@cf/baai/bge-large-en-v1.5",
-            "@cf/google/embeddinggemma-300m",
-            "google-ai-studio/gemini-embedding-001",
-            "openai/text-embedding-3-small",
-            "openai/text-embedding-3-large",
-            "",
+        embedding_model: Optional[
+            Literal[
+                "@cf/qwen/qwen3-embedding-0.6b",
+                "@cf/baai/bge-m3",
+                "@cf/baai/bge-large-en-v1.5",
+                "@cf/google/embeddinggemma-300m",
+                "google-ai-studio/gemini-embedding-001",
+                "google-ai-studio/gemini-embedding-2-preview",
+                "openai/text-embedding-3-small",
+                "openai/text-embedding-3-large",
+                "",
+            ]
         ]
         | Omit = omit,
-        hybrid_search_enabled: bool | Omit = omit,
+        fusion_method: Literal["max", "rrf"] | Omit = omit,
+        index_method: instance_update_params.IndexMethod | Omit = omit,
+        indexing_options: Optional[instance_update_params.IndexingOptions] | Omit = omit,
         max_num_results: int | Omit = omit,
         metadata: instance_update_params.Metadata | Omit = omit,
         paused: bool | Omit = omit,
         public_endpoint_params: instance_update_params.PublicEndpointParams | Omit = omit,
         reranking: bool | Omit = omit,
-        reranking_model: Literal["@cf/baai/bge-reranker-base", ""] | Omit = omit,
-        rewrite_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        reranking_model: Optional[Literal["@cf/baai/bge-reranker-base", ""]] | Omit = omit,
+        retrieval_options: Optional[instance_update_params.RetrievalOptions] | Omit = omit,
+        rewrite_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
         rewrite_query: bool | Omit = omit,
         score_threshold: float | Omit = omit,
-        source_params: instance_update_params.SourceParams | Omit = omit,
+        source_params: Optional[instance_update_params.SourceParams] | Omit = omit,
         summarization: bool | Omit = omit,
-        summarization_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        summarization_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
-        system_prompt_aisearch: str | Omit = omit,
-        system_prompt_index_summarization: str | Omit = omit,
-        system_prompt_rewrite_query: str | Omit = omit,
+        sync_interval: Literal[900, 1800, 3600, 7200, 14400, 21600, 43200, 86400] | Omit = omit,
+        system_prompt_aisearch: Optional[str] | Omit = omit,
+        system_prompt_index_summarization: Optional[str] | Omit = omit,
+        system_prompt_rewrite_query: Optional[str] | Omit = omit,
         token_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -368,11 +422,18 @@ class InstancesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceUpdateResponse:
-        """
-        Update instances.
+        """Update instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
+
+          index_method: Controls which storage backends are used during indexing. Defaults to
+              vector-only.
+
+          sync_interval: Interval between automatic syncs, in seconds. Allowed values: 900 (15min), 1800
+              (30min), 3600 (1h), 7200 (2h), 14400 (4h), 21600 (6h), 43200 (12h), 86400 (24h).
 
           extra_headers: Send extra headers
 
@@ -382,12 +443,14 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._put(
-            f"/accounts/{account_id}/ai-search/instances/{id}",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}", account_id=account_id, id=id),
             body=maybe_transform(
                 {
                     "ai_gateway_id": ai_gateway_id,
@@ -399,19 +462,23 @@ class InstancesResource(SyncAPIResource):
                     "chunk_size": chunk_size,
                     "custom_metadata": custom_metadata,
                     "embedding_model": embedding_model,
-                    "hybrid_search_enabled": hybrid_search_enabled,
+                    "fusion_method": fusion_method,
+                    "index_method": index_method,
+                    "indexing_options": indexing_options,
                     "max_num_results": max_num_results,
                     "metadata": metadata,
                     "paused": paused,
                     "public_endpoint_params": public_endpoint_params,
                     "reranking": reranking,
                     "reranking_model": reranking_model,
+                    "retrieval_options": retrieval_options,
                     "rewrite_model": rewrite_model,
                     "rewrite_query": rewrite_query,
                     "score_threshold": score_threshold,
                     "source_params": source_params,
                     "summarization": summarization,
                     "summarization_model": summarization_model,
+                    "sync_interval": sync_interval,
                     "system_prompt_aisearch": system_prompt_aisearch,
                     "system_prompt_index_summarization": system_prompt_index_summarization,
                     "system_prompt_rewrite_query": system_prompt_rewrite_query,
@@ -432,7 +499,10 @@ class InstancesResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        namespace: Optional[str] | Omit = omit,
+        order_by: Literal["created_at"] | Omit = omit,
+        order_by_direction: Literal["asc", "desc"] | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         search: str | Omit = omit,
@@ -447,6 +517,10 @@ class InstancesResource(SyncAPIResource):
         List instances.
 
         Args:
+          order_by: Order By Column Name
+
+          order_by_direction: Order By Direction
+
           search: Search by id
 
           extra_headers: Send extra headers
@@ -457,10 +531,12 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/ai-search/instances",
+            path_template("/accounts/{account_id}/ai-search/instances", account_id=account_id),
             page=SyncV4PagePaginationArray[InstanceListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -469,6 +545,9 @@ class InstancesResource(SyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "namespace": namespace,
+                        "order_by": order_by,
+                        "order_by_direction": order_by_direction,
                         "page": page,
                         "per_page": per_page,
                         "search": search,
@@ -483,7 +562,7 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -491,11 +570,12 @@ class InstancesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceDeleteResponse:
-        """
-        Delete instances.
+        """Delete instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -505,12 +585,14 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._delete(
-            f"/accounts/{account_id}/ai-search/instances/{id}",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -525,17 +607,21 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         messages: Iterable[instance_chat_completions_params.Message],
         aisearch_options: instance_chat_completions_params.AISearchOptions | Omit = omit,
         model: Literal[
             "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "@cf/zai-org/glm-4.7-flash",
             "@cf/meta/llama-3.1-8b-instruct-fast",
             "@cf/meta/llama-3.1-8b-instruct-fp8",
             "@cf/meta/llama-4-scout-17b-16e-instruct",
             "@cf/qwen/qwen3-30b-a3b-fp8",
             "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
             "@cf/moonshotai/kimi-k2-instruct",
+            "@cf/google/gemma-3-12b-it",
+            "@cf/google/gemma-4-26b-a4b-it",
+            "@cf/moonshotai/kimi-k2.5",
             "anthropic/claude-3-7-sonnet",
             "anthropic/claude-sonnet-4",
             "anthropic/claude-opus-4",
@@ -566,10 +652,11 @@ class InstancesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceChatCompletionsResponse:
         """
-        Chat Completions
+        Performs a chat completion request against an AI Search instance, using indexed
+        content as context for generating responses.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID. Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -579,12 +666,16 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._post(
-            f"/accounts/{account_id}/ai-search/instances/{id}/chat/completions",
+            path_template(
+                "/accounts/{account_id}/ai-search/instances/{id}/chat/completions", account_id=account_id, id=id
+            ),
             body=maybe_transform(
                 {
                     "messages": messages,
@@ -604,7 +695,7 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -612,11 +703,12 @@ class InstancesResource(SyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceReadResponse:
-        """
-        Read instances.
+        """Read instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -626,12 +718,14 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._get(
-            f"/accounts/{account_id}/ai-search/instances/{id}",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -646,9 +740,10 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
-        messages: Iterable[instance_search_params.Message],
+        account_id: str | None = None,
         aisearch_options: instance_search_params.AISearchOptions | Omit = omit,
+        messages: Iterable[instance_search_params.Message] | Omit = omit,
+        query: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -657,10 +752,14 @@ class InstancesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceSearchResponse:
         """
-        Search
+        Executes a semantic search query against an AI Search instance to find relevant
+        indexed content.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID. Lowercase alphanumeric, hyphens, and underscores.
+
+          query: A simple text query string. Alternative to 'messages' — provide either this or
+              'messages', not both.
 
           extra_headers: Send extra headers
 
@@ -670,16 +769,19 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._post(
-            f"/accounts/{account_id}/ai-search/instances/{id}/search",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}/search", account_id=account_id, id=id),
             body=maybe_transform(
                 {
-                    "messages": messages,
                     "aisearch_options": aisearch_options,
+                    "messages": messages,
+                    "query": query,
                 },
                 instance_search_params.InstanceSearchParams,
             ),
@@ -697,7 +799,7 @@ class InstancesResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -706,10 +808,10 @@ class InstancesResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceStatsResponse:
         """
-        Stats
+        Retrieves usage statistics for AI Search instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID. Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -719,12 +821,14 @@ class InstancesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._get(
-            f"/accounts/{account_id}/ai-search/instances/{id}/stats",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}/stats", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -737,10 +841,6 @@ class InstancesResource(SyncAPIResource):
 
 
 class AsyncInstancesResource(AsyncAPIResource):
-    @cached_property
-    def items(self) -> AsyncItemsResource:
-        return AsyncItemsResource(self._client)
-
     @cached_property
     def jobs(self) -> AsyncJobsResource:
         return AsyncJobsResource(self._client)
@@ -767,94 +867,117 @@ class AsyncInstancesResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         id: str,
-        source: str,
-        type: Literal["r2", "web-crawler"],
-        ai_gateway_id: str | Omit = omit,
-        aisearch_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        ai_gateway_id: Optional[str] | Omit = omit,
+        aisearch_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
+        | Omit = omit,
+        cache: bool | Omit = omit,
+        cache_threshold: Literal["super_strict_match", "close_enough", "flexible_friend", "anything_goes"]
         | Omit = omit,
         chunk: bool | Omit = omit,
         chunk_overlap: int | Omit = omit,
         chunk_size: int | Omit = omit,
         custom_metadata: Iterable[instance_create_params.CustomMetadata] | Omit = omit,
-        embedding_model: Literal[
-            "@cf/qwen/qwen3-embedding-0.6b",
-            "@cf/baai/bge-m3",
-            "@cf/baai/bge-large-en-v1.5",
-            "@cf/google/embeddinggemma-300m",
-            "google-ai-studio/gemini-embedding-001",
-            "openai/text-embedding-3-small",
-            "openai/text-embedding-3-large",
-            "",
+        embedding_model: Optional[
+            Literal[
+                "@cf/qwen/qwen3-embedding-0.6b",
+                "@cf/baai/bge-m3",
+                "@cf/baai/bge-large-en-v1.5",
+                "@cf/google/embeddinggemma-300m",
+                "google-ai-studio/gemini-embedding-001",
+                "google-ai-studio/gemini-embedding-2-preview",
+                "openai/text-embedding-3-small",
+                "openai/text-embedding-3-large",
+                "",
+            ]
         ]
         | Omit = omit,
+        fusion_method: Literal["max", "rrf"] | Omit = omit,
         hybrid_search_enabled: bool | Omit = omit,
+        index_method: instance_create_params.IndexMethod | Omit = omit,
+        indexing_options: Optional[instance_create_params.IndexingOptions] | Omit = omit,
         max_num_results: int | Omit = omit,
         metadata: instance_create_params.Metadata | Omit = omit,
         public_endpoint_params: instance_create_params.PublicEndpointParams | Omit = omit,
         reranking: bool | Omit = omit,
-        reranking_model: Literal["@cf/baai/bge-reranker-base", ""] | Omit = omit,
-        rewrite_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        reranking_model: Optional[Literal["@cf/baai/bge-reranker-base", ""]] | Omit = omit,
+        retrieval_options: Optional[instance_create_params.RetrievalOptions] | Omit = omit,
+        rewrite_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
         rewrite_query: bool | Omit = omit,
         score_threshold: float | Omit = omit,
-        source_params: instance_create_params.SourceParams | Omit = omit,
+        source: Optional[str] | Omit = omit,
+        source_params: Optional[instance_create_params.SourceParams] | Omit = omit,
+        sync_interval: Literal[900, 1800, 3600, 7200, 14400, 21600, 43200, 86400] | Omit = omit,
         token_id: str | Omit = omit,
+        type: Optional[Literal["r2", "web-crawler"]] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -862,11 +985,20 @@ class AsyncInstancesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceCreateResponse:
-        """
-        Create new instances.
+        """Create a new instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
+
+          hybrid_search_enabled: Deprecated — use index_method instead.
+
+          index_method: Controls which storage backends are used during indexing. Defaults to
+              vector-only.
+
+          sync_interval: Interval between automatic syncs, in seconds. Allowed values: 900 (15min), 1800
+              (30min), 3600 (1h), 7200 (2h), 14400 (4h), 21600 (6h), 43200 (12h), 86400 (24h).
 
           extra_headers: Send extra headers
 
@@ -876,33 +1008,42 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/ai-search/instances",
+            path_template("/accounts/{account_id}/ai-search/instances", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "id": id,
-                    "source": source,
-                    "type": type,
                     "ai_gateway_id": ai_gateway_id,
                     "aisearch_model": aisearch_model,
+                    "cache": cache,
+                    "cache_threshold": cache_threshold,
                     "chunk": chunk,
                     "chunk_overlap": chunk_overlap,
                     "chunk_size": chunk_size,
                     "custom_metadata": custom_metadata,
                     "embedding_model": embedding_model,
+                    "fusion_method": fusion_method,
                     "hybrid_search_enabled": hybrid_search_enabled,
+                    "index_method": index_method,
+                    "indexing_options": indexing_options,
                     "max_num_results": max_num_results,
                     "metadata": metadata,
                     "public_endpoint_params": public_endpoint_params,
                     "reranking": reranking,
                     "reranking_model": reranking_model,
+                    "retrieval_options": retrieval_options,
                     "rewrite_model": rewrite_model,
                     "rewrite_query": rewrite_query,
                     "score_threshold": score_threshold,
+                    "source": source,
                     "source_params": source_params,
+                    "sync_interval": sync_interval,
                     "token_id": token_id,
+                    "type": type,
                 },
                 instance_create_params.InstanceCreateParams,
             ),
@@ -920,35 +1061,41 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
-        ai_gateway_id: str | Omit = omit,
-        aisearch_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        account_id: str | None = None,
+        ai_gateway_id: Optional[str] | Omit = omit,
+        aisearch_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
         cache: bool | Omit = omit,
@@ -958,89 +1105,108 @@ class AsyncInstancesResource(AsyncAPIResource):
         chunk_overlap: int | Omit = omit,
         chunk_size: int | Omit = omit,
         custom_metadata: Iterable[instance_update_params.CustomMetadata] | Omit = omit,
-        embedding_model: Literal[
-            "@cf/qwen/qwen3-embedding-0.6b",
-            "@cf/baai/bge-m3",
-            "@cf/baai/bge-large-en-v1.5",
-            "@cf/google/embeddinggemma-300m",
-            "google-ai-studio/gemini-embedding-001",
-            "openai/text-embedding-3-small",
-            "openai/text-embedding-3-large",
-            "",
+        embedding_model: Optional[
+            Literal[
+                "@cf/qwen/qwen3-embedding-0.6b",
+                "@cf/baai/bge-m3",
+                "@cf/baai/bge-large-en-v1.5",
+                "@cf/google/embeddinggemma-300m",
+                "google-ai-studio/gemini-embedding-001",
+                "google-ai-studio/gemini-embedding-2-preview",
+                "openai/text-embedding-3-small",
+                "openai/text-embedding-3-large",
+                "",
+            ]
         ]
         | Omit = omit,
-        hybrid_search_enabled: bool | Omit = omit,
+        fusion_method: Literal["max", "rrf"] | Omit = omit,
+        index_method: instance_update_params.IndexMethod | Omit = omit,
+        indexing_options: Optional[instance_update_params.IndexingOptions] | Omit = omit,
         max_num_results: int | Omit = omit,
         metadata: instance_update_params.Metadata | Omit = omit,
         paused: bool | Omit = omit,
         public_endpoint_params: instance_update_params.PublicEndpointParams | Omit = omit,
         reranking: bool | Omit = omit,
-        reranking_model: Literal["@cf/baai/bge-reranker-base", ""] | Omit = omit,
-        rewrite_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        reranking_model: Optional[Literal["@cf/baai/bge-reranker-base", ""]] | Omit = omit,
+        retrieval_options: Optional[instance_update_params.RetrievalOptions] | Omit = omit,
+        rewrite_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
         rewrite_query: bool | Omit = omit,
         score_threshold: float | Omit = omit,
-        source_params: instance_update_params.SourceParams | Omit = omit,
+        source_params: Optional[instance_update_params.SourceParams] | Omit = omit,
         summarization: bool | Omit = omit,
-        summarization_model: Literal[
-            "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fast",
-            "@cf/meta/llama-3.1-8b-instruct-fp8",
-            "@cf/meta/llama-4-scout-17b-16e-instruct",
-            "@cf/qwen/qwen3-30b-a3b-fp8",
-            "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
-            "@cf/moonshotai/kimi-k2-instruct",
-            "anthropic/claude-3-7-sonnet",
-            "anthropic/claude-sonnet-4",
-            "anthropic/claude-opus-4",
-            "anthropic/claude-3-5-haiku",
-            "cerebras/qwen-3-235b-a22b-instruct",
-            "cerebras/qwen-3-235b-a22b-thinking",
-            "cerebras/llama-3.3-70b",
-            "cerebras/llama-4-maverick-17b-128e-instruct",
-            "cerebras/llama-4-scout-17b-16e-instruct",
-            "cerebras/gpt-oss-120b",
-            "google-ai-studio/gemini-2.5-flash",
-            "google-ai-studio/gemini-2.5-pro",
-            "grok/grok-4",
-            "groq/llama-3.3-70b-versatile",
-            "groq/llama-3.1-8b-instant",
-            "openai/gpt-5",
-            "openai/gpt-5-mini",
-            "openai/gpt-5-nano",
-            "",
+        summarization_model: Optional[
+            Literal[
+                "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+                "@cf/zai-org/glm-4.7-flash",
+                "@cf/meta/llama-3.1-8b-instruct-fast",
+                "@cf/meta/llama-3.1-8b-instruct-fp8",
+                "@cf/meta/llama-4-scout-17b-16e-instruct",
+                "@cf/qwen/qwen3-30b-a3b-fp8",
+                "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
+                "@cf/moonshotai/kimi-k2-instruct",
+                "@cf/google/gemma-3-12b-it",
+                "@cf/google/gemma-4-26b-a4b-it",
+                "@cf/moonshotai/kimi-k2.5",
+                "anthropic/claude-3-7-sonnet",
+                "anthropic/claude-sonnet-4",
+                "anthropic/claude-opus-4",
+                "anthropic/claude-3-5-haiku",
+                "cerebras/qwen-3-235b-a22b-instruct",
+                "cerebras/qwen-3-235b-a22b-thinking",
+                "cerebras/llama-3.3-70b",
+                "cerebras/llama-4-maverick-17b-128e-instruct",
+                "cerebras/llama-4-scout-17b-16e-instruct",
+                "cerebras/gpt-oss-120b",
+                "google-ai-studio/gemini-2.5-flash",
+                "google-ai-studio/gemini-2.5-pro",
+                "grok/grok-4",
+                "groq/llama-3.3-70b-versatile",
+                "groq/llama-3.1-8b-instant",
+                "openai/gpt-5",
+                "openai/gpt-5-mini",
+                "openai/gpt-5-nano",
+                "",
+            ]
         ]
         | Omit = omit,
-        system_prompt_aisearch: str | Omit = omit,
-        system_prompt_index_summarization: str | Omit = omit,
-        system_prompt_rewrite_query: str | Omit = omit,
+        sync_interval: Literal[900, 1800, 3600, 7200, 14400, 21600, 43200, 86400] | Omit = omit,
+        system_prompt_aisearch: Optional[str] | Omit = omit,
+        system_prompt_index_summarization: Optional[str] | Omit = omit,
+        system_prompt_rewrite_query: Optional[str] | Omit = omit,
         token_id: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -1049,11 +1215,18 @@ class AsyncInstancesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceUpdateResponse:
-        """
-        Update instances.
+        """Update instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
+
+          index_method: Controls which storage backends are used during indexing. Defaults to
+              vector-only.
+
+          sync_interval: Interval between automatic syncs, in seconds. Allowed values: 900 (15min), 1800
+              (30min), 3600 (1h), 7200 (2h), 14400 (4h), 21600 (6h), 43200 (12h), 86400 (24h).
 
           extra_headers: Send extra headers
 
@@ -1063,12 +1236,14 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._put(
-            f"/accounts/{account_id}/ai-search/instances/{id}",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}", account_id=account_id, id=id),
             body=await async_maybe_transform(
                 {
                     "ai_gateway_id": ai_gateway_id,
@@ -1080,19 +1255,23 @@ class AsyncInstancesResource(AsyncAPIResource):
                     "chunk_size": chunk_size,
                     "custom_metadata": custom_metadata,
                     "embedding_model": embedding_model,
-                    "hybrid_search_enabled": hybrid_search_enabled,
+                    "fusion_method": fusion_method,
+                    "index_method": index_method,
+                    "indexing_options": indexing_options,
                     "max_num_results": max_num_results,
                     "metadata": metadata,
                     "paused": paused,
                     "public_endpoint_params": public_endpoint_params,
                     "reranking": reranking,
                     "reranking_model": reranking_model,
+                    "retrieval_options": retrieval_options,
                     "rewrite_model": rewrite_model,
                     "rewrite_query": rewrite_query,
                     "score_threshold": score_threshold,
                     "source_params": source_params,
                     "summarization": summarization,
                     "summarization_model": summarization_model,
+                    "sync_interval": sync_interval,
                     "system_prompt_aisearch": system_prompt_aisearch,
                     "system_prompt_index_summarization": system_prompt_index_summarization,
                     "system_prompt_rewrite_query": system_prompt_rewrite_query,
@@ -1113,7 +1292,10 @@ class AsyncInstancesResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
+        namespace: Optional[str] | Omit = omit,
+        order_by: Literal["created_at"] | Omit = omit,
+        order_by_direction: Literal["asc", "desc"] | Omit = omit,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         search: str | Omit = omit,
@@ -1128,6 +1310,10 @@ class AsyncInstancesResource(AsyncAPIResource):
         List instances.
 
         Args:
+          order_by: Order By Column Name
+
+          order_by_direction: Order By Direction
+
           search: Search by id
 
           extra_headers: Send extra headers
@@ -1138,10 +1324,12 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/ai-search/instances",
+            path_template("/accounts/{account_id}/ai-search/instances", account_id=account_id),
             page=AsyncV4PagePaginationArray[InstanceListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -1150,6 +1338,9 @@ class AsyncInstancesResource(AsyncAPIResource):
                 timeout=timeout,
                 query=maybe_transform(
                     {
+                        "namespace": namespace,
+                        "order_by": order_by,
+                        "order_by_direction": order_by_direction,
                         "page": page,
                         "per_page": per_page,
                         "search": search,
@@ -1164,7 +1355,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1172,11 +1363,12 @@ class AsyncInstancesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceDeleteResponse:
-        """
-        Delete instances.
+        """Delete instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -1186,12 +1378,14 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/ai-search/instances/{id}",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -1206,17 +1400,21 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         messages: Iterable[instance_chat_completions_params.Message],
         aisearch_options: instance_chat_completions_params.AISearchOptions | Omit = omit,
         model: Literal[
             "@cf/meta/llama-3.3-70b-instruct-fp8-fast",
+            "@cf/zai-org/glm-4.7-flash",
             "@cf/meta/llama-3.1-8b-instruct-fast",
             "@cf/meta/llama-3.1-8b-instruct-fp8",
             "@cf/meta/llama-4-scout-17b-16e-instruct",
             "@cf/qwen/qwen3-30b-a3b-fp8",
             "@cf/deepseek-ai/deepseek-r1-distill-qwen-32b",
             "@cf/moonshotai/kimi-k2-instruct",
+            "@cf/google/gemma-3-12b-it",
+            "@cf/google/gemma-4-26b-a4b-it",
+            "@cf/moonshotai/kimi-k2.5",
             "anthropic/claude-3-7-sonnet",
             "anthropic/claude-sonnet-4",
             "anthropic/claude-opus-4",
@@ -1247,10 +1445,11 @@ class AsyncInstancesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceChatCompletionsResponse:
         """
-        Chat Completions
+        Performs a chat completion request against an AI Search instance, using indexed
+        content as context for generating responses.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID. Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -1260,12 +1459,16 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._post(
-            f"/accounts/{account_id}/ai-search/instances/{id}/chat/completions",
+            path_template(
+                "/accounts/{account_id}/ai-search/instances/{id}/chat/completions", account_id=account_id, id=id
+            ),
             body=await async_maybe_transform(
                 {
                     "messages": messages,
@@ -1285,7 +1488,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1293,11 +1496,12 @@ class AsyncInstancesResource(AsyncAPIResource):
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceReadResponse:
-        """
-        Read instances.
+        """Read instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID.
+
+        Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -1307,12 +1511,14 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._get(
-            f"/accounts/{account_id}/ai-search/instances/{id}",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -1327,9 +1533,10 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
-        messages: Iterable[instance_search_params.Message],
+        account_id: str | None = None,
         aisearch_options: instance_search_params.AISearchOptions | Omit = omit,
+        messages: Iterable[instance_search_params.Message] | Omit = omit,
+        query: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1338,10 +1545,14 @@ class AsyncInstancesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceSearchResponse:
         """
-        Search
+        Executes a semantic search query against an AI Search instance to find relevant
+        indexed content.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID. Lowercase alphanumeric, hyphens, and underscores.
+
+          query: A simple text query string. Alternative to 'messages' — provide either this or
+              'messages', not both.
 
           extra_headers: Send extra headers
 
@@ -1351,16 +1562,19 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._post(
-            f"/accounts/{account_id}/ai-search/instances/{id}/search",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}/search", account_id=account_id, id=id),
             body=await async_maybe_transform(
                 {
-                    "messages": messages,
                     "aisearch_options": aisearch_options,
+                    "messages": messages,
+                    "query": query,
                 },
                 instance_search_params.InstanceSearchParams,
             ),
@@ -1378,7 +1592,7 @@ class AsyncInstancesResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -1387,10 +1601,10 @@ class AsyncInstancesResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> InstanceStatsResponse:
         """
-        Stats
+        Retrieves usage statistics for AI Search instances.
 
         Args:
-          id: Use your AI Search ID.
+          id: AI Search instance ID. Lowercase alphanumeric, hyphens, and underscores.
 
           extra_headers: Send extra headers
 
@@ -1400,12 +1614,14 @@ class AsyncInstancesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._get(
-            f"/accounts/{account_id}/ai-search/instances/{id}/stats",
+            path_template("/accounts/{account_id}/ai-search/instances/{id}/stats", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -1447,10 +1663,6 @@ class InstancesResourceWithRawResponse:
         )
 
     @cached_property
-    def items(self) -> ItemsResourceWithRawResponse:
-        return ItemsResourceWithRawResponse(self._instances.items)
-
-    @cached_property
     def jobs(self) -> JobsResourceWithRawResponse:
         return JobsResourceWithRawResponse(self._instances.jobs)
 
@@ -1483,10 +1695,6 @@ class AsyncInstancesResourceWithRawResponse:
         self.stats = async_to_raw_response_wrapper(
             instances.stats,
         )
-
-    @cached_property
-    def items(self) -> AsyncItemsResourceWithRawResponse:
-        return AsyncItemsResourceWithRawResponse(self._instances.items)
 
     @cached_property
     def jobs(self) -> AsyncJobsResourceWithRawResponse:
@@ -1523,10 +1731,6 @@ class InstancesResourceWithStreamingResponse:
         )
 
     @cached_property
-    def items(self) -> ItemsResourceWithStreamingResponse:
-        return ItemsResourceWithStreamingResponse(self._instances.items)
-
-    @cached_property
     def jobs(self) -> JobsResourceWithStreamingResponse:
         return JobsResourceWithStreamingResponse(self._instances.jobs)
 
@@ -1559,10 +1763,6 @@ class AsyncInstancesResourceWithStreamingResponse:
         self.stats = async_to_streamed_response_wrapper(
             instances.stats,
         )
-
-    @cached_property
-    def items(self) -> AsyncItemsResourceWithStreamingResponse:
-        return AsyncItemsResourceWithStreamingResponse(self._instances.items)
 
     @cached_property
     def jobs(self) -> AsyncJobsResourceWithStreamingResponse:

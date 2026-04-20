@@ -15,7 +15,7 @@ from .upload import (
     AsyncUploadResourceWithStreamingResponse,
 )
 from ....._types import Body, Omit, Query, Headers, NoneType, NotGiven, omit, not_given
-from ....._utils import maybe_transform, async_maybe_transform
+from ....._utils import path_template, maybe_transform, async_maybe_transform
 from ....._compat import cached_property
 from ....._resource import SyncAPIResource, AsyncAPIResource
 from ....._response import (
@@ -37,9 +37,7 @@ from .versions.versions import (
 )
 from .....types.zero_trust.dlp import dataset_create_params, dataset_update_params
 from .....types.zero_trust.dlp.dataset import Dataset
-from .....types.zero_trust.dlp.dataset_get_response import DatasetGetResponse
-from .....types.zero_trust.dlp.dataset_create_response import DatasetCreateResponse
-from .....types.zero_trust.dlp.dataset_update_response import DatasetUpdateResponse
+from .....types.zero_trust.dlp.dataset_creation import DatasetCreation
 
 __all__ = ["DatasetsResource", "AsyncDatasetsResource"]
 
@@ -75,7 +73,7 @@ class DatasetsResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         case_sensitive: bool | Omit = omit,
         description: Optional[str] | Omit = omit,
@@ -87,13 +85,14 @@ class DatasetsResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[DatasetCreateResponse]:
-        """Create a new dataset
+    ) -> Optional[DatasetCreation]:
+        """
+        Creates a new DLP (Data Loss Prevention) dataset for storing custom detection
+        patterns. Datasets can contain exact match data, word lists, or EDM (Exact Data
+        Match) configurations.
 
         Args:
-          case_sensitive: Only applies to custom word lists.
-
-        Determines if the words should be matched in
+          case_sensitive: Only applies to custom word lists. Determines if the words should be matched in
               a case-sensitive manner Cannot be set to false if `secret` is true or undefined
 
           description: The description of the dataset.
@@ -118,10 +117,12 @@ class DatasetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/dlp/datasets",
+            path_template("/accounts/{account_id}/dlp/datasets", account_id=account_id),
             body=maybe_transform(
                 {
                     "name": name,
@@ -137,16 +138,16 @@ class DatasetsResource(SyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[DatasetCreateResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[DatasetCreation]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[DatasetCreateResponse]], ResultWrapper[DatasetCreateResponse]),
+            cast_to=cast(Type[Optional[DatasetCreation]], ResultWrapper[DatasetCreation]),
         )
 
     def update(
         self,
         dataset_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         case_sensitive: bool | Omit = omit,
         description: Optional[str] | Omit = omit,
         name: Optional[str] | Omit = omit,
@@ -156,9 +157,10 @@ class DatasetsResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[DatasetUpdateResponse]:
+    ) -> Optional[Dataset]:
         """
-        Update details about a dataset
+        Updates the configuration of an existing DLP dataset, such as its name,
+        description, or detection settings.
 
         Args:
           case_sensitive: Determines if the words should be matched in a case-sensitive manner.
@@ -177,12 +179,16 @@ class DatasetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not dataset_id:
             raise ValueError(f"Expected a non-empty value for `dataset_id` but received {dataset_id!r}")
         return self._put(
-            f"/accounts/{account_id}/dlp/datasets/{dataset_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/datasets/{dataset_id}", account_id=account_id, dataset_id=dataset_id
+            ),
             body=maybe_transform(
                 {
                     "case_sensitive": case_sensitive,
@@ -196,15 +202,15 @@ class DatasetsResource(SyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[DatasetUpdateResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[Dataset]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[DatasetUpdateResponse]], ResultWrapper[DatasetUpdateResponse]),
+            cast_to=cast(Type[Optional[Dataset]], ResultWrapper[Dataset]),
         )
 
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -213,7 +219,8 @@ class DatasetsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncSinglePage[Dataset]:
         """
-        Fetch all datasets
+        Lists all DLP datasets configured for the account, including custom word lists
+        and EDM datasets.
 
         Args:
           extra_headers: Send extra headers
@@ -224,10 +231,12 @@ class DatasetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/dlp/datasets",
+            path_template("/accounts/{account_id}/dlp/datasets", account_id=account_id),
             page=SyncSinglePage[Dataset],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -239,7 +248,7 @@ class DatasetsResource(SyncAPIResource):
         self,
         dataset_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -259,13 +268,17 @@ class DatasetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not dataset_id:
             raise ValueError(f"Expected a non-empty value for `dataset_id` but received {dataset_id!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return self._delete(
-            f"/accounts/{account_id}/dlp/datasets/{dataset_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/datasets/{dataset_id}", account_id=account_id, dataset_id=dataset_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -276,14 +289,14 @@ class DatasetsResource(SyncAPIResource):
         self,
         dataset_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[DatasetGetResponse]:
+    ) -> Optional[Dataset]:
         """
         Fetch a specific dataset
 
@@ -296,20 +309,24 @@ class DatasetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not dataset_id:
             raise ValueError(f"Expected a non-empty value for `dataset_id` but received {dataset_id!r}")
         return self._get(
-            f"/accounts/{account_id}/dlp/datasets/{dataset_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/datasets/{dataset_id}", account_id=account_id, dataset_id=dataset_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[DatasetGetResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[Dataset]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[DatasetGetResponse]], ResultWrapper[DatasetGetResponse]),
+            cast_to=cast(Type[Optional[Dataset]], ResultWrapper[Dataset]),
         )
 
 
@@ -344,7 +361,7 @@ class AsyncDatasetsResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         name: str,
         case_sensitive: bool | Omit = omit,
         description: Optional[str] | Omit = omit,
@@ -356,13 +373,14 @@ class AsyncDatasetsResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[DatasetCreateResponse]:
-        """Create a new dataset
+    ) -> Optional[DatasetCreation]:
+        """
+        Creates a new DLP (Data Loss Prevention) dataset for storing custom detection
+        patterns. Datasets can contain exact match data, word lists, or EDM (Exact Data
+        Match) configurations.
 
         Args:
-          case_sensitive: Only applies to custom word lists.
-
-        Determines if the words should be matched in
+          case_sensitive: Only applies to custom word lists. Determines if the words should be matched in
               a case-sensitive manner Cannot be set to false if `secret` is true or undefined
 
           description: The description of the dataset.
@@ -387,10 +405,12 @@ class AsyncDatasetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/dlp/datasets",
+            path_template("/accounts/{account_id}/dlp/datasets", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "name": name,
@@ -406,16 +426,16 @@ class AsyncDatasetsResource(AsyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[DatasetCreateResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[DatasetCreation]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[DatasetCreateResponse]], ResultWrapper[DatasetCreateResponse]),
+            cast_to=cast(Type[Optional[DatasetCreation]], ResultWrapper[DatasetCreation]),
         )
 
     async def update(
         self,
         dataset_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         case_sensitive: bool | Omit = omit,
         description: Optional[str] | Omit = omit,
         name: Optional[str] | Omit = omit,
@@ -425,9 +445,10 @@ class AsyncDatasetsResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[DatasetUpdateResponse]:
+    ) -> Optional[Dataset]:
         """
-        Update details about a dataset
+        Updates the configuration of an existing DLP dataset, such as its name,
+        description, or detection settings.
 
         Args:
           case_sensitive: Determines if the words should be matched in a case-sensitive manner.
@@ -446,12 +467,16 @@ class AsyncDatasetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not dataset_id:
             raise ValueError(f"Expected a non-empty value for `dataset_id` but received {dataset_id!r}")
         return await self._put(
-            f"/accounts/{account_id}/dlp/datasets/{dataset_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/datasets/{dataset_id}", account_id=account_id, dataset_id=dataset_id
+            ),
             body=await async_maybe_transform(
                 {
                     "case_sensitive": case_sensitive,
@@ -465,15 +490,15 @@ class AsyncDatasetsResource(AsyncAPIResource):
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[DatasetUpdateResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[Dataset]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[DatasetUpdateResponse]], ResultWrapper[DatasetUpdateResponse]),
+            cast_to=cast(Type[Optional[Dataset]], ResultWrapper[Dataset]),
         )
 
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -482,7 +507,8 @@ class AsyncDatasetsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[Dataset, AsyncSinglePage[Dataset]]:
         """
-        Fetch all datasets
+        Lists all DLP datasets configured for the account, including custom word lists
+        and EDM datasets.
 
         Args:
           extra_headers: Send extra headers
@@ -493,10 +519,12 @@ class AsyncDatasetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/dlp/datasets",
+            path_template("/accounts/{account_id}/dlp/datasets", account_id=account_id),
             page=AsyncSinglePage[Dataset],
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
@@ -508,7 +536,7 @@ class AsyncDatasetsResource(AsyncAPIResource):
         self,
         dataset_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -528,13 +556,17 @@ class AsyncDatasetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not dataset_id:
             raise ValueError(f"Expected a non-empty value for `dataset_id` but received {dataset_id!r}")
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return await self._delete(
-            f"/accounts/{account_id}/dlp/datasets/{dataset_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/datasets/{dataset_id}", account_id=account_id, dataset_id=dataset_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -545,14 +577,14 @@ class AsyncDatasetsResource(AsyncAPIResource):
         self,
         dataset_id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> Optional[DatasetGetResponse]:
+    ) -> Optional[Dataset]:
         """
         Fetch a specific dataset
 
@@ -565,20 +597,24 @@ class AsyncDatasetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not dataset_id:
             raise ValueError(f"Expected a non-empty value for `dataset_id` but received {dataset_id!r}")
         return await self._get(
-            f"/accounts/{account_id}/dlp/datasets/{dataset_id}",
+            path_template(
+                "/accounts/{account_id}/dlp/datasets/{dataset_id}", account_id=account_id, dataset_id=dataset_id
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
                 extra_body=extra_body,
                 timeout=timeout,
-                post_parser=ResultWrapper[Optional[DatasetGetResponse]]._unwrapper,
+                post_parser=ResultWrapper[Optional[Dataset]]._unwrapper,
             ),
-            cast_to=cast(Type[Optional[DatasetGetResponse]], ResultWrapper[DatasetGetResponse]),
+            cast_to=cast(Type[Optional[Dataset]], ResultWrapper[Dataset]),
         )
 
 

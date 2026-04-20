@@ -8,7 +8,7 @@ __all__ = ["ResourceCreateParams"]
 
 
 class ResourceCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account identifier."""
 
     meta: Required[object]
@@ -23,7 +23,6 @@ class ResourceCreateParams(TypedDict, total=False):
     resource_type: Required[
         Literal[
             "custom-ruleset",
-            "widget",
             "gateway-policy",
             "gateway-destination-ip",
             "gateway-block-page-settings",

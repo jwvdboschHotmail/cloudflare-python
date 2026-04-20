@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from typing import Optional
 from typing_extensions import Required, TypedDict
 
 from ..profiles.pattern_param import PatternParam
@@ -10,10 +11,12 @@ __all__ = ["CustomUpdateParams"]
 
 
 class CustomUpdateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     enabled: Required[bool]
 
     name: Required[str]
 
     pattern: Required[PatternParam]
+
+    description: Optional[str]

@@ -14,13 +14,17 @@ __all__ = [
     "RunQueryParameters",
     "RunQueryParametersCalculation",
     "RunQueryParametersFilter",
+    "RunQueryParametersFilterUnionMember0",
+    "RunQueryParametersFilterWorkersObservabilityFilterLeaf",
     "RunQueryParametersGroupBy",
     "RunQueryParametersHaving",
     "RunQueryParametersNeedle",
+    "RunQueryParametersNeedleValue",
     "RunQueryParametersOrderBy",
     "RunTimeframe",
     "RunStatistics",
     "Statistics",
+    "Agent",
     "Calculation",
     "CalculationAggregate",
     "CalculationAggregateGroup",
@@ -54,10 +58,6 @@ __all__ = [
     "InvocationWorkersUnionMember1",
     "InvocationWorkersUnionMember1DiagnosticsChannelEvent",
     "InvocationWorkersUnionMember1ScriptVersion",
-    "Pattern",
-    "PatternSeries",
-    "PatternSeriesData",
-    "PatternSeriesDataGroup",
     "Trace",
 ]
 
@@ -111,8 +111,26 @@ class RunQueryParametersCalculation(BaseModel):
     key_type: Optional[Literal["string", "number", "boolean"]] = FieldInfo(alias="keyType", default=None)
 
 
-class RunQueryParametersFilter(BaseModel):
+class RunQueryParametersFilterUnionMember0(BaseModel):
+    filter_combination: Literal["and", "or", "AND", "OR"] = FieldInfo(alias="filterCombination")
+
+    filters: List[object]
+
+    kind: Literal["group"]
+
+
+class RunQueryParametersFilterWorkersObservabilityFilterLeaf(BaseModel):
+    """
+    Filtering best practices: use observability_keys and observability_values to confirm available fields and values. If searching for errors, filter for $metadata.error exists.
+    """
+
     key: str
+    """Filter field name.
+
+    IMPORTANT: do not guess keys. Always use verified keys from previous query
+    results or the observability_keys response. Preferred keys: $metadata.service,
+    $metadata.origin, $metadata.trigger, $metadata.message, $metadata.error.
+    """
 
     operation: Literal[
         "includes",
@@ -147,7 +165,22 @@ class RunQueryParametersFilter(BaseModel):
 
     type: Literal["string", "number", "boolean"]
 
+    kind: Optional[Literal["filter"]] = None
+
     value: Union[str, float, bool, None] = None
+    """Filter comparison value.
+
+    IMPORTANT: must match actual values in your logs. Verify using previous query
+    results or the /values endpoint. Ensure value type matches the field type.
+    String comparisons are case-sensitive unless using specific operations. Regex
+    uses ClickHouse RE2 syntax (no lookaheads/lookbehinds); examples: ^5\\dd{2}$ for
+    HTTP 5xx, \bERROR\b for word boundary.
+    """
+
+
+RunQueryParametersFilter: TypeAlias = Union[
+    RunQueryParametersFilterUnionMember0, RunQueryParametersFilterWorkersObservabilityFilterLeaf
+]
 
 
 class RunQueryParametersGroupBy(BaseModel):
@@ -164,10 +197,14 @@ class RunQueryParametersHaving(BaseModel):
     value: float
 
 
+class RunQueryParametersNeedleValue(BaseModel):
+    model_config = {"arbitrary_types_allowed": True}
+
+
 class RunQueryParametersNeedle(BaseModel):
     """Define an expression to search using full-text search."""
 
-    value: Union[str, float, bool]
+    value: RunQueryParametersNeedleValue
 
     is_regex: Optional[bool] = FieldInfo(alias="isRegex", default=None)
 
@@ -195,7 +232,10 @@ class RunQueryParameters(BaseModel):
     """Set a Flag to describe how to combine the filters on the query."""
 
     filters: Optional[List[RunQueryParametersFilter]] = None
-    """Configure the Filters to apply to the query."""
+    """Configure the Filters to apply to the query.
+
+    Supports nested groups via kind: 'group'.
+    """
 
     group_bys: Optional[List[RunQueryParametersGroupBy]] = FieldInfo(alias="groupBys", default=None)
     """Define how to group the results of the query."""
@@ -215,29 +255,24 @@ class RunQueryParameters(BaseModel):
 
 class RunQuery(BaseModel):
     id: str
-    """ID of the query"""
+
+    adhoc: bool
+    """If the query wasn't explcitly saved"""
 
     created: str
 
+    created_by: str = FieldInfo(alias="createdBy")
+
     description: Optional[str] = None
 
-    environment_id: str = FieldInfo(alias="environmentId")
-    """ID of your environment"""
-
-    generated: Optional[bool] = None
-    """Flag for alerts automatically created"""
-
-    name: Optional[str] = None
+    name: str
     """Query name"""
 
     parameters: RunQueryParameters
 
     updated: str
 
-    user_id: str = FieldInfo(alias="userId")
-
-    workspace_id: str = FieldInfo(alias="workspaceId")
-    """ID of your workspace"""
+    updated_by: str = FieldInfo(alias="updatedBy")
 
 
 class RunTimeframe(BaseModel):
@@ -276,8 +311,6 @@ class Run(BaseModel):
 
     dry: bool
 
-    environment_id: str = FieldInfo(alias="environmentId")
-
     granularity: float
 
     query: RunQuery
@@ -288,8 +321,6 @@ class Run(BaseModel):
     """Time range for the query execution"""
 
     user_id: str = FieldInfo(alias="userId")
-
-    workspace_id: str = FieldInfo(alias="workspaceId")
 
     created: Optional[str] = None
 
@@ -319,6 +350,24 @@ class Statistics(BaseModel):
     """
 
 
+class Agent(BaseModel):
+    agent_class: str = FieldInfo(alias="agentClass")
+
+    event_type_counts: Dict[str, float] = FieldInfo(alias="eventTypeCounts")
+
+    first_event_ms: float = FieldInfo(alias="firstEventMs")
+
+    has_errors: bool = FieldInfo(alias="hasErrors")
+
+    last_event_ms: float = FieldInfo(alias="lastEventMs")
+
+    namespace: str
+
+    service: str
+
+    total_events: float = FieldInfo(alias="totalEvents")
+
+
 class CalculationAggregateGroup(BaseModel):
     key: str
 
@@ -346,17 +395,17 @@ class CalculationSeriesDataGroup(BaseModel):
 class CalculationSeriesData(BaseModel):
     count: float
 
-    first_seen: str = FieldInfo(alias="firstSeen")
-
     interval: float
-
-    last_seen: str = FieldInfo(alias="lastSeen")
 
     sample_interval: float = FieldInfo(alias="sampleInterval")
 
     value: float
 
+    first_seen: Optional[str] = FieldInfo(alias="firstSeen", default=None)
+
     groups: Optional[List[CalculationSeriesDataGroup]] = None
+
+    last_seen: Optional[str] = FieldInfo(alias="lastSeen", default=None)
 
 
 class CalculationSeries(BaseModel):
@@ -402,17 +451,17 @@ class CompareSeriesDataGroup(BaseModel):
 class CompareSeriesData(BaseModel):
     count: float
 
-    first_seen: str = FieldInfo(alias="firstSeen")
-
     interval: float
-
-    last_seen: str = FieldInfo(alias="lastSeen")
 
     sample_interval: float = FieldInfo(alias="sampleInterval")
 
     value: float
 
+    first_seen: Optional[str] = FieldInfo(alias="firstSeen", default=None)
+
     groups: Optional[List[CompareSeriesDataGroup]] = None
+
+    last_seen: Optional[str] = FieldInfo(alias="lastSeen", default=None)
 
 
 class CompareSeries(BaseModel):
@@ -433,6 +482,7 @@ class Compare(BaseModel):
 
 class EventsEventMetadata(BaseModel):
     id: str
+    """Unique event ID. Use as the cursor for offset-based pagination."""
 
     account: Optional[str] = None
 
@@ -505,7 +555,7 @@ class EventsEventWorkersUnionMember0ScriptVersion(BaseModel):
 
 class EventsEventWorkersUnionMember0(BaseModel):
     event_type: Literal[
-        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "unknown"
+        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "workflow", "unknown"
     ] = FieldInfo(alias="eventType")
 
     request_id: str = FieldInfo(alias="requestId")
@@ -516,17 +566,7 @@ class EventsEventWorkersUnionMember0(BaseModel):
 
     entrypoint: Optional[str] = None
 
-    event: Optional[
-        Dict[
-            str,
-            Union[
-                str,
-                float,
-                bool,
-                Dict[str, Union[str, float, bool, Dict[str, Union[List[Union[str, float, bool]], str, float, bool]]]],
-            ],
-        ]
-    ] = None
+    event: Optional[Dict[str, object]] = None
 
     execution_model: Optional[Literal["durableObject", "stateless"]] = FieldInfo(alias="executionModel", default=None)
 
@@ -559,7 +599,7 @@ class EventsEventWorkersUnionMember1(BaseModel):
     cpu_time_ms: float = FieldInfo(alias="cpuTimeMs")
 
     event_type: Literal[
-        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "unknown"
+        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "workflow", "unknown"
     ] = FieldInfo(alias="eventType")
 
     outcome: str
@@ -580,7 +620,7 @@ class EventsEventWorkersUnionMember1(BaseModel):
 
     entrypoint: Optional[str] = None
 
-    event: Optional[Dict[str, Union[str, float, bool]]] = None
+    event: Optional[Dict[str, object]] = None
 
     execution_model: Optional[Literal["durableObject", "stateless"]] = FieldInfo(alias="executionModel", default=None)
 
@@ -627,11 +667,11 @@ class EventsField(BaseModel):
 class EventsSeriesDataAggregates(BaseModel):
     api_count: int = FieldInfo(alias="_count")
 
-    api_first_seen: str = FieldInfo(alias="_firstSeen")
+    api_interval: float = FieldInfo(alias="_interval")
 
-    api_interval: int = FieldInfo(alias="_interval")
+    api_first_seen: Optional[str] = FieldInfo(alias="_firstSeen", default=None)
 
-    api_last_seen: str = FieldInfo(alias="_lastSeen")
+    api_last_seen: Optional[str] = FieldInfo(alias="_lastSeen", default=None)
 
     bin: Optional[object] = None
 
@@ -669,6 +709,7 @@ class Events(BaseModel):
 
 class InvocationMetadata(BaseModel):
     id: str
+    """Unique event ID. Use as the cursor for offset-based pagination."""
 
     account: Optional[str] = None
 
@@ -741,7 +782,7 @@ class InvocationWorkersUnionMember0ScriptVersion(BaseModel):
 
 class InvocationWorkersUnionMember0(BaseModel):
     event_type: Literal[
-        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "unknown"
+        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "workflow", "unknown"
     ] = FieldInfo(alias="eventType")
 
     request_id: str = FieldInfo(alias="requestId")
@@ -752,17 +793,7 @@ class InvocationWorkersUnionMember0(BaseModel):
 
     entrypoint: Optional[str] = None
 
-    event: Optional[
-        Dict[
-            str,
-            Union[
-                str,
-                float,
-                bool,
-                Dict[str, Union[str, float, bool, Dict[str, Union[List[Union[str, float, bool]], str, float, bool]]]],
-            ],
-        ]
-    ] = None
+    event: Optional[Dict[str, object]] = None
 
     execution_model: Optional[Literal["durableObject", "stateless"]] = FieldInfo(alias="executionModel", default=None)
 
@@ -795,7 +826,7 @@ class InvocationWorkersUnionMember1(BaseModel):
     cpu_time_ms: float = FieldInfo(alias="cpuTimeMs")
 
     event_type: Literal[
-        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "unknown"
+        "fetch", "scheduled", "alarm", "cron", "queue", "email", "tail", "rpc", "websocket", "workflow", "unknown"
     ] = FieldInfo(alias="eventType")
 
     outcome: str
@@ -816,7 +847,7 @@ class InvocationWorkersUnionMember1(BaseModel):
 
     entrypoint: Optional[str] = None
 
-    event: Optional[Dict[str, Union[str, float, bool]]] = None
+    event: Optional[Dict[str, object]] = None
 
     execution_model: Optional[Literal["durableObject", "stateless"]] = FieldInfo(alias="executionModel", default=None)
 
@@ -854,40 +885,6 @@ class Invocation(BaseModel):
     """
 
 
-class PatternSeriesDataGroup(BaseModel):
-    key: str
-
-    value: Union[str, float, bool]
-
-
-class PatternSeriesData(BaseModel):
-    count: float
-
-    interval: float
-
-    sample_interval: float = FieldInfo(alias="sampleInterval")
-
-    value: float
-
-    groups: Optional[List[PatternSeriesDataGroup]] = None
-
-
-class PatternSeries(BaseModel):
-    data: PatternSeriesData
-
-    time: str
-
-
-class Pattern(BaseModel):
-    count: float
-
-    pattern: str
-
-    series: List[PatternSeries]
-
-    service: str
-
-
 class Trace(BaseModel):
     root_span_name: str = FieldInfo(alias="rootSpanName")
 
@@ -918,6 +915,8 @@ class TelemetryQueryResponse(BaseModel):
     database, it does not include any network latency
     """
 
+    agents: Optional[List[Agent]] = None
+
     calculations: Optional[List[Calculation]] = None
 
     compare: Optional[List[Compare]] = None
@@ -925,7 +924,5 @@ class TelemetryQueryResponse(BaseModel):
     events: Optional[Events] = None
 
     invocations: Optional[Dict[str, List[Invocation]]] = None
-
-    patterns: Optional[List[Pattern]] = None
 
     traces: Optional[List[Trace]] = None

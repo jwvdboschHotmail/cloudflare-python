@@ -2,12 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Type, Iterable, cast
 
 import httpx
 
 from ..._types import Body, Query, Headers, NotGiven, not_given
-from ..._utils import maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from ..._compat import cached_property
 from ..._resource import SyncAPIResource, AsyncAPIResource
 from ..._response import (
@@ -16,12 +16,9 @@ from ..._response import (
     async_to_raw_response_wrapper,
     async_to_streamed_response_wrapper,
 )
-from ...pagination import SyncSinglePage, AsyncSinglePage
-from ..._base_client import AsyncPaginator, make_request_options
+from ..._wrappers import ResultWrapper
+from ..._base_client import make_request_options
 from ...types.snippets import rule_update_params
-from ...types.snippets.rule_list_response import RuleListResponse
-from ...types.snippets.rule_delete_response import RuleDeleteResponse
-from ...types.snippets.rule_update_response import RuleUpdateResponse
 
 __all__ = ["RulesResource", "AsyncRulesResource"]
 
@@ -49,7 +46,7 @@ class RulesResource(SyncAPIResource):
     def update(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         rules: Iterable[rule_update_params.Rule],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -57,14 +54,14 @@ class RulesResource(SyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncSinglePage[RuleUpdateResponse]:
+    ) -> object:
         """
         Updates all snippet rules belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          rules: A list of snippet rules.
+          rules: Lists snippet rules.
 
           extra_headers: Send extra headers
 
@@ -74,35 +71,39 @@ class RulesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
-        return self._get_api_list(
-            f"/zones/{zone_id}/snippets/snippet_rules",
-            page=SyncSinglePage[RuleUpdateResponse],
+        return self._put(
+            path_template("/zones/{zone_id}/snippets/snippet_rules", zone_id=zone_id),
             body=maybe_transform({"rules": rules}, rule_update_params.RuleUpdateParams),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
             ),
-            model=RuleUpdateResponse,
-            method="put",
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncSinglePage[RuleListResponse]:
+    ) -> object:
         """
         Fetches all snippet rules belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
           extra_headers: Send extra headers
 
@@ -112,33 +113,38 @@ class RulesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
-        return self._get_api_list(
-            f"/zones/{zone_id}/snippets/snippet_rules",
-            page=SyncSinglePage[RuleListResponse],
+        return self._get(
+            path_template("/zones/{zone_id}/snippets/snippet_rules", zone_id=zone_id),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
             ),
-            model=RuleListResponse,
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
     def delete(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> SyncSinglePage[RuleDeleteResponse]:
+    ) -> object:
         """
         Deletes all snippet rules belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
           extra_headers: Send extra headers
 
@@ -148,16 +154,20 @@ class RulesResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
-        return self._get_api_list(
-            f"/zones/{zone_id}/snippets/snippet_rules",
-            page=SyncSinglePage[RuleDeleteResponse],
+        return self._delete(
+            path_template("/zones/{zone_id}/snippets/snippet_rules", zone_id=zone_id),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
             ),
-            model=RuleDeleteResponse,
-            method="delete",
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
 
@@ -181,10 +191,10 @@ class AsyncRulesResource(AsyncAPIResource):
         """
         return AsyncRulesResourceWithStreamingResponse(self)
 
-    def update(
+    async def update(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         rules: Iterable[rule_update_params.Rule],
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -192,14 +202,14 @@ class AsyncRulesResource(AsyncAPIResource):
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[RuleUpdateResponse, AsyncSinglePage[RuleUpdateResponse]]:
+    ) -> object:
         """
         Updates all snippet rules belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
-          rules: A list of snippet rules.
+          rules: Lists snippet rules.
 
           extra_headers: Send extra headers
 
@@ -209,35 +219,39 @@ class AsyncRulesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
-        return self._get_api_list(
-            f"/zones/{zone_id}/snippets/snippet_rules",
-            page=AsyncSinglePage[RuleUpdateResponse],
-            body=maybe_transform({"rules": rules}, rule_update_params.RuleUpdateParams),
+        return await self._put(
+            path_template("/zones/{zone_id}/snippets/snippet_rules", zone_id=zone_id),
+            body=await async_maybe_transform({"rules": rules}, rule_update_params.RuleUpdateParams),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
             ),
-            model=RuleUpdateResponse,
-            method="put",
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
-    def list(
+    async def list(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[RuleListResponse, AsyncSinglePage[RuleListResponse]]:
+    ) -> object:
         """
         Fetches all snippet rules belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
           extra_headers: Send extra headers
 
@@ -247,33 +261,38 @@ class AsyncRulesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
-        return self._get_api_list(
-            f"/zones/{zone_id}/snippets/snippet_rules",
-            page=AsyncSinglePage[RuleListResponse],
+        return await self._get(
+            path_template("/zones/{zone_id}/snippets/snippet_rules", zone_id=zone_id),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
             ),
-            model=RuleListResponse,
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
-    def delete(
+    async def delete(
         self,
         *,
-        zone_id: str,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
         extra_query: Query | None = None,
         extra_body: Body | None = None,
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
-    ) -> AsyncPaginator[RuleDeleteResponse, AsyncSinglePage[RuleDeleteResponse]]:
+    ) -> object:
         """
         Deletes all snippet rules belonging to the zone.
 
         Args:
-          zone_id: The unique ID of the zone.
+          zone_id: Use this field to specify the unique ID of the zone.
 
           extra_headers: Send extra headers
 
@@ -283,16 +302,20 @@ class AsyncRulesResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if not zone_id:
             raise ValueError(f"Expected a non-empty value for `zone_id` but received {zone_id!r}")
-        return self._get_api_list(
-            f"/zones/{zone_id}/snippets/snippet_rules",
-            page=AsyncSinglePage[RuleDeleteResponse],
+        return await self._delete(
+            path_template("/zones/{zone_id}/snippets/snippet_rules", zone_id=zone_id),
             options=make_request_options(
-                extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
+                extra_headers=extra_headers,
+                extra_query=extra_query,
+                extra_body=extra_body,
+                timeout=timeout,
+                post_parser=ResultWrapper[object]._unwrapper,
             ),
-            model=RuleDeleteResponse,
-            method="delete",
+            cast_to=cast(Type[object], ResultWrapper[object]),
         )
 
 

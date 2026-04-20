@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-from typing_extensions import Literal, Required, TypedDict
+from typing_extensions import Literal, TypedDict
 
 __all__ = ["ResourceListParams"]
 
 
 class ResourceListParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account identifier."""
 
     page: int
@@ -19,7 +19,6 @@ class ResourceListParams(TypedDict, total=False):
 
     resource_type: Literal[
         "custom-ruleset",
-        "widget",
         "gateway-policy",
         "gateway-destination-ip",
         "gateway-block-page-settings",

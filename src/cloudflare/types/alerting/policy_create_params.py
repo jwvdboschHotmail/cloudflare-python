@@ -11,7 +11,7 @@ __all__ = ["PolicyCreateParams"]
 
 
 class PolicyCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """The account id"""
 
     alert_type: Required[
@@ -32,6 +32,7 @@ class PolicyCreateParams(TypedDict, total=False):
             "clickhouse_alert_fw_anomaly",
             "clickhouse_alert_fw_ent_anomaly",
             "cloudforce_one_request_notification",
+            "cni_maintenance_notification",
             "custom_analytics",
             "custom_bot_detection_alert",
             "custom_ssl_certificate_event_type",

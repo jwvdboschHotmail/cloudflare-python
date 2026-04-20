@@ -18,7 +18,7 @@ from .top import (
     AsyncTopResourceWithStreamingResponse,
 )
 from ...._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ...._utils import maybe_transform, async_maybe_transform
+from ...._utils import path_template, maybe_transform, async_maybe_transform
 from ...._compat import cached_property
 from ...._resource import SyncAPIResource, AsyncAPIResource
 from ...._response import (
@@ -160,7 +160,7 @@ class NetFlowsResource(SyncAPIResource):
 
     def summary_v2(
         self,
-        dimension: Literal["ADM1", "PRODUCT"],
+        dimension: Literal["ADM1", "AS", "LOCATION", "PRODUCT"],
         *,
         asn: SequenceNotStr[str] | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
@@ -234,7 +234,7 @@ class NetFlowsResource(SyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return self._get(
-            f"/radar/netflows/summary/{dimension}",
+            path_template("/radar/netflows/summary/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -365,7 +365,7 @@ class NetFlowsResource(SyncAPIResource):
 
     def timeseries_groups(
         self,
-        dimension: Literal["ADM1", "PRODUCT"],
+        dimension: Literal["ADM1", "AS", "LOCATION", "PRODUCT"],
         *,
         agg_interval: Literal["15m", "1h", "1d", "1w"] | Omit = omit,
         asn: SequenceNotStr[str] | Omit = omit,
@@ -388,7 +388,7 @@ class NetFlowsResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> NetFlowsTimeseriesGroupsResponse:
         """
-        Retrieves the distribution of NetFlows traffic, grouped by chosen the specified
+        Retrieves the distribution of NetFlows traffic, grouped by the specified
         dimension over time.
 
         Args:
@@ -448,7 +448,7 @@ class NetFlowsResource(SyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return self._get(
-            f"/radar/netflows/timeseries_groups/{dimension}",
+            path_template("/radar/netflows/timeseries_groups/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -595,7 +595,7 @@ class AsyncNetFlowsResource(AsyncAPIResource):
 
     async def summary_v2(
         self,
-        dimension: Literal["ADM1", "PRODUCT"],
+        dimension: Literal["ADM1", "AS", "LOCATION", "PRODUCT"],
         *,
         asn: SequenceNotStr[str] | Omit = omit,
         continent: SequenceNotStr[str] | Omit = omit,
@@ -669,7 +669,7 @@ class AsyncNetFlowsResource(AsyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return await self._get(
-            f"/radar/netflows/summary/{dimension}",
+            path_template("/radar/netflows/summary/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -800,7 +800,7 @@ class AsyncNetFlowsResource(AsyncAPIResource):
 
     async def timeseries_groups(
         self,
-        dimension: Literal["ADM1", "PRODUCT"],
+        dimension: Literal["ADM1", "AS", "LOCATION", "PRODUCT"],
         *,
         agg_interval: Literal["15m", "1h", "1d", "1w"] | Omit = omit,
         asn: SequenceNotStr[str] | Omit = omit,
@@ -823,7 +823,7 @@ class AsyncNetFlowsResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> NetFlowsTimeseriesGroupsResponse:
         """
-        Retrieves the distribution of NetFlows traffic, grouped by chosen the specified
+        Retrieves the distribution of NetFlows traffic, grouped by the specified
         dimension over time.
 
         Args:
@@ -883,7 +883,7 @@ class AsyncNetFlowsResource(AsyncAPIResource):
         if not dimension:
             raise ValueError(f"Expected a non-empty value for `dimension` but received {dimension!r}")
         return await self._get(
-            f"/radar/netflows/timeseries_groups/{dimension}",
+            path_template("/radar/netflows/timeseries_groups/{dimension}", dimension=dimension),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

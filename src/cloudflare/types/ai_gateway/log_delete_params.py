@@ -11,7 +11,7 @@ __all__ = ["LogDeleteParams", "Filter"]
 
 
 class LogDeleteParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     filters: Iterable[Filter]
 
@@ -56,8 +56,6 @@ class Filter(TypedDict, total=False):
             "event_id",
             "metadata.key",
             "metadata.value",
-            "prompts.prompt_id",
-            "prompts.version_id",
             "authentication",
             "wholesale",
             "compatibilityMode",

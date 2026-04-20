@@ -3,16 +3,16 @@
 from __future__ import annotations
 
 from typing import Iterable
-from typing_extensions import Literal, Required, Annotated, TypedDict
+from typing_extensions import Literal, Annotated, TypedDict
 
 from ..._types import SequenceNotStr
 from ..._utils import PropertyInfo
 
-__all__ = ["TokenCreateParams", "AccessRule"]
+__all__ = ["TokenCreateParams", "AccessRule", "Flags"]
 
 
 class TokenCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """The account identifier tag."""
 
     id: str
@@ -41,6 +41,9 @@ class TokenCreateParams(TypedDict, total=False):
     accepted. The maximum time specification is 24 hours from issuing time. If this
     field is not set, the default is one hour after issuing.
     """
+
+    flags: Flags
+    """Optional flags for the signed token."""
 
     nbf: int
     """
@@ -83,3 +86,10 @@ class AccessRule(TypedDict, total=False):
     An `any` type matches all requests and can be used as a wildcard to apply
     default actions after other rules.
     """
+
+
+class Flags(TypedDict, total=False):
+    """Optional flags for the signed token."""
+
+    original: bool
+    """Whether to return the original video without transformations."""

@@ -8,8 +8,14 @@ __all__ = ["WARPConnectorCreateParams"]
 
 
 class WARPConnectorCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Cloudflare account ID"""
 
     name: Required[str]
     """A user-friendly name for a tunnel."""
+
+    ha: bool
+    """Indicates that the tunnel will be created to be highly available.
+
+    If omitted, defaults to false.
+    """

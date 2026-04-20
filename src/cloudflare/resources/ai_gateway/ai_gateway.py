@@ -24,7 +24,7 @@ from .urls import (
     AsyncURLsResourceWithStreamingResponse,
 )
 from ..._types import Body, Omit, Query, Headers, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from .datasets import (
     DatasetsResource,
     AsyncDatasetsResource,
@@ -137,20 +137,23 @@ class AIGatewayResource(SyncAPIResource):
     def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         id: str,
         cache_invalidate_on_update: bool,
         cache_ttl: Optional[int],
         collect_logs: bool,
         rate_limiting_interval: Optional[int],
         rate_limiting_limit: Optional[int],
-        rate_limiting_technique: Literal["fixed", "sliding"],
         authentication: bool | Omit = omit,
-        is_default: bool | Omit = omit,
         log_management: Optional[int] | Omit = omit,
         log_management_strategy: Optional[Literal["STOP_INSERTING", "DELETE_OLDEST"]] | Omit = omit,
         logpush: bool | Omit = omit,
         logpush_public_key: Optional[str] | Omit = omit,
+        rate_limiting_technique: Optional[Literal["fixed", "sliding"]] | Omit = omit,
+        retry_backoff: Optional[Literal["constant", "linear", "exponential"]] | Omit = omit,
+        retry_delay: Optional[int] | Omit = omit,
+        retry_max_attempts: Optional[int] | Omit = omit,
+        workers_ai_billing_mode: Literal["postpaid"] | Omit = omit,
         zdr: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -160,10 +163,19 @@ class AIGatewayResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayCreateResponse:
         """
-        Create a new Gateway
+        Creates a new AI Gateway.
 
         Args:
           id: gateway id
+
+          retry_backoff: Backoff strategy for retry delays
+
+          retry_delay: Delay between retry attempts in milliseconds (0-5000)
+
+          retry_max_attempts: Maximum number of retry attempts for failed requests (1-5)
+
+          workers_ai_billing_mode: Controls how Workers AI inference calls routed through this gateway are billed.
+              Only 'postpaid' is currently supported.
 
           extra_headers: Send extra headers
 
@@ -173,10 +185,12 @@ class AIGatewayResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._post(
-            f"/accounts/{account_id}/ai-gateway/gateways",
+            path_template("/accounts/{account_id}/ai-gateway/gateways", account_id=account_id),
             body=maybe_transform(
                 {
                     "id": id,
@@ -185,13 +199,16 @@ class AIGatewayResource(SyncAPIResource):
                     "collect_logs": collect_logs,
                     "rate_limiting_interval": rate_limiting_interval,
                     "rate_limiting_limit": rate_limiting_limit,
-                    "rate_limiting_technique": rate_limiting_technique,
                     "authentication": authentication,
-                    "is_default": is_default,
                     "log_management": log_management,
                     "log_management_strategy": log_management_strategy,
                     "logpush": logpush,
                     "logpush_public_key": logpush_public_key,
+                    "rate_limiting_technique": rate_limiting_technique,
+                    "retry_backoff": retry_backoff,
+                    "retry_delay": retry_delay,
+                    "retry_max_attempts": retry_max_attempts,
+                    "workers_ai_billing_mode": workers_ai_billing_mode,
                     "zdr": zdr,
                 },
                 ai_gateway_create_params.AIGatewayCreateParams,
@@ -210,23 +227,26 @@ class AIGatewayResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         cache_invalidate_on_update: bool,
         cache_ttl: Optional[int],
         collect_logs: bool,
         rate_limiting_interval: Optional[int],
         rate_limiting_limit: Optional[int],
-        rate_limiting_technique: Literal["fixed", "sliding"],
         authentication: bool | Omit = omit,
         dlp: ai_gateway_update_params.DLP | Omit = omit,
-        is_default: bool | Omit = omit,
         log_management: Optional[int] | Omit = omit,
         log_management_strategy: Optional[Literal["STOP_INSERTING", "DELETE_OLDEST"]] | Omit = omit,
         logpush: bool | Omit = omit,
         logpush_public_key: Optional[str] | Omit = omit,
         otel: Optional[Iterable[ai_gateway_update_params.Otel]] | Omit = omit,
+        rate_limiting_technique: Optional[Literal["fixed", "sliding"]] | Omit = omit,
+        retry_backoff: Optional[Literal["constant", "linear", "exponential"]] | Omit = omit,
+        retry_delay: Optional[int] | Omit = omit,
+        retry_max_attempts: Optional[int] | Omit = omit,
         store_id: Optional[str] | Omit = omit,
         stripe: Optional[ai_gateway_update_params.Stripe] | Omit = omit,
+        workers_ai_billing_mode: Literal["postpaid"] | Omit = omit,
         zdr: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -236,10 +256,19 @@ class AIGatewayResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayUpdateResponse:
         """
-        Update a Gateway
+        Updates an existing AI Gateway dataset.
 
         Args:
           id: gateway id
+
+          retry_backoff: Backoff strategy for retry delays
+
+          retry_delay: Delay between retry attempts in milliseconds (0-5000)
+
+          retry_max_attempts: Maximum number of retry attempts for failed requests (1-5)
+
+          workers_ai_billing_mode: Controls how Workers AI inference calls routed through this gateway are billed.
+              Only 'postpaid' is currently supported.
 
           extra_headers: Send extra headers
 
@@ -249,12 +278,14 @@ class AIGatewayResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._put(
-            f"/accounts/{account_id}/ai-gateway/gateways/{id}",
+            path_template("/accounts/{account_id}/ai-gateway/gateways/{id}", account_id=account_id, id=id),
             body=maybe_transform(
                 {
                     "cache_invalidate_on_update": cache_invalidate_on_update,
@@ -262,17 +293,20 @@ class AIGatewayResource(SyncAPIResource):
                     "collect_logs": collect_logs,
                     "rate_limiting_interval": rate_limiting_interval,
                     "rate_limiting_limit": rate_limiting_limit,
-                    "rate_limiting_technique": rate_limiting_technique,
                     "authentication": authentication,
                     "dlp": dlp,
-                    "is_default": is_default,
                     "log_management": log_management,
                     "log_management_strategy": log_management_strategy,
                     "logpush": logpush,
                     "logpush_public_key": logpush_public_key,
                     "otel": otel,
+                    "rate_limiting_technique": rate_limiting_technique,
+                    "retry_backoff": retry_backoff,
+                    "retry_delay": retry_delay,
+                    "retry_max_attempts": retry_max_attempts,
                     "store_id": store_id,
                     "stripe": stripe,
+                    "workers_ai_billing_mode": workers_ai_billing_mode,
                     "zdr": zdr,
                 },
                 ai_gateway_update_params.AIGatewayUpdateParams,
@@ -290,7 +324,7 @@ class AIGatewayResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         search: str | Omit = omit,
@@ -302,7 +336,7 @@ class AIGatewayResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> SyncV4PagePaginationArray[AIGatewayListResponse]:
         """
-        List Gateways
+        Lists all AI Gateway evaluator types configured for the account.
 
         Args:
           search: Search by id
@@ -315,10 +349,12 @@ class AIGatewayResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/ai-gateway/gateways",
+            path_template("/accounts/{account_id}/ai-gateway/gateways", account_id=account_id),
             page=SyncV4PagePaginationArray[AIGatewayListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -341,7 +377,7 @@ class AIGatewayResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -350,7 +386,7 @@ class AIGatewayResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayDeleteResponse:
         """
-        Delete a Gateway
+        Deletes an AI Gateway dataset.
 
         Args:
           id: gateway id
@@ -363,12 +399,14 @@ class AIGatewayResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._delete(
-            f"/accounts/{account_id}/ai-gateway/gateways/{id}",
+            path_template("/accounts/{account_id}/ai-gateway/gateways/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -383,7 +421,7 @@ class AIGatewayResource(SyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -392,7 +430,7 @@ class AIGatewayResource(SyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayGetResponse:
         """
-        Fetch a Gateway
+        Retrieves details for a specific AI Gateway dataset.
 
         Args:
           id: gateway id
@@ -405,12 +443,14 @@ class AIGatewayResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return self._get(
-            f"/accounts/{account_id}/ai-gateway/gateways/{id}",
+            path_template("/accounts/{account_id}/ai-gateway/gateways/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -473,20 +513,23 @@ class AsyncAIGatewayResource(AsyncAPIResource):
     async def create(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         id: str,
         cache_invalidate_on_update: bool,
         cache_ttl: Optional[int],
         collect_logs: bool,
         rate_limiting_interval: Optional[int],
         rate_limiting_limit: Optional[int],
-        rate_limiting_technique: Literal["fixed", "sliding"],
         authentication: bool | Omit = omit,
-        is_default: bool | Omit = omit,
         log_management: Optional[int] | Omit = omit,
         log_management_strategy: Optional[Literal["STOP_INSERTING", "DELETE_OLDEST"]] | Omit = omit,
         logpush: bool | Omit = omit,
         logpush_public_key: Optional[str] | Omit = omit,
+        rate_limiting_technique: Optional[Literal["fixed", "sliding"]] | Omit = omit,
+        retry_backoff: Optional[Literal["constant", "linear", "exponential"]] | Omit = omit,
+        retry_delay: Optional[int] | Omit = omit,
+        retry_max_attempts: Optional[int] | Omit = omit,
+        workers_ai_billing_mode: Literal["postpaid"] | Omit = omit,
         zdr: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -496,10 +539,19 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayCreateResponse:
         """
-        Create a new Gateway
+        Creates a new AI Gateway.
 
         Args:
           id: gateway id
+
+          retry_backoff: Backoff strategy for retry delays
+
+          retry_delay: Delay between retry attempts in milliseconds (0-5000)
+
+          retry_max_attempts: Maximum number of retry attempts for failed requests (1-5)
+
+          workers_ai_billing_mode: Controls how Workers AI inference calls routed through this gateway are billed.
+              Only 'postpaid' is currently supported.
 
           extra_headers: Send extra headers
 
@@ -509,10 +561,12 @@ class AsyncAIGatewayResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return await self._post(
-            f"/accounts/{account_id}/ai-gateway/gateways",
+            path_template("/accounts/{account_id}/ai-gateway/gateways", account_id=account_id),
             body=await async_maybe_transform(
                 {
                     "id": id,
@@ -521,13 +575,16 @@ class AsyncAIGatewayResource(AsyncAPIResource):
                     "collect_logs": collect_logs,
                     "rate_limiting_interval": rate_limiting_interval,
                     "rate_limiting_limit": rate_limiting_limit,
-                    "rate_limiting_technique": rate_limiting_technique,
                     "authentication": authentication,
-                    "is_default": is_default,
                     "log_management": log_management,
                     "log_management_strategy": log_management_strategy,
                     "logpush": logpush,
                     "logpush_public_key": logpush_public_key,
+                    "rate_limiting_technique": rate_limiting_technique,
+                    "retry_backoff": retry_backoff,
+                    "retry_delay": retry_delay,
+                    "retry_max_attempts": retry_max_attempts,
+                    "workers_ai_billing_mode": workers_ai_billing_mode,
                     "zdr": zdr,
                 },
                 ai_gateway_create_params.AIGatewayCreateParams,
@@ -546,23 +603,26 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         cache_invalidate_on_update: bool,
         cache_ttl: Optional[int],
         collect_logs: bool,
         rate_limiting_interval: Optional[int],
         rate_limiting_limit: Optional[int],
-        rate_limiting_technique: Literal["fixed", "sliding"],
         authentication: bool | Omit = omit,
         dlp: ai_gateway_update_params.DLP | Omit = omit,
-        is_default: bool | Omit = omit,
         log_management: Optional[int] | Omit = omit,
         log_management_strategy: Optional[Literal["STOP_INSERTING", "DELETE_OLDEST"]] | Omit = omit,
         logpush: bool | Omit = omit,
         logpush_public_key: Optional[str] | Omit = omit,
         otel: Optional[Iterable[ai_gateway_update_params.Otel]] | Omit = omit,
+        rate_limiting_technique: Optional[Literal["fixed", "sliding"]] | Omit = omit,
+        retry_backoff: Optional[Literal["constant", "linear", "exponential"]] | Omit = omit,
+        retry_delay: Optional[int] | Omit = omit,
+        retry_max_attempts: Optional[int] | Omit = omit,
         store_id: Optional[str] | Omit = omit,
         stripe: Optional[ai_gateway_update_params.Stripe] | Omit = omit,
+        workers_ai_billing_mode: Literal["postpaid"] | Omit = omit,
         zdr: bool | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -572,10 +632,19 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayUpdateResponse:
         """
-        Update a Gateway
+        Updates an existing AI Gateway dataset.
 
         Args:
           id: gateway id
+
+          retry_backoff: Backoff strategy for retry delays
+
+          retry_delay: Delay between retry attempts in milliseconds (0-5000)
+
+          retry_max_attempts: Maximum number of retry attempts for failed requests (1-5)
+
+          workers_ai_billing_mode: Controls how Workers AI inference calls routed through this gateway are billed.
+              Only 'postpaid' is currently supported.
 
           extra_headers: Send extra headers
 
@@ -585,12 +654,14 @@ class AsyncAIGatewayResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._put(
-            f"/accounts/{account_id}/ai-gateway/gateways/{id}",
+            path_template("/accounts/{account_id}/ai-gateway/gateways/{id}", account_id=account_id, id=id),
             body=await async_maybe_transform(
                 {
                     "cache_invalidate_on_update": cache_invalidate_on_update,
@@ -598,17 +669,20 @@ class AsyncAIGatewayResource(AsyncAPIResource):
                     "collect_logs": collect_logs,
                     "rate_limiting_interval": rate_limiting_interval,
                     "rate_limiting_limit": rate_limiting_limit,
-                    "rate_limiting_technique": rate_limiting_technique,
                     "authentication": authentication,
                     "dlp": dlp,
-                    "is_default": is_default,
                     "log_management": log_management,
                     "log_management_strategy": log_management_strategy,
                     "logpush": logpush,
                     "logpush_public_key": logpush_public_key,
                     "otel": otel,
+                    "rate_limiting_technique": rate_limiting_technique,
+                    "retry_backoff": retry_backoff,
+                    "retry_delay": retry_delay,
+                    "retry_max_attempts": retry_max_attempts,
                     "store_id": store_id,
                     "stripe": stripe,
+                    "workers_ai_billing_mode": workers_ai_billing_mode,
                     "zdr": zdr,
                 },
                 ai_gateway_update_params.AIGatewayUpdateParams,
@@ -626,7 +700,7 @@ class AsyncAIGatewayResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         page: int | Omit = omit,
         per_page: int | Omit = omit,
         search: str | Omit = omit,
@@ -638,7 +712,7 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AsyncPaginator[AIGatewayListResponse, AsyncV4PagePaginationArray[AIGatewayListResponse]]:
         """
-        List Gateways
+        Lists all AI Gateway evaluator types configured for the account.
 
         Args:
           search: Search by id
@@ -651,10 +725,12 @@ class AsyncAIGatewayResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/ai-gateway/gateways",
+            path_template("/accounts/{account_id}/ai-gateway/gateways", account_id=account_id),
             page=AsyncV4PagePaginationArray[AIGatewayListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -677,7 +753,7 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -686,7 +762,7 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayDeleteResponse:
         """
-        Delete a Gateway
+        Deletes an AI Gateway dataset.
 
         Args:
           id: gateway id
@@ -699,12 +775,14 @@ class AsyncAIGatewayResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._delete(
-            f"/accounts/{account_id}/ai-gateway/gateways/{id}",
+            path_template("/accounts/{account_id}/ai-gateway/gateways/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -719,7 +797,7 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         self,
         id: str,
         *,
-        account_id: str,
+        account_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -728,7 +806,7 @@ class AsyncAIGatewayResource(AsyncAPIResource):
         timeout: float | httpx.Timeout | None | NotGiven = not_given,
     ) -> AIGatewayGetResponse:
         """
-        Fetch a Gateway
+        Retrieves details for a specific AI Gateway dataset.
 
         Args:
           id: gateway id
@@ -741,12 +819,14 @@ class AsyncAIGatewayResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         if not id:
             raise ValueError(f"Expected a non-empty value for `id` but received {id!r}")
         return await self._get(
-            f"/accounts/{account_id}/ai-gateway/gateways/{id}",
+            path_template("/accounts/{account_id}/ai-gateway/gateways/{id}", account_id=account_id, id=id),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

@@ -15,7 +15,7 @@ from .rules import (
     AsyncRulesResourceWithStreamingResponse,
 )
 from ..._types import Body, Omit, Query, Headers, NoneType, NotGiven, omit, not_given
-from ..._utils import maybe_transform, async_maybe_transform
+from ..._utils import path_template, maybe_transform, async_maybe_transform
 from .versions import (
     VersionsResource,
     AsyncVersionsResource,
@@ -92,8 +92,8 @@ class RulesetsResource(SyncAPIResource):
         kind: Kind,
         name: str,
         phase: Phase,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         description: str | Omit = omit,
         rules: Iterable[ruleset_create_params.Rule] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -129,6 +129,10 @@ class RulesetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -142,7 +146,11 @@ class RulesetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform(
                 {
                     "kind": kind,
@@ -167,8 +175,8 @@ class RulesetsResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         description: str | Omit = omit,
         kind: Kind | Omit = omit,
         name: str | Omit = omit,
@@ -211,6 +219,10 @@ class RulesetsResource(SyncAPIResource):
         """
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -224,7 +236,12 @@ class RulesetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._put(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=maybe_transform(
                 {
                     "description": description,
@@ -248,8 +265,8 @@ class RulesetsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         cursor: str | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -279,6 +296,10 @@ class RulesetsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -292,7 +313,11 @@ class RulesetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             page=SyncCursorPagination[RulesetListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -314,8 +339,8 @@ class RulesetsResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -343,6 +368,10 @@ class RulesetsResource(SyncAPIResource):
         """
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -357,7 +386,12 @@ class RulesetsResource(SyncAPIResource):
             account_or_zone_id = zone_id
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return self._delete(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -368,8 +402,8 @@ class RulesetsResource(SyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -397,6 +431,10 @@ class RulesetsResource(SyncAPIResource):
         """
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -410,7 +448,12 @@ class RulesetsResource(SyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,
@@ -460,8 +503,8 @@ class AsyncRulesetsResource(AsyncAPIResource):
         kind: Kind,
         name: str,
         phase: Phase,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         description: str | Omit = omit,
         rules: Iterable[ruleset_create_params.Rule] | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -497,6 +540,10 @@ class AsyncRulesetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -510,7 +557,11 @@ class AsyncRulesetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._post(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "kind": kind,
@@ -535,8 +586,8 @@ class AsyncRulesetsResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         description: str | Omit = omit,
         kind: Kind | Omit = omit,
         name: str | Omit = omit,
@@ -579,6 +630,10 @@ class AsyncRulesetsResource(AsyncAPIResource):
         """
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -592,7 +647,12 @@ class AsyncRulesetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._put(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             body=await async_maybe_transform(
                 {
                     "description": description,
@@ -616,8 +676,8 @@ class AsyncRulesetsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         cursor: str | Omit = omit,
         per_page: int | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
@@ -647,6 +707,10 @@ class AsyncRulesetsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -660,7 +724,11 @@ class AsyncRulesetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return self._get_api_list(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets",
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             page=AsyncCursorPagination[RulesetListResponse],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -682,8 +750,8 @@ class AsyncRulesetsResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -711,6 +779,10 @@ class AsyncRulesetsResource(AsyncAPIResource):
         """
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -725,7 +797,12 @@ class AsyncRulesetsResource(AsyncAPIResource):
             account_or_zone_id = zone_id
         extra_headers = {"Accept": "*/*", **(extra_headers or {})}
         return await self._delete(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers, extra_query=extra_query, extra_body=extra_body, timeout=timeout
             ),
@@ -736,8 +813,8 @@ class AsyncRulesetsResource(AsyncAPIResource):
         self,
         ruleset_id: str,
         *,
-        account_id: str | Omit = omit,
-        zone_id: str | Omit = omit,
+        account_id: str | None = None,
+        zone_id: str | None = None,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
         extra_headers: Headers | None = None,
@@ -765,6 +842,10 @@ class AsyncRulesetsResource(AsyncAPIResource):
         """
         if not ruleset_id:
             raise ValueError(f"Expected a non-empty value for `ruleset_id` but received {ruleset_id!r}")
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
+        if zone_id is None:
+            zone_id = self._client._get_zone_id_path_param()
         if account_id and zone_id:
             raise ValueError("You cannot provide both account_id and zone_id")
 
@@ -778,7 +859,12 @@ class AsyncRulesetsResource(AsyncAPIResource):
             account_or_zone = "zones"
             account_or_zone_id = zone_id
         return await self._get(
-            f"/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+            path_template(
+                "/{account_or_zone}/{account_or_zone_id}/rulesets/{ruleset_id}",
+                ruleset_id=ruleset_id,
+                account_or_zone=account_or_zone,
+                account_or_zone_id=account_or_zone_id,
+            ),
             options=make_request_options(
                 extra_headers=extra_headers,
                 extra_query=extra_query,

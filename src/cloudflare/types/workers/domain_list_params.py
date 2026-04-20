@@ -2,26 +2,26 @@
 
 from __future__ import annotations
 
-from typing_extensions import Required, TypedDict
+from typing_extensions import TypedDict
 
 __all__ = ["DomainListParams"]
 
 
 class DomainListParams(TypedDict, total=False):
-    account_id: Required[str]
-    """Identifer of the account."""
+    account_id: str
+    """Identifier."""
 
     environment: str
-    """Worker environment associated with the zone and hostname."""
+    """Worker environment associated with the domain."""
 
     hostname: str
-    """Hostname of the Worker Domain."""
+    """Hostname of the domain."""
 
     service: str
-    """Worker service associated with the zone and hostname."""
+    """Name of the Worker associated with the domain."""
 
     zone_id: str
-    """Identifier of the zone."""
+    """ID of the zone containing the domain hostname."""
 
     zone_name: str
-    """Name of the zone."""
+    """Name of the zone containing the domain hostname."""

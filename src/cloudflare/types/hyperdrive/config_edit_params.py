@@ -15,16 +15,21 @@ __all__ = [
     "OriginHyperdriveHyperdriveDatabase",
     "OriginHyperdriveInternetOrigin",
     "OriginHyperdriveOverAccessOrigin",
+    "OriginHyperdriveVPCServiceOrigin",
 ]
 
 
 class ConfigEditParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Define configurations using a unique string identifier."""
 
     caching: Caching
 
     mtls: MTLS
+    """mTLS configuration for the origin connection.
+
+    Cannot be used with VPC Service origins; TLS must be managed on the VPC Service.
+    """
 
     name: str
     """The name of the Hyperdrive configuration.
@@ -33,11 +38,20 @@ class ConfigEditParams(TypedDict, total=False):
     """
 
     origin: Origin
+    """Connect to a database through a Workers VPC Service.
+
+    TLS settings (mTLS, sslmode) cannot be configured on the Hyperdrive when using a
+    VPC Service origin; TLS must be managed on the VPC Service itself.
+    """
 
     origin_connection_limit: int
     """
     The (soft) maximum number of connections the Hyperdrive is allowed to make to
     the origin database.
+
+    Maximum allowed: 20 for free tier accounts, 100 for paid tier accounts. If not
+    specified, defaults to 20 for free tier and 60 for paid tier. Contact Cloudflare
+    if you need a higher limit.
     """
 
 
@@ -67,6 +81,11 @@ Caching: TypeAlias = Union[CachingHyperdriveHyperdriveCachingCommon, CachingHype
 
 
 class MTLS(TypedDict, total=False):
+    """mTLS configuration for the origin connection.
+
+    Cannot be used with VPC Service origins; TLS must be managed on the VPC Service.
+    """
+
     ca_certificate_id: str
     """Define CA certificate ID obtained after uploading CA cert."""
 
@@ -122,6 +141,23 @@ class OriginHyperdriveOverAccessOrigin(TypedDict, total=False):
     """Defines the host (hostname or IP) of your origin database."""
 
 
+class OriginHyperdriveVPCServiceOrigin(TypedDict, total=False):
+    """Connect to a database through a Workers VPC Service.
+
+    TLS settings (mTLS, sslmode) cannot be configured on the Hyperdrive when using a VPC Service origin; TLS must be managed on the VPC Service itself.
+    """
+
+    service_id: Required[str]
+    """The identifier of the Workers VPC Service to connect through.
+
+    Hyperdrive will egress through the specified VPC Service to reach the origin
+    database.
+    """
+
+
 Origin: TypeAlias = Union[
-    OriginHyperdriveHyperdriveDatabase, OriginHyperdriveInternetOrigin, OriginHyperdriveOverAccessOrigin
+    OriginHyperdriveHyperdriveDatabase,
+    OriginHyperdriveInternetOrigin,
+    OriginHyperdriveOverAccessOrigin,
+    OriginHyperdriveVPCServiceOrigin,
 ]

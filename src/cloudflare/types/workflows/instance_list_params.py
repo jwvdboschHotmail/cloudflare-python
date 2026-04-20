@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from typing import Union
 from datetime import datetime
-from typing_extensions import Literal, Required, Annotated, TypedDict
+from typing_extensions import Literal, Annotated, TypedDict
 
 from ..._utils import PropertyInfo
 
@@ -12,10 +12,10 @@ __all__ = ["InstanceListParams"]
 
 
 class InstanceListParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     cursor: str
-    """`page` and `cursor` are mutually exclusive, use one or the other."""
+    """Opaque token for cursor-based pagination. Mutually exclusive with `page`."""
 
     date_end: Annotated[Union[str, datetime], PropertyInfo(format="iso8601")]
     """Accepts ISO 8601 with no timezone offsets and in UTC."""
@@ -24,13 +24,10 @@ class InstanceListParams(TypedDict, total=False):
     """Accepts ISO 8601 with no timezone offsets and in UTC."""
 
     direction: Literal["asc", "desc"]
-    """
-    should only be used when `cursor` is used, defines a new direction for the
-    cursor
-    """
+    """Defines the direction for cursor-based pagination."""
 
     page: float
-    """`page` and `cursor` are mutually exclusive, use one or the other."""
+    """Deprecated: use `cursor` for pagination instead."""
 
     per_page: float
 

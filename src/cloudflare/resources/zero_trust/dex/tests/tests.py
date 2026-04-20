@@ -8,7 +8,7 @@ from typing_extensions import Literal
 import httpx
 
 from ....._types import Body, Omit, Query, Headers, NotGiven, SequenceNotStr, omit, not_given
-from ....._utils import maybe_transform
+from ....._utils import path_template, maybe_transform
 from ....._compat import cached_property
 from ....._resource import SyncAPIResource, AsyncAPIResource
 from ....._response import (
@@ -62,12 +62,13 @@ class TestsResource(SyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         colo: str | Omit = omit,
         device_id: SequenceNotStr[str] | Omit = omit,
         kind: Literal["http", "traceroute"] | Omit = omit,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
+        registration_id: str | Omit = omit,
         test_name: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -92,6 +93,9 @@ class TestsResource(SyncAPIResource):
 
           per_page: Number of items per page
 
+          registration_id: Optionally filter results to a specific device registration. Must be used in
+              combination with a single deviceId.
+
           test_name: Optionally filter results by test name
 
           extra_headers: Send extra headers
@@ -102,10 +106,12 @@ class TestsResource(SyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/dex/tests/overview",
+            path_template("/accounts/{account_id}/dex/tests/overview", account_id=account_id),
             page=SyncV4PagePagination[Optional[Tests]],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -119,6 +125,7 @@ class TestsResource(SyncAPIResource):
                         "kind": kind,
                         "page": page,
                         "per_page": per_page,
+                        "registration_id": registration_id,
                         "test_name": test_name,
                     },
                     test_list_params.TestListParams,
@@ -155,12 +162,13 @@ class AsyncTestsResource(AsyncAPIResource):
     def list(
         self,
         *,
-        account_id: str,
+        account_id: str | None = None,
         colo: str | Omit = omit,
         device_id: SequenceNotStr[str] | Omit = omit,
         kind: Literal["http", "traceroute"] | Omit = omit,
         page: float | Omit = omit,
         per_page: float | Omit = omit,
+        registration_id: str | Omit = omit,
         test_name: str | Omit = omit,
         # Use the following arguments if you need to pass additional parameters to the API that aren't available via kwargs.
         # The extra values given here take precedence over values defined on the client or passed to this method.
@@ -185,6 +193,9 @@ class AsyncTestsResource(AsyncAPIResource):
 
           per_page: Number of items per page
 
+          registration_id: Optionally filter results to a specific device registration. Must be used in
+              combination with a single deviceId.
+
           test_name: Optionally filter results by test name
 
           extra_headers: Send extra headers
@@ -195,10 +206,12 @@ class AsyncTestsResource(AsyncAPIResource):
 
           timeout: Override the client-level default timeout for this request, in seconds
         """
+        if account_id is None:
+            account_id = self._client._get_account_id_path_param()
         if not account_id:
             raise ValueError(f"Expected a non-empty value for `account_id` but received {account_id!r}")
         return self._get_api_list(
-            f"/accounts/{account_id}/dex/tests/overview",
+            path_template("/accounts/{account_id}/dex/tests/overview", account_id=account_id),
             page=AsyncV4PagePagination[Optional[Tests]],
             options=make_request_options(
                 extra_headers=extra_headers,
@@ -212,6 +225,7 @@ class AsyncTestsResource(AsyncAPIResource):
                         "kind": kind,
                         "page": page,
                         "per_page": per_page,
+                        "registration_id": registration_id,
                         "test_name": test_name,
                     },
                     test_list_params.TestListParams,

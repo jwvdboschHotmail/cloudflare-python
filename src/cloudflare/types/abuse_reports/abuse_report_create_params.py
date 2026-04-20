@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Union
+from typing import List, Union
 from typing_extensions import Literal, Required, TypeAlias, TypedDict
 
 __all__ = [
@@ -14,12 +14,13 @@ __all__ = [
     "AbuseReportsCsamReport",
     "AbuseReportsThreatReport",
     "AbuseReportsRegistrarWhoisReport",
+    "AbuseReportsRegistrarWhoisReportRegWhoRequest",
     "AbuseReportsNcseiReport",
 ]
 
 
 class AbuseReportsDmcaReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_dmca"]]
     """The report type for submitted reports."""
@@ -141,7 +142,7 @@ class AbuseReportsDmcaReport(TypedDict, total=False):
 
 
 class AbuseReportsTrademarkReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_trademark"]]
     """The report type for submitted reports."""
@@ -227,7 +228,7 @@ class AbuseReportsTrademarkReport(TypedDict, total=False):
 
 
 class AbuseReportsGeneralReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_general"]]
     """The report type for submitted reports."""
@@ -262,7 +263,7 @@ class AbuseReportsGeneralReport(TypedDict, total=False):
     Database (https://lumendatabase.org/).
     """
 
-    owner_notification: Required[Literal["send", "send-anon", "none"]]
+    owner_notification: Required[Literal["send", "send-anon"]]
     """Notification type based on the abuse type.
 
     NOTE: Copyright (DMCA) and Trademark reports cannot be anonymous.
@@ -326,7 +327,7 @@ class AbuseReportsGeneralReport(TypedDict, total=False):
 
 
 class AbuseReportsPhishingReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_phishing"]]
     """The report type for submitted reports."""
@@ -410,7 +411,7 @@ class AbuseReportsPhishingReport(TypedDict, total=False):
 
 
 class AbuseReportsCsamReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_children"]]
     """The report type for submitted reports."""
@@ -500,7 +501,7 @@ class AbuseReportsCsamReport(TypedDict, total=False):
 
 
 class AbuseReportsThreatReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_threat"]]
     """The report type for submitted reports."""
@@ -577,7 +578,7 @@ class AbuseReportsThreatReport(TypedDict, total=False):
 
 
 class AbuseReportsRegistrarWhoisReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_registrar_whois"]]
     """The report type for submitted reports."""
@@ -623,6 +624,9 @@ class AbuseReportsRegistrarWhoisReport(TypedDict, total=False):
     Database (https://lumendatabase.org/).
     """
 
+    reg_who_request: AbuseReportsRegistrarWhoisReportRegWhoRequest
+    """RDP-mandated fields for registrar WHOIS data disclosure requests."""
+
     reported_country: str
     """Text containing 2 characters"""
 
@@ -640,8 +644,64 @@ class AbuseReportsRegistrarWhoisReport(TypedDict, total=False):
     """Text not exceeding 255 characters"""
 
 
+class AbuseReportsRegistrarWhoisReportRegWhoRequest(TypedDict, total=False):
+    """RDP-mandated fields for registrar WHOIS data disclosure requests."""
+
+    reg_who_good_faith_affirmation: Required[bool]
+    """Affirmation that the request is made in good faith per RDP 10.2.4.
+
+    Must be true.
+    """
+
+    reg_who_lawful_processing_agreement: Required[bool]
+    """Agreement to process data lawfully per RDP 10.2.5. Must be true."""
+
+    reg_who_legal_basis: Required[str]
+    """Legal rights and rationale for the request per RDP 10.2.3.
+
+    Required for all WHOIS requests.
+    """
+
+    reg_who_request_type: Required[Literal["disclosure", "invalid_whois"]]
+    """The type of WHOIS data request per RDP procedure."""
+
+    reg_who_requested_data_elements: Required[
+        List[
+            Literal[
+                "registrant_name",
+                "registrant_organization",
+                "registrant_email",
+                "registrant_phone",
+                "registrant_address",
+                "registrant_address_country",
+                "registrant_address_postal_code",
+                "admin_name",
+                "admin_organization",
+                "admin_email",
+                "admin_phone",
+                "admin_address",
+                "tech_name",
+                "tech_organization",
+                "tech_email",
+                "tech_phone",
+                "tech_address",
+            ]
+        ]
+    ]
+    """The specific WHOIS data elements being requested per RDP 10.2.2.
+
+    Required for all WHOIS requests.
+    """
+
+    reg_who_authorization_statement: str
+    """Optional authorization statement or power of attorney per RDP 10.2.1.3."""
+
+    reg_who_requestor_type: Literal["government", "corporation", "individual"]
+    """The nature of the requestor per RDP 10.2.1.2."""
+
+
 class AbuseReportsNcseiReport(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
 
     act: Required[Literal["abuse_ncsei"]]
     """The report type for submitted reports."""

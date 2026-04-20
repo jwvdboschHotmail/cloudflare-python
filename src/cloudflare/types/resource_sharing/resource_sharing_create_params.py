@@ -9,7 +9,7 @@ __all__ = ["ResourceSharingCreateParams", "Recipient", "Resource"]
 
 
 class ResourceSharingCreateParams(TypedDict, total=False):
-    account_id: Required[str]
+    account_id: str
     """Account identifier."""
 
     name: Required[str]
@@ -43,7 +43,6 @@ class Resource(TypedDict, total=False):
     resource_type: Required[
         Literal[
             "custom-ruleset",
-            "widget",
             "gateway-policy",
             "gateway-destination-ip",
             "gateway-block-page-settings",

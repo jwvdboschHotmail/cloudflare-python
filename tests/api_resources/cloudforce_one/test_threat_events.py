@@ -15,7 +15,6 @@ from cloudflare.types.cloudforce_one import (
     ThreatEventEditResponse,
     ThreatEventListResponse,
     ThreatEventCreateResponse,
-    ThreatEventDeleteResponse,
     ThreatEventBulkCreateResponse,
 )
 
@@ -189,58 +188,6 @@ class TestThreatEvents:
 
     @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
     @parametrize
-    def test_method_delete(self, client: Cloudflare) -> None:
-        threat_event = client.cloudforce_one.threat_events.delete(
-            event_id="event_id",
-            account_id="account_id",
-        )
-        assert_matches_type(ThreatEventDeleteResponse, threat_event, path=["response"])
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
-    def test_raw_response_delete(self, client: Cloudflare) -> None:
-        response = client.cloudforce_one.threat_events.with_raw_response.delete(
-            event_id="event_id",
-            account_id="account_id",
-        )
-
-        assert response.is_closed is True
-        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
-        threat_event = response.parse()
-        assert_matches_type(ThreatEventDeleteResponse, threat_event, path=["response"])
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
-    def test_streaming_response_delete(self, client: Cloudflare) -> None:
-        with client.cloudforce_one.threat_events.with_streaming_response.delete(
-            event_id="event_id",
-            account_id="account_id",
-        ) as response:
-            assert not response.is_closed
-            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
-
-            threat_event = response.parse()
-            assert_matches_type(ThreatEventDeleteResponse, threat_event, path=["response"])
-
-        assert cast(Any, response.is_closed) is True
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
-    def test_path_params_delete(self, client: Cloudflare) -> None:
-        with pytest.raises(ValueError, match=r"Expected a non-empty value for `account_id` but received ''"):
-            client.cloudforce_one.threat_events.with_raw_response.delete(
-                event_id="event_id",
-                account_id="",
-            )
-
-        with pytest.raises(ValueError, match=r"Expected a non-empty value for `event_id` but received ''"):
-            client.cloudforce_one.threat_events.with_raw_response.delete(
-                event_id="",
-                account_id="account_id",
-            )
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
     def test_method_bulk_create(self, client: Cloudflare) -> None:
         threat_event = client.cloudforce_one.threat_events.bulk_create(
             account_id="account_id",
@@ -366,6 +313,7 @@ class TestThreatEvents:
         threat_event = client.cloudforce_one.threat_events.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
         )
         assert_matches_type(ThreatEventEditResponse, threat_event, path=["response"])
 
@@ -375,11 +323,11 @@ class TestThreatEvents:
         threat_event = client.cloudforce_one.threat_events.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             attacker="Flying Yeti",
             attacker_country="CN",
             category="Domain Resolution",
             created_at=parse_datetime("2025-12-19T00:00:00Z"),
-            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             date=parse_datetime("2022-04-01T00:00:00Z"),
             event="An attacker registered the domain domain.com",
             indicator="domain2.com",
@@ -402,6 +350,7 @@ class TestThreatEvents:
         response = client.cloudforce_one.threat_events.with_raw_response.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
         )
 
         assert response.is_closed is True
@@ -415,6 +364,7 @@ class TestThreatEvents:
         with client.cloudforce_one.threat_events.with_streaming_response.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -431,12 +381,14 @@ class TestThreatEvents:
             client.cloudforce_one.threat_events.with_raw_response.edit(
                 event_id="event_id",
                 account_id="",
+                dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             )
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `event_id` but received ''"):
             client.cloudforce_one.threat_events.with_raw_response.edit(
                 event_id="",
                 account_id="account_id",
+                dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             )
 
     @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
@@ -664,58 +616,6 @@ class TestAsyncThreatEvents:
 
     @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
     @parametrize
-    async def test_method_delete(self, async_client: AsyncCloudflare) -> None:
-        threat_event = await async_client.cloudforce_one.threat_events.delete(
-            event_id="event_id",
-            account_id="account_id",
-        )
-        assert_matches_type(ThreatEventDeleteResponse, threat_event, path=["response"])
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
-    async def test_raw_response_delete(self, async_client: AsyncCloudflare) -> None:
-        response = await async_client.cloudforce_one.threat_events.with_raw_response.delete(
-            event_id="event_id",
-            account_id="account_id",
-        )
-
-        assert response.is_closed is True
-        assert response.http_request.headers.get("X-Stainless-Lang") == "python"
-        threat_event = await response.parse()
-        assert_matches_type(ThreatEventDeleteResponse, threat_event, path=["response"])
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
-    async def test_streaming_response_delete(self, async_client: AsyncCloudflare) -> None:
-        async with async_client.cloudforce_one.threat_events.with_streaming_response.delete(
-            event_id="event_id",
-            account_id="account_id",
-        ) as response:
-            assert not response.is_closed
-            assert response.http_request.headers.get("X-Stainless-Lang") == "python"
-
-            threat_event = await response.parse()
-            assert_matches_type(ThreatEventDeleteResponse, threat_event, path=["response"])
-
-        assert cast(Any, response.is_closed) is True
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
-    async def test_path_params_delete(self, async_client: AsyncCloudflare) -> None:
-        with pytest.raises(ValueError, match=r"Expected a non-empty value for `account_id` but received ''"):
-            await async_client.cloudforce_one.threat_events.with_raw_response.delete(
-                event_id="event_id",
-                account_id="",
-            )
-
-        with pytest.raises(ValueError, match=r"Expected a non-empty value for `event_id` but received ''"):
-            await async_client.cloudforce_one.threat_events.with_raw_response.delete(
-                event_id="",
-                account_id="account_id",
-            )
-
-    @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
-    @parametrize
     async def test_method_bulk_create(self, async_client: AsyncCloudflare) -> None:
         threat_event = await async_client.cloudforce_one.threat_events.bulk_create(
             account_id="account_id",
@@ -841,6 +741,7 @@ class TestAsyncThreatEvents:
         threat_event = await async_client.cloudforce_one.threat_events.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
         )
         assert_matches_type(ThreatEventEditResponse, threat_event, path=["response"])
 
@@ -850,11 +751,11 @@ class TestAsyncThreatEvents:
         threat_event = await async_client.cloudforce_one.threat_events.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             attacker="Flying Yeti",
             attacker_country="CN",
             category="Domain Resolution",
             created_at=parse_datetime("2025-12-19T00:00:00Z"),
-            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             date=parse_datetime("2022-04-01T00:00:00Z"),
             event="An attacker registered the domain domain.com",
             indicator="domain2.com",
@@ -877,6 +778,7 @@ class TestAsyncThreatEvents:
         response = await async_client.cloudforce_one.threat_events.with_raw_response.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
         )
 
         assert response.is_closed is True
@@ -890,6 +792,7 @@ class TestAsyncThreatEvents:
         async with async_client.cloudforce_one.threat_events.with_streaming_response.edit(
             event_id="event_id",
             account_id="account_id",
+            dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
         ) as response:
             assert not response.is_closed
             assert response.http_request.headers.get("X-Stainless-Lang") == "python"
@@ -906,12 +809,14 @@ class TestAsyncThreatEvents:
             await async_client.cloudforce_one.threat_events.with_raw_response.edit(
                 event_id="event_id",
                 account_id="",
+                dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             )
 
         with pytest.raises(ValueError, match=r"Expected a non-empty value for `event_id` but received ''"):
             await async_client.cloudforce_one.threat_events.with_raw_response.edit(
                 event_id="",
                 account_id="account_id",
+                dataset_id="9b769969-a211-466c-8ac3-cb91266a066a",
             )
 
     @pytest.mark.skip(reason="TODO: HTTP 401 from prism")
