@@ -858,6 +858,7 @@ if PYDANTIC_V2:
     CustomProfileEntryIntegrationEntry.model_rebuild()
     CustomProfileEntryExactDataEntry.model_rebuild()
     CustomProfileEntryWordListEntry.model_rebuild()
+    CustomProfileSharedEntryCustomEntry.model_rebuild()
     PredefinedProfile.model_rebuild()
     PredefinedProfileEntryCustomEntry.model_rebuild()
     PredefinedProfileEntryPredefinedEntry.model_rebuild()
@@ -872,6 +873,7 @@ if PYDANTIC_V2:
     IntegrationProfileEntryIntegrationEntry.model_rebuild()
     IntegrationProfileEntryExactDataEntry.model_rebuild()
     IntegrationProfileEntryWordListEntry.model_rebuild()
+    IntegrationProfileSharedEntryCustomEntry.model_rebuild()
 else:
     CustomProfile.update_forward_refs()  # type: ignore
     CustomProfileEntryCustomEntry.update_forward_refs()  # type: ignore
@@ -880,6 +882,7 @@ else:
     CustomProfileEntryIntegrationEntry.update_forward_refs()  # type: ignore
     CustomProfileEntryExactDataEntry.update_forward_refs()  # type: ignore
     CustomProfileEntryWordListEntry.update_forward_refs()  # type: ignore
+    CustomProfileSharedEntryCustomEntry.update_forward_refs()  # type: ignore
     PredefinedProfile.update_forward_refs()  # type: ignore
     PredefinedProfileEntryCustomEntry.update_forward_refs()  # type: ignore
     PredefinedProfileEntryPredefinedEntry.update_forward_refs()  # type: ignore
@@ -894,3 +897,4 @@ else:
     IntegrationProfileEntryIntegrationEntry.update_forward_refs()  # type: ignore
     IntegrationProfileEntryExactDataEntry.update_forward_refs()  # type: ignore
     IntegrationProfileEntryWordListEntry.update_forward_refs()  # type: ignore
+    IntegrationProfileSharedEntryCustomEntry.update_forward_refs()  # type: ignore
